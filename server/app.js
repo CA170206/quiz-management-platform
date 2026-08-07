@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import authMiddleware from "./middleware/authMiddleware.js";
 
 const app = express();
 
@@ -12,6 +13,12 @@ app.use("/api/auth", authRoutes);
 app.get("/", (req, res) => {
     res.json({
         message: "Quiz Management Backend Running 🚀"
+    });
+});
+
+app.get("/api/test", authMiddleware, (req, res) => {
+    res.json({
+        message: "Protected Route Accessed"
     });
 });
 
