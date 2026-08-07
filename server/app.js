@@ -18,7 +18,8 @@ app.get("/", (req, res) => {
 
 app.get("/api/test", authMiddleware, (req, res) => {
     res.json({
-        message: "Protected Route Accessed"
+        message: "Protected Route Accessed",
+        user: req.user
     });
 });
 
