@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import Questions from "../pages/admin/Questions";
 import Categories from "../pages/admin/Categories";
 
 function AppRoutes() {
@@ -11,6 +11,11 @@ function AppRoutes() {
                 <Route
                     path="/admin/categories"
                     element={<Categories />}
+                />
+
+                <Route
+                    path="/admin/questions"
+                    element={<Questions />}
                 />
             </Routes>
         </BrowserRouter>
