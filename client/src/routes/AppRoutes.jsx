@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Questions from "../pages/admin/Questions";
 import Categories from "../pages/admin/Categories";
+import Quizzes from "../pages/admin/Quizzes";
 
 function AppRoutes() {
     return (
@@ -16,6 +17,11 @@ function AppRoutes() {
                 <Route
                     path="/admin/questions"
                     element={<Questions />}
+                />
+                
+                <Route
+                    path="/admin/quizzes"
+                    element={<Quizzes />}
                 />
             </Routes>
         </BrowserRouter>
