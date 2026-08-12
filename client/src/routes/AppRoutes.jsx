@@ -8,6 +8,7 @@ import AttemptQuiz from "../pages/student/AttemptQuiz";
 import Results from "../pages/student/Results";
 import Leaderboard from "../pages/student/Leaderboard";
 import Dashboard from "../pages/student/Dashboard";
+import AdminDashboard from "../pages/admin/Dashboard";
 
 function AppRoutes() {
     return (
@@ -58,6 +59,11 @@ function AppRoutes() {
                 <Route
                     path="/student/dashboard"
                     element={<Dashboard />}
+                />
+
+                <Route
+                    path="/admin/dashboard"
+                    element={<AdminDashboard />}
                 />
             </Routes>
         </BrowserRouter>
