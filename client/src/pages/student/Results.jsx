@@ -81,6 +81,41 @@ function Results() {
                     : "Failed"}
             </p>
 
+            <hr />
+
+            <h2>Answer Review</h2>
+
+            {result.answers.map((answer, index) => (
+                <div key={answer.question_id}>
+                    <h3>
+                        Question {index + 1}
+                    </h3>
+
+                    <p>
+                        {answer.question_text}
+                    </p>
+
+                    <p>
+                        Your Answer:{" "}
+                        {answer.selected_answer ||
+                            "Not Answered"}
+                    </p>
+
+                    <p>
+                        Correct Answer:{" "}
+                        {answer.correct_answer}
+                    </p>
+
+                    <p>
+                        {answer.is_correct
+                            ? "Correct"
+                            : "Incorrect"}
+                    </p>
+
+                    <hr />
+                </div>
+            ))}
+
             <button
                 onClick={() =>
                     navigate("/student/quizzes")

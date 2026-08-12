@@ -50,10 +50,12 @@ export const submitQuiz = async (req, res) => {
 
         const totalQuestions = questions.length;
         const score = correctAnswers;
+
         const percentage =
             (correctAnswers / totalQuestions) * 100;
 
-        const result = await pool.query(
+        // Create attempt
+        const attemptResult = await pool.query(
             `INSERT INTO attempts
             (
                 user_id,
@@ -81,9 +83,37 @@ export const submitQuiz = async (req, res) => {
             ]
         );
 
+        const attempt = attemptResult.rows[0];
+
+        // Save individual answers
+        for (const question of questions) {
+            const selectedAnswer = answers[question.id] || null;
+
+            const isCorrect =
+                selectedAnswer !== null &&
+                selectedAnswer === question.correct_answer;
+
+            await pool.query(
+                `INSERT INTO answers
+                (
+                    attempt_id,
+                    question_id,
+                    selected_answer,
+                    is_correct
+                )
+                VALUES ($1, $2, $3, $4)`,
+                [
+                    attempt.id,
+                    question.id,
+                    selectedAnswer,
+                    isCorrect
+                ]
+            );
+        }
+
         res.status(201).json({
             message: "Quiz submitted successfully",
-            attempt: result.rows[0]
+            attempt
         });
 
     } catch (error) {
@@ -116,7 +146,27 @@ export const getAttemptById = async (req, res) => {
             });
         }
 
-        res.json(result.rows[0]);
+        const attempt = result.rows[0];
+
+        const answersResult = await pool.query(
+            `SELECT
+                answers.question_id,
+                answers.selected_answer,
+                answers.is_correct,
+                questions.question_text,
+                questions.correct_answer
+             FROM answers
+             JOIN questions
+             ON answers.question_id = questions.id
+             WHERE answers.attempt_id = $1
+             ORDER BY answers.question_id`,
+            [id]
+        );
+
+        res.json({
+            ...attempt,
+            answers: answersResult.rows
+        });
 
     } catch (error) {
         console.error(error);
