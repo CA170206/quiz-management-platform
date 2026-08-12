@@ -176,3 +176,30 @@ export const getAttemptById = async (req, res) => {
         });
     }
 };
+
+export const getLeaderboard = async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT
+                users.id AS user_id,
+                users.full_name,
+                MAX(attempts.score) AS best_score,
+                MAX(attempts.percentage) AS best_percentage,
+                COUNT(attempts.id) AS attempts
+             FROM attempts
+             JOIN users
+             ON attempts.user_id = users.id
+             GROUP BY users.id, users.full_name
+             ORDER BY best_percentage DESC, best_score DESC`
+        );
+
+        res.json(result.rows);
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: "Failed to fetch leaderboard"
+        });
+    }
+};

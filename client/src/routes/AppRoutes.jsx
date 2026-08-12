@@ -6,6 +6,7 @@ import QuizList from "../pages/student/QuizList";
 import QuizDetails from "../pages/student/QuizDetails";
 import AttemptQuiz from "../pages/student/AttemptQuiz";
 import Results from "../pages/student/Results";
+import Leaderboard from "../pages/student/Leaderboard";
 
 function AppRoutes() {
     return (
@@ -47,9 +48,13 @@ function AppRoutes() {
                     path="/student/results/:id"
                     element={<Results />}
                 />
+
+                <Route
+                    path="/student/leaderboard"
+                    element={<Leaderboard />}
+                />
             </Routes>
         </BrowserRouter>
     );
 }
-
 export default AppRoutes;
