@@ -2,6 +2,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Questions from "../pages/admin/Questions";
 import Categories from "../pages/admin/Categories";
 import Quizzes from "../pages/admin/Quizzes";
+import QuizList from "../pages/student/QuizList";
+import QuizDetails from "../pages/student/QuizDetails";
+import AttemptQuiz from "../pages/student/AttemptQuiz";
+import Results from "../pages/student/Results";
 
 function AppRoutes() {
     return (
@@ -22,6 +26,26 @@ function AppRoutes() {
                 <Route
                     path="/admin/quizzes"
                     element={<Quizzes />}
+                />
+
+                <Route
+                    path="/student/quizzes"
+                    element={<QuizList />}
+                />
+
+                <Route
+                    path="/student/quizzes/:id"
+                    element={<QuizDetails />}
+                />
+
+                <Route
+                    path="/student/quizzes/:id/attempt"
+                    element={<AttemptQuiz />}
+                />
+
+                <Route
+                    path="/student/results/:id"
+                    element={<Results />}
                 />
             </Routes>
         </BrowserRouter>

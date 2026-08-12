@@ -108,3 +108,39 @@ export const deleteQuiz = async (req, res) => {
         quiz: result.rows[0]
     });
 };
+
+
+export const getQuizById = async (req, res) => {
+    const { id } = req.params;
+
+    const result = await pool.query(
+        "SELECT * FROM quizzes WHERE id = $1",
+        [id]
+    );
+
+    if (result.rows.length === 0) {
+        return res.status(404).json({
+            message: "Quiz not found"
+        });
+    }
+
+    res.json(result.rows[0]);
+};
+
+export const getQuestionsByQuiz = async (req, res) => {
+    const { quizId } = req.params;
+
+    const result = await pool.query(
+        `SELECT *
+         FROM questions
+         WHERE category_id = (
+             SELECT category_id
+             FROM quizzes
+             WHERE id = $1
+         )
+         ORDER BY id`,
+        [quizId]
+    );
+
+    res.json(result.rows);
+};

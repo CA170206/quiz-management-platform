@@ -139,3 +139,21 @@ export const deleteQuestion = async (req, res) => {
         question: result.rows[0]
     });
 };
+
+export const getQuestionsByQuiz = async (req, res) => {
+    const { quizId } = req.params;
+
+    const result = await pool.query(
+        `SELECT *
+         FROM questions
+         WHERE category_id = (
+             SELECT category_id
+             FROM quizzes
+             WHERE id = $1
+         )
+         ORDER BY id`,
+        [quizId]
+    );
+
+    res.json(result.rows);
+};
