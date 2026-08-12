@@ -21,7 +21,10 @@ function Questions() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // Fetch questions
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+
     const fetchQuestions = async () => {
         try {
             setLoading(true);
@@ -42,7 +45,6 @@ function Questions() {
         }
     };
 
-    // Fetch categories
     const fetchCategories = async () => {
         try {
             const response = await fetch(CATEGORY_API_URL);
@@ -63,7 +65,6 @@ function Questions() {
         fetchCategories();
     }, []);
 
-    // Handle input changes
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -71,12 +72,16 @@ function Questions() {
         });
     };
 
-    // Add / Update question
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
             setError("");
+
+            if (!formData.category_id) {
+                setError("Please select a category.");
+                return;
+            }
 
             const url = editingId
                 ? `${API_URL}/${editingId}`
@@ -91,7 +96,9 @@ function Questions() {
                 },
                 body: JSON.stringify({
                     ...formData,
-                    category_id: Number(formData.category_id),
+                    category_id: Number(
+                        formData.category_id
+                    ),
                 }),
             });
 
@@ -110,7 +117,6 @@ function Questions() {
         }
     };
 
-    // Edit question
     const handleEdit = (question) => {
         setEditingId(question.id);
 
@@ -123,40 +129,63 @@ function Questions() {
             option_d: question.option_d,
             correct_answer: question.correct_answer,
         });
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
     };
 
-    // Delete question
-    const handleDelete = async (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this question?"
-        );
+    const openDeleteModal = (id) => {
+        setDeleteId(id);
+        setShowDeleteModal(true);
+    };
 
-        if (!confirmed) {
+    const closeDeleteModal = () => {
+        if (deleting) {
+            return;
+        }
+
+        setDeleteId(null);
+        setShowDeleteModal(false);
+    };
+
+    const handleDelete = async () => {
+        if (!deleteId) {
             return;
         }
 
         try {
+            setDeleting(true);
             setError("");
 
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: "DELETE",
-            });
+            const response = await fetch(
+                `${API_URL}/${deleteId}`,
+                {
+                    method: "DELETE",
+                }
+            );
 
             const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.message || "Failed to delete question"
+                    data.message ||
+                        "Failed to delete question"
                 );
             }
+
+            setDeleteId(null);
+            setShowDeleteModal(false);
 
             fetchQuestions();
         } catch (err) {
             setError(err.message);
+        } finally {
+            setDeleting(false);
         }
     };
 
-    // Reset form
     const resetForm = () => {
         setEditingId(null);
 
@@ -171,176 +200,437 @@ function Questions() {
         });
     };
 
+    const getCategoryName = (categoryId) => {
+        const category = categories.find(
+            (item) => item.id === categoryId
+        );
+
+        return category?.name || "Unknown";
+    };
+
     return (
-        <div>
-            <h1>Questions</h1>
+        <div className="min-h-screen bg-slate-50 px-6 py-10">
+            <div className="mx-auto max-w-7xl">
 
-            <p>Manage quiz questions from this page.</p>
+                {/* Header */}
+                <div className="mb-8">
+                    <p className="text-sm font-semibold text-blue-600">
+                        Administration
+                    </p>
 
-            <form onSubmit={handleSubmit}>
+                    <h1 className="mt-1 text-3xl font-bold text-slate-900">
+                        Question Bank
+                    </h1>
 
-                <select
-                    name="category_id"
-                    value={formData.category_id}
-                    onChange={handleChange}
-                >
-                    <option value="">
-                        Select Category
-                    </option>
+                    <p className="mt-2 text-slate-500">
+                        Create, edit, and manage questions for
+                        your quizzes.
+                    </p>
+                </div>
 
-                    {categories.map((category) => (
-                        <option
-                            key={category.id}
-                            value={category.id}
-                        >
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
+                {/* Form Card */}
+                <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
 
-                <br />
+                    <div className="mb-6 flex items-center gap-4">
 
-                <textarea
-                    name="question_text"
-                    placeholder="Enter question"
-                    value={formData.question_text}
-                    onChange={handleChange}
-                />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl">
+                            {editingId ? "✏️" : "❓"}
+                        </div>
 
-                <br />
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900">
+                                {editingId
+                                    ? "Edit Question"
+                                    : "Add New Question"}
+                            </h2>
 
-                <input
-                    type="text"
-                    name="option_a"
-                    placeholder="Option A"
-                    value={formData.option_a}
-                    onChange={handleChange}
-                />
+                            <p className="mt-1 text-sm text-slate-500">
+                                {editingId
+                                    ? "Update the selected question."
+                                    : "Add a question to your question bank."}
+                            </p>
+                        </div>
 
-                <br />
+                    </div>
 
-                <input
-                    type="text"
-                    name="option_b"
-                    placeholder="Option B"
-                    value={formData.option_b}
-                    onChange={handleChange}
-                />
-
-                <br />
-
-                <input
-                    type="text"
-                    name="option_c"
-                    placeholder="Option C"
-                    value={formData.option_c}
-                    onChange={handleChange}
-                />
-
-                <br />
-
-                <input
-                    type="text"
-                    name="option_d"
-                    placeholder="Option D"
-                    value={formData.option_d}
-                    onChange={handleChange}
-                />
-
-                <br />
-
-                <input
-                    type="text"
-                    name="correct_answer"
-                    placeholder="Correct Answer"
-                    value={formData.correct_answer}
-                    onChange={handleChange}
-                />
-
-                <br />
-
-                <button type="submit">
-                    {editingId
-                        ? "Update Question"
-                        : "Add Question"}
-                </button>
-
-                {editingId && (
-                    <button
-                        type="button"
-                        onClick={resetForm}
+                    <form
+                        onSubmit={handleSubmit}
+                        className="space-y-6"
                     >
-                        Cancel
-                    </button>
-                )}
-            </form>
 
-            {error && <p>{error}</p>}
+                        {/* Category */}
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Category
+                            </label>
 
-            <hr />
+                            <select
+                                name="category_id"
+                                value={formData.category_id}
+                                onChange={handleChange}
+                                required
+                                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            >
+                                <option value="">
+                                    Select Category
+                                </option>
 
-            <h2>All Questions</h2>
+                                {categories.map(
+                                    (category) => (
+                                        <option
+                                            key={category.id}
+                                            value={category.id}
+                                        >
+                                            {category.name}
+                                        </option>
+                                    )
+                                )}
+                            </select>
+                        </div>
 
-            {loading ? (
-                <p>Loading questions...</p>
-            ) : questions.length === 0 ? (
-                <p>No questions found.</p>
-            ) : (
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Category</th>
-                            <th>Question</th>
-                            <th>Correct Answer</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+                        {/* Question */}
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Question
+                            </label>
 
-                    <tbody>
-                        {questions.map((question) => (
-                            <tr key={question.id}>
-                                <td>{question.id}</td>
+                            <textarea
+                                name="question_text"
+                                placeholder="Enter your question..."
+                                value={
+                                    formData.question_text
+                                }
+                                onChange={handleChange}
+                                required
+                                rows={4}
+                                className="w-full resize-none rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            />
+                        </div>
 
-                                <td>
-                                    {categories.find(
-                                        (category) =>
-                                            category.id ===
-                                            question.category_id
-                                    )?.name || "Unknown"}
-                                </td>
+                        {/* Options */}
+                        <div>
 
-                                <td>
-                                    {question.question_text}
-                                </td>
+                            <div className="mb-3 flex items-center justify-between">
+                                <label className="text-sm font-semibold text-slate-700">
+                                    Answer Options
+                                </label>
 
-                                <td>
-                                    {question.correct_answer}
-                                </td>
+                                <span className="text-xs text-slate-400">
+                                    Four options required
+                                </span>
+                            </div>
 
-                                <td>
-                                    <button
-                                        onClick={() =>
-                                            handleEdit(question)
-                                        }
-                                    >
-                                        Edit
-                                    </button>
+                            <div className="grid gap-4 sm:grid-cols-2">
 
-                                    <button
-                                        onClick={() =>
-                                            handleDelete(
-                                                question.id
-                                            )
-                                        }
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
+                                {[
+                                    ["option_a", "A"],
+                                    ["option_b", "B"],
+                                    ["option_c", "C"],
+                                    ["option_d", "D"],
+                                ].map(
+                                    ([field, letter]) => (
+                                        <div
+                                            key={field}
+                                            className="flex items-center gap-3"
+                                        >
+                                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-bold text-slate-600">
+                                                {letter}
+                                            </span>
+
+                                            <input
+                                                type="text"
+                                                name={field}
+                                                placeholder={`Option ${letter}`}
+                                                value={
+                                                    formData[
+                                                        field
+                                                    ]
+                                                }
+                                                onChange={
+                                                    handleChange
+                                                }
+                                                required
+                                                className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                            />
+                                        </div>
+                                    )
+                                )}
+
+                            </div>
+                        </div>
+
+                        {/* Correct Answer */}
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Correct Answer
+                            </label>
+
+                            <input
+                                type="text"
+                                name="correct_answer"
+                                placeholder="Enter the correct answer exactly as it appears above"
+                                value={
+                                    formData.correct_answer
+                                }
+                                onChange={handleChange}
+                                required
+                                className="w-full rounded-lg border border-green-200 bg-green-50/30 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                            />
+                        </div>
+
+                        {/* Error */}
+                        {error && (
+                            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* Buttons */}
+                        <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-5">
+
+                            <button
+                                type="submit"
+                                className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                            >
+                                {editingId
+                                    ? "Update Question"
+                                    : "Add Question"}
+                            </button>
+
+                            {editingId && (
+                                <button
+                                    type="button"
+                                    onClick={resetForm}
+                                    className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                                >
+                                    Cancel
+                                </button>
+                            )}
+
+                        </div>
+                    </form>
+                </div>
+
+                {/* Questions Header */}
+                <div className="mb-4 flex items-end justify-between">
+
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900">
+                            All Questions
+                        </h2>
+
+                        <p className="mt-1 text-sm text-slate-500">
+                            {questions.length}{" "}
+                            {questions.length === 1
+                                ? "question"
+                                : "questions"}{" "}
+                            available
+                        </p>
+                    </div>
+
+                </div>
+
+                {/* Loading */}
+                {loading ? (
+                    <div className="grid gap-4 lg:grid-cols-2">
+                        {[1, 2, 3, 4].map((item) => (
+                            <div
+                                key={item}
+                                className="h-52 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
+                            />
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+                ) : questions.length === 0 ? (
+                    <div className="rounded-2xl bg-white px-6 py-14 text-center shadow-sm ring-1 ring-slate-200">
+
+                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl">
+                            ❓
+                        </div>
+
+                        <h3 className="mt-4 text-lg font-bold text-slate-900">
+                            No questions yet
+                        </h3>
+
+                        <p className="mt-2 text-sm text-slate-500">
+                            Add your first question using the
+                            form above.
+                        </p>
+
+                    </div>
+                ) : (
+                    <div className="grid gap-5 lg:grid-cols-2">
+
+                        {questions.map(
+                            (question, index) => (
+                                <div
+                                    key={question.id}
+                                    className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+                                >
+
+                                    {/* Card Header */}
+                                    <div className="flex items-start justify-between gap-4">
+
+                                        <div className="flex items-center gap-3">
+
+                                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600">
+                                                {index + 1}
+                                            </span>
+
+                                            <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
+                                                {getCategoryName(
+                                                    question.category_id
+                                                )}
+                                            </span>
+
+                                        </div>
+
+                                        <span className="text-xs font-medium text-slate-400">
+                                            #{question.id}
+                                        </span>
+
+                                    </div>
+
+                                    {/* Question */}
+                                    <h3 className="mt-5 text-base font-bold leading-6 text-slate-900">
+                                        {
+                                            question.question_text
+                                        }
+                                    </h3>
+
+                                    {/* Options */}
+                                    <div className="mt-5 grid gap-2">
+
+                                        {[
+                                            [
+                                                "A",
+                                                question.option_a,
+                                            ],
+                                            [
+                                                "B",
+                                                question.option_b,
+                                            ],
+                                            [
+                                                "C",
+                                                question.option_c,
+                                            ],
+                                            [
+                                                "D",
+                                                question.option_d,
+                                            ],
+                                        ].map(
+                                            ([letter, option]) => (
+                                                <div
+                                                    key={letter}
+                                                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm ${
+                                                        option ===
+                                                        question.correct_answer
+                                                            ? "bg-green-50 text-green-700 ring-1 ring-green-100"
+                                                            : "bg-slate-50 text-slate-600"
+                                                    }`}
+                                                >
+                                                    <span className="font-bold">
+                                                        {letter}.
+                                                    </span>
+
+                                                    <span className="flex-1">
+                                                        {option}
+                                                    </span>
+
+                                                    {option ===
+                                                        question.correct_answer && (
+                                                        <span className="text-xs font-bold">
+                                                            ✓
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )
+                                        )}
+
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="mt-5 flex gap-2 border-t border-slate-100 pt-4">
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                handleEdit(
+                                                    question
+                                                )
+                                            }
+                                            className="flex-1 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                openDeleteModal(
+                                                    question.id
+                                                )
+                                            }
+                                            className="flex-1 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </div>
+
+                                </div>
+                            )
+                        )}
+
+                    </div>
+                )}
+            </div>
+
+            {/* Delete Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-5">
+
+                    <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-2xl">
+
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl">
+                            ⚠️
+                        </div>
+
+                        <h2 className="mt-5 text-xl font-bold text-slate-900">
+                            Delete Question?
+                        </h2>
+
+                        <p className="mt-2 text-sm leading-6 text-slate-500">
+                            Are you sure you want to delete this
+                            question? This action cannot be
+                            undone.
+                        </p>
+
+                        <div className="mt-7 flex justify-end gap-3">
+
+                            <button
+                                type="button"
+                                onClick={closeDeleteModal}
+                                disabled={deleting}
+                                className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                disabled={deleting}
+                                className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                {deleting
+                                    ? "Deleting..."
+                                    : "Delete Question"}
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
             )}
         </div>
     );

@@ -6,12 +6,12 @@ const PORT = 5000;
 async function startServer() {
     try {
         await pool.query("SELECT NOW()");
+
         console.log("✅ PostgreSQL Connected");
 
         app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
         });
-
     } catch (err) {
         console.error("Database Connection Error");
         console.error(err.message);
