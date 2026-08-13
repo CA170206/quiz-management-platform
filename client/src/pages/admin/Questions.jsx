@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:5000/api/questions";
-const CATEGORY_API_URL = "http://localhost:5000/api/categories";
+const QUIZ_API_URL = "http://localhost:5000/api/quizzes";
 
 function Questions() {
     const [questions, setQuestions] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [quizzes, setQuizzes] = useState([]);
 
     const [formData, setFormData] = useState({
-        category_id: "",
+        quiz_id: "",
         question_text: "",
         option_a: "",
         option_b: "",
@@ -25,6 +25,10 @@ function Questions() {
     const [deleteId, setDeleteId] = useState(null);
     const [deleting, setDeleting] = useState(false);
 
+    // =========================
+    // FETCH QUESTIONS
+    // =========================
+
     const fetchQuestions = async () => {
         try {
             setLoading(true);
@@ -37,7 +41,12 @@ function Questions() {
             }
 
             const data = await response.json();
-            setQuestions(data);
+
+            const sortedQuestions = [...data].sort(
+                (a, b) => a.id - b.id
+            );
+
+            setQuestions(sortedQuestions);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -45,25 +54,42 @@ function Questions() {
         }
     };
 
-    const fetchCategories = async () => {
+    // =========================
+    // FETCH QUIZZES
+    // =========================
+
+    const fetchQuizzes = async () => {
         try {
-            const response = await fetch(CATEGORY_API_URL);
+            const response = await fetch(QUIZ_API_URL);
 
             if (!response.ok) {
-                throw new Error("Failed to fetch categories");
+                throw new Error("Failed to fetch quizzes");
             }
 
             const data = await response.json();
-            setCategories(data);
+
+            const sortedQuizzes = [...data].sort(
+                (a, b) => a.id - b.id
+            );
+
+            setQuizzes(sortedQuizzes);
         } catch (err) {
             setError(err.message);
         }
     };
 
+    // =========================
+    // INITIAL LOAD
+    // =========================
+
     useEffect(() => {
         fetchQuestions();
-        fetchCategories();
+        fetchQuizzes();
     }, []);
+
+    // =========================
+    // HANDLE INPUT
+    // =========================
 
     const handleChange = (e) => {
         setFormData({
@@ -72,14 +98,55 @@ function Questions() {
         });
     };
 
+    // =========================
+    // CREATE / UPDATE
+    // =========================
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
             setError("");
 
-            if (!formData.category_id) {
-                setError("Please select a category.");
+            if (!formData.quiz_id) {
+                setError("Please select a quiz.");
+                return;
+            }
+
+            if (!formData.question_text.trim()) {
+                setError("Question is required.");
+                return;
+            }
+
+            if (
+                !formData.option_a.trim() ||
+                !formData.option_b.trim() ||
+                !formData.option_c.trim() ||
+                !formData.option_d.trim()
+            ) {
+                setError("All four options are required.");
+                return;
+            }
+
+            if (!formData.correct_answer.trim()) {
+                setError("Correct answer is required.");
+                return;
+            }
+
+            const options = [
+                formData.option_a.trim(),
+                formData.option_b.trim(),
+                formData.option_c.trim(),
+                formData.option_d.trim(),
+            ];
+
+            const correctAnswer =
+                formData.correct_answer.trim();
+
+            if (!options.includes(correctAnswer)) {
+                setError(
+                    "Correct answer must exactly match one of the four options."
+                );
                 return;
             }
 
@@ -89,16 +156,30 @@ function Questions() {
 
             const method = editingId ? "PUT" : "POST";
 
+            const token = sessionStorage.getItem("token");
+
+            if (!token) {
+                setError(
+                    "Authentication required. Please login again."
+                );
+                return;
+            }
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    ...formData,
-                    category_id: Number(
-                        formData.category_id
-                    ),
+                    quiz_id: Number(formData.quiz_id),
+                    question_text:
+                        formData.question_text.trim(),
+                    option_a: formData.option_a.trim(),
+                    option_b: formData.option_b.trim(),
+                    option_c: formData.option_c.trim(),
+                    option_d: formData.option_d.trim(),
+                    correct_answer: correctAnswer,
                 }),
             });
 
@@ -106,28 +187,40 @@ function Questions() {
 
             if (!response.ok) {
                 throw new Error(
-                    data.message || "Something went wrong"
+                    data.message ||
+                        "Something went wrong"
                 );
             }
 
             resetForm();
-            fetchQuestions();
+            await fetchQuestions();
         } catch (err) {
             setError(err.message);
         }
     };
 
+    // =========================
+    // EDIT
+    // =========================
+
     const handleEdit = (question) => {
         setEditingId(question.id);
 
         setFormData({
-            category_id: question.category_id,
-            question_text: question.question_text,
-            option_a: question.option_a,
-            option_b: question.option_b,
-            option_c: question.option_c,
-            option_d: question.option_d,
-            correct_answer: question.correct_answer,
+            quiz_id:
+                question.quiz_id?.toString() || "",
+            question_text:
+                question.question_text || "",
+            option_a:
+                question.option_a || "",
+            option_b:
+                question.option_b || "",
+            option_c:
+                question.option_c || "",
+            option_d:
+                question.option_d || "",
+            correct_answer:
+                question.correct_answer || "",
         });
 
         window.scrollTo({
@@ -135,6 +228,10 @@ function Questions() {
             behavior: "smooth",
         });
     };
+
+    // =========================
+    // DELETE MODAL
+    // =========================
 
     const openDeleteModal = (id) => {
         setDeleteId(id);
@@ -150,6 +247,10 @@ function Questions() {
         setShowDeleteModal(false);
     };
 
+    // =========================
+    // DELETE
+    // =========================
+
     const handleDelete = async () => {
         if (!deleteId) {
             return;
@@ -159,10 +260,22 @@ function Questions() {
             setDeleting(true);
             setError("");
 
+            const token = sessionStorage.getItem("token");
+
+            if (!token) {
+                setError(
+                    "Authentication required. Please login again."
+                );
+                return;
+            }
+
             const response = await fetch(
                 `${API_URL}/${deleteId}`,
                 {
                     method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
 
@@ -178,7 +291,7 @@ function Questions() {
             setDeleteId(null);
             setShowDeleteModal(false);
 
-            fetchQuestions();
+            await fetchQuestions();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -186,11 +299,15 @@ function Questions() {
         }
     };
 
+    // =========================
+    // RESET FORM
+    // =========================
+
     const resetForm = () => {
         setEditingId(null);
 
         setFormData({
-            category_id: "",
+            quiz_id: "",
             question_text: "",
             option_a: "",
             option_b: "",
@@ -198,15 +315,25 @@ function Questions() {
             option_d: "",
             correct_answer: "",
         });
+
+        setError("");
     };
 
-    const getCategoryName = (categoryId) => {
-        const category = categories.find(
-            (item) => item.id === categoryId
+    // =========================
+    // GET QUIZ NAME
+    // =========================
+
+    const getQuizName = (quizId) => {
+        const quiz = quizzes.find(
+            (item) => item.id === Number(quizId)
         );
 
-        return category?.name || "Unknown";
+        return quiz?.title || "Unknown Quiz";
     };
+
+    // =========================
+    // RENDER
+    // =========================
 
     return (
         <div className="min-h-screen bg-slate-50 px-6 py-10">
@@ -223,8 +350,8 @@ function Questions() {
                     </h1>
 
                     <p className="mt-2 text-slate-500">
-                        Create, edit, and manage questions for
-                        your quizzes.
+                        Create, edit, and manage questions
+                        for your quizzes.
                     </p>
                 </div>
 
@@ -247,7 +374,7 @@ function Questions() {
                             <p className="mt-1 text-sm text-slate-500">
                                 {editingId
                                     ? "Update the selected question."
-                                    : "Add a question to your question bank."}
+                                    : "Add a question to a specific quiz."}
                             </p>
                         </div>
 
@@ -258,33 +385,31 @@ function Questions() {
                         className="space-y-6"
                     >
 
-                        {/* Category */}
+                        {/* Quiz */}
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Category
+                                Quiz
                             </label>
 
                             <select
-                                name="category_id"
-                                value={formData.category_id}
+                                name="quiz_id"
+                                value={formData.quiz_id}
                                 onChange={handleChange}
                                 required
                                 className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             >
                                 <option value="">
-                                    Select Category
+                                    Select Quiz
                                 </option>
 
-                                {categories.map(
-                                    (category) => (
-                                        <option
-                                            key={category.id}
-                                            value={category.id}
-                                        >
-                                            {category.name}
-                                        </option>
-                                    )
-                                )}
+                                {quizzes.map((quiz) => (
+                                    <option
+                                        key={quiz.id}
+                                        value={quiz.id}
+                                    >
+                                        {quiz.title}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
@@ -452,8 +577,8 @@ function Questions() {
                         </h3>
 
                         <p className="mt-2 text-sm text-slate-500">
-                            Add your first question using the
-                            form above.
+                            Add your first question using
+                            the form above.
                         </p>
 
                     </div>
@@ -470,16 +595,15 @@ function Questions() {
                                     {/* Card Header */}
                                     <div className="flex items-start justify-between gap-4">
 
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
 
                                             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600">
                                                 {index + 1}
                                             </span>
 
                                             <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
-                                                {getCategoryName(
-                                                    question.category_id
-                                                )}
+                                                {question.category_name ||
+                                                    "Category"}
                                             </span>
 
                                         </div>
@@ -490,11 +614,23 @@ function Questions() {
 
                                     </div>
 
+                                    {/* Quiz Name */}
+                                    <div className="mt-4 rounded-lg bg-blue-50 px-3 py-2">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-blue-500">
+                                            Quiz
+                                        </p>
+
+                                        <p className="mt-1 text-sm font-semibold text-blue-700">
+                                            {question.quiz_title ||
+                                                getQuizName(
+                                                    question.quiz_id
+                                                )}
+                                        </p>
+                                    </div>
+
                                     {/* Question */}
                                     <h3 className="mt-5 text-base font-bold leading-6 text-slate-900">
-                                        {
-                                            question.question_text
-                                        }
+                                        {question.question_text}
                                     </h3>
 
                                     {/* Options */}
@@ -600,9 +736,9 @@ function Questions() {
                         </h2>
 
                         <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Are you sure you want to delete this
-                            question? This action cannot be
-                            undone.
+                            Are you sure you want to delete
+                            this question? This action cannot
+                            be undone.
                         </p>
 
                         <div className="mt-7 flex justify-end gap-3">
@@ -628,7 +764,6 @@ function Questions() {
                             </button>
 
                         </div>
-
                     </div>
                 </div>
             )}

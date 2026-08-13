@@ -53,11 +53,14 @@ function Categories() {
 
             const method = editingId ? "PUT" : "POST";
 
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                },
+           const token = sessionStorage.getItem("token");
+
+const response = await fetch(url, {
+    method,
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+    },
                 body: JSON.stringify({
                     name: name.trim(),
                 }),

@@ -42,11 +42,18 @@ function QuizList() {
             }
 
             const quizData = await quizResponse.json();
+
             const categoryData =
                 await categoryResponse.json();
 
-            setQuizzes(quizData);
+            // Keep quizzes in ID order
+            const sortedQuizzes = [...quizData].sort(
+                (a, b) => a.id - b.id
+            );
+
+            setQuizzes(sortedQuizzes);
             setCategories(categoryData);
+
         } catch (err) {
             setError(err.message);
         } finally {
@@ -279,7 +286,7 @@ function QuizList() {
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
                         {filteredQuizzes.map(
-                            (quiz, index) => (
+                            (quiz) => (
                                 <div
                                     key={quiz.id}
                                     className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition duration-200 hover:-translate-y-1 hover:shadow-lg"

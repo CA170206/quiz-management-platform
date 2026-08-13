@@ -63,7 +63,6 @@ function AttemptQuiz() {
         fetchQuizData();
     }, [id]);
 
-
     // ==========================================
     // SET TIMER
     // ==========================================
@@ -75,7 +74,6 @@ function AttemptQuiz() {
 
         setTimeLeft(quiz.duration * 60);
     }, [quiz]);
-
 
     // ==========================================
     // COUNTDOWN
@@ -93,7 +91,6 @@ function AttemptQuiz() {
         return () => clearInterval(timer);
     }, [timeLeft]);
 
-
     // ==========================================
     // HANDLE ANSWER
     // ==========================================
@@ -105,7 +102,6 @@ function AttemptQuiz() {
         }));
     };
 
-
     // ==========================================
     // SUBMIT QUIZ
     // ==========================================
@@ -115,8 +111,9 @@ function AttemptQuiz() {
             setSubmitting(true);
             setError("");
 
+            // Token is stored in localStorage during login
             const token =
-                sessionStorage.getItem("token");
+                localStorage.getItem("token");
 
             if (!token) {
                 throw new Error(
@@ -129,7 +126,6 @@ function AttemptQuiz() {
 
             const timeTaken =
                 totalTime - timeLeft;
-
 
             const response = await fetch(
                 ATTEMPTS_API,
@@ -152,10 +148,8 @@ function AttemptQuiz() {
                 }
             );
 
-
             const data =
                 await response.json();
-
 
             if (!response.ok) {
                 throw new Error(
@@ -164,10 +158,8 @@ function AttemptQuiz() {
                 );
             }
 
-
             // Close modal
             setShowSubmitModal(false);
-
 
             // Go to result page
             navigate(
@@ -182,7 +174,6 @@ function AttemptQuiz() {
         }
     };
 
-
     // ==========================================
     // LOADING
     // ==========================================
@@ -190,17 +181,12 @@ function AttemptQuiz() {
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-50 px-6 py-12">
-
                 <div className="mx-auto max-w-4xl">
-
                     <div className="h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
-
                 </div>
-
             </div>
         );
     }
-
 
     // ==========================================
     // ERROR
@@ -209,20 +195,16 @@ function AttemptQuiz() {
     if (error && !quiz) {
         return (
             <div className="min-h-screen bg-slate-50 px-6 py-12">
-
                 <div className="mx-auto max-w-4xl rounded-xl bg-red-50 p-5 text-red-600">
                     {error}
                 </div>
-
             </div>
         );
     }
 
-
     if (!quiz) {
         return null;
     }
-
 
     // ==========================================
     // NO QUESTIONS
@@ -231,7 +213,6 @@ function AttemptQuiz() {
     if (questions.length === 0) {
         return (
             <div className="min-h-screen bg-slate-50 px-6 py-12">
-
                 <div className="mx-auto max-w-4xl rounded-2xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
 
                     <div className="text-4xl">
@@ -258,11 +239,9 @@ function AttemptQuiz() {
                     </button>
 
                 </div>
-
             </div>
         );
     }
-
 
     // ==========================================
     // VALUES
@@ -292,7 +271,6 @@ function AttemptQuiz() {
         currentIndex ===
         questions.length - 1;
 
-
     // ==========================================
     // UI
     // ==========================================
@@ -302,16 +280,13 @@ function AttemptQuiz() {
 
             <div className="mx-auto max-w-5xl">
 
-                {/* ================================= */}
                 {/* HEADER */}
-                {/* ================================= */}
 
                 <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
 
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                         <div>
-
                             <p className="text-sm font-semibold text-blue-600">
                                 Quiz Attempt
                             </p>
@@ -319,9 +294,7 @@ function AttemptQuiz() {
                             <h1 className="mt-1 text-xl font-bold text-slate-900">
                                 {quiz.title}
                             </h1>
-
                         </div>
-
 
                         {/* Timer */}
 
@@ -345,7 +318,6 @@ function AttemptQuiz() {
 
                     </div>
 
-
                     {/* Progress */}
 
                     <div className="mt-5">
@@ -365,7 +337,6 @@ function AttemptQuiz() {
 
                         </div>
 
-
                         <div className="h-2 overflow-hidden rounded-full bg-slate-100">
 
                             <div
@@ -381,10 +352,7 @@ function AttemptQuiz() {
 
                 </div>
 
-
-                {/* ================================= */}
                 {/* ERROR */}
-                {/* ================================= */}
 
                 {error && (
                     <div className="mb-5 rounded-xl bg-red-50 px-5 py-4 text-sm text-red-600">
@@ -392,10 +360,7 @@ function AttemptQuiz() {
                     </div>
                 )}
 
-
-                {/* ================================= */}
                 {/* QUESTION */}
-                {/* ================================= */}
 
                 <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
 
@@ -413,7 +378,6 @@ function AttemptQuiz() {
                         </h2>
 
                     </div>
-
 
                     {/* Options */}
 
@@ -440,7 +404,6 @@ function AttemptQuiz() {
                                         currentQuestion.id
                                     ] === option;
 
-
                                 return (
                                     <label
                                         key={index}
@@ -466,7 +429,6 @@ function AttemptQuiz() {
                                             className="sr-only"
                                         />
 
-
                                         <span
                                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
                                                 selected
@@ -478,7 +440,6 @@ function AttemptQuiz() {
                                                 optionLetter
                                             }
                                         </span>
-
 
                                         <span
                                             className={`text-sm font-medium leading-6 ${
@@ -496,7 +457,6 @@ function AttemptQuiz() {
                         )}
 
                     </div>
-
 
                     {/* Navigation */}
 
@@ -520,7 +480,6 @@ function AttemptQuiz() {
                             >
                                 ← Previous
                             </button>
-
 
                             {!isLastQuestion ? (
 
@@ -559,17 +518,13 @@ function AttemptQuiz() {
 
                 </div>
 
-
-                {/* ================================= */}
                 {/* QUESTION NAVIGATION */}
-                {/* ================================= */}
 
                 <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
 
                     <h3 className="text-sm font-bold text-slate-900">
                         Question Navigation
                     </h3>
-
 
                     <div className="mt-4 flex flex-wrap gap-2">
 
@@ -587,7 +542,6 @@ function AttemptQuiz() {
                                 const current =
                                     index ===
                                     currentIndex;
-
 
                                 return (
                                     <button
@@ -616,7 +570,6 @@ function AttemptQuiz() {
 
                     </div>
 
-
                     <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
 
                         <span className="flex items-center gap-2">
@@ -640,10 +593,7 @@ function AttemptQuiz() {
 
             </div>
 
-
-            {/* ================================= */}
             {/* SUBMIT MODAL */}
-            {/* ================================= */}
 
             {showSubmitModal && (
 
@@ -655,11 +605,9 @@ function AttemptQuiz() {
                             📝
                         </div>
 
-
                         <h2 className="mt-5 text-xl font-bold text-slate-900">
                             Submit Quiz?
                         </h2>
-
 
                         <p className="mt-2 text-sm leading-6 text-slate-500">
 
@@ -679,7 +627,6 @@ function AttemptQuiz() {
 
                         </p>
 
-
                         <div className="mt-7 flex justify-end gap-3">
 
                             <button
@@ -696,7 +643,6 @@ function AttemptQuiz() {
                             >
                                 Continue Quiz
                             </button>
-
 
                             <button
                                 type="button"

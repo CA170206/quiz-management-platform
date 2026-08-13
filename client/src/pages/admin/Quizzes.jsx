@@ -43,7 +43,11 @@ function Quizzes() {
 
             const data = await response.json();
 
-            setQuizzes(data);
+const sortedQuizzes = [...data].sort(
+    (a, b) => a.id - b.id
+);
+
+setQuizzes(sortedQuizzes);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -126,11 +130,15 @@ function Quizzes() {
 
             const method = editingId ? "PUT" : "POST";
 
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                },
+           const token = sessionStorage.getItem("token");
+
+const response = await fetch(url, {
+    method,
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+    },
+
                 body: JSON.stringify({
                     title: formData.title.trim(),
                     description:
@@ -213,12 +221,17 @@ function Quizzes() {
             setDeleting(true);
             setError("");
 
-            const response = await fetch(
-                `${API_URL}/${deleteId}`,
-                {
-                    method: "DELETE",
-                }
-            );
+            const token = sessionStorage.getItem("token");
+
+const response = await fetch(
+    `${API_URL}/${deleteId}`,
+    {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    }
+);
 
             const data = await response.json();
 
