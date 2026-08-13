@@ -1,18 +1,57 @@
 import express from "express";
+
 import {
     getQuizzes,
     getQuizById,
     createQuiz,
     updateQuiz,
-    deleteQuiz
+    deleteQuiz,
 } from "../controllers/quizController.js";
+
+import authMiddleware from "../middleware/authMiddleware.js";
+import { adminOnly } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
+
+// ==========================================
+// PUBLIC / STUDENT ACCESS
+// ==========================================
+
+// Get all quizzes
 router.get("/", getQuizzes);
-router.post("/", createQuiz);
-router.put("/:id", updateQuiz);
-router.delete("/:id", deleteQuiz);
+
+// Get single quiz
 router.get("/:id", getQuizById);
+
+
+// ==========================================
+// ADMIN ONLY
+// ==========================================
+
+// Create quiz
+router.post(
+    "/",
+    authMiddleware,
+    adminOnly,
+    createQuiz
+);
+
+// Update quiz
+router.put(
+    "/:id",
+    authMiddleware,
+    adminOnly,
+    updateQuiz
+);
+
+// Delete quiz
+router.delete(
+    "/:id",
+    authMiddleware,
+    adminOnly,
+    deleteQuiz
+);
+
 
 export default router;

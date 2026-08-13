@@ -12,6 +12,7 @@ import Register from "../pages/auth/Register";
 
 // Common
 import Navbar from "../components/common/Navbar";
+import ProtectedRoute from "../components/common/ProtectedRoute";
 
 // Admin
 import AdminDashboard from "../pages/admin/Dashboard";
@@ -75,83 +76,103 @@ function AppContent() {
 
 
                     {/* ================================= */}
-                    {/* ADMIN */}
+                    {/* ADMIN PROTECTED ROUTES */}
                     {/* ================================= */}
 
                     <Route
-                        path="/admin/dashboard"
-                        element={<AdminDashboard />}
-                    />
+                        element={
+                            <ProtectedRoute
+                                allowedRole="admin"
+                            />
+                        }
+                    >
 
-                    <Route
-                        path="/admin/categories"
-                        element={<Categories />}
-                    />
+                        <Route
+                            path="/admin/dashboard"
+                            element={<AdminDashboard />}
+                        />
 
-                    <Route
-                        path="/admin/questions"
-                        element={<Questions />}
-                    />
+                        <Route
+                            path="/admin/categories"
+                            element={<Categories />}
+                        />
 
-                    <Route
-                        path="/admin/quizzes"
-                        element={<Quizzes />}
-                    />
+                        <Route
+                            path="/admin/questions"
+                            element={<Questions />}
+                        />
 
-                    <Route
-                        path="/admin/profile"
-                        element={<AdminProfile />}
-                    />
+                        <Route
+                            path="/admin/quizzes"
+                            element={<Quizzes />}
+                        />
 
-                    <Route
-                        path="/admin/analytics"
-                        element={<AdminAnalytics />}
-                    />
+                        <Route
+                            path="/admin/profile"
+                            element={<AdminProfile />}
+                        />
+
+                        <Route
+                            path="/admin/analytics"
+                            element={<AdminAnalytics />}
+                        />
+
+                    </Route>
 
 
                     {/* ================================= */}
-                    {/* STUDENT */}
+                    {/* STUDENT PROTECTED ROUTES */}
                     {/* ================================= */}
 
                     <Route
-                        path="/student/dashboard"
-                        element={<Dashboard />}
-                    />
+                        element={
+                            <ProtectedRoute
+                                allowedRole="student"
+                            />
+                        }
+                    >
 
-                    <Route
-                        path="/student/quizzes"
-                        element={<QuizList />}
-                    />
+                        <Route
+                            path="/student/dashboard"
+                            element={<Dashboard />}
+                        />
 
-                    <Route
-                        path="/student/quizzes/:id"
-                        element={<QuizDetails />}
-                    />
+                        <Route
+                            path="/student/quizzes"
+                            element={<QuizList />}
+                        />
 
-                    <Route
-                        path="/student/quizzes/:id/attempt"
-                        element={<AttemptQuiz />}
-                    />
+                        <Route
+                            path="/student/quizzes/:id"
+                            element={<QuizDetails />}
+                        />
 
-                    <Route
-                        path="/student/results/:id"
-                        element={<Results />}
-                    />
+                        <Route
+                            path="/student/quizzes/:id/attempt"
+                            element={<AttemptQuiz />}
+                        />
 
-                    <Route
-                        path="/student/leaderboard"
-                        element={<Leaderboard />}
-                    />
+                        <Route
+                            path="/student/results/:id"
+                            element={<Results />}
+                        />
 
-                    <Route
-                        path="/student/profile"
-                        element={<Profile />}
-                    />
+                        <Route
+                            path="/student/leaderboard"
+                            element={<Leaderboard />}
+                        />
 
-                    <Route
-                        path="/student/analytics"
-                        element={<Analytics />}
-                    />
+                        <Route
+                            path="/student/profile"
+                            element={<Profile />}
+                        />
+
+                        <Route
+                            path="/student/analytics"
+                            element={<Analytics />}
+                        />
+
+                    </Route>
 
                 </Routes>
 

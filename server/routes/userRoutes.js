@@ -2,6 +2,7 @@ import express from "express";
 
 import {
     getProfile,
+    updateProfile,
     deleteAccount,
 } from "../controllers/userController.js";
 
@@ -10,7 +11,11 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 
-// Get logged-in user's profile
+// ==========================================
+// USER PROFILE
+// ==========================================
+
+// Get profile
 router.get(
     "/profile",
     authMiddleware,
@@ -18,7 +23,15 @@ router.get(
 );
 
 
-// Permanently delete account
+// Update profile
+router.put(
+    "/profile",
+    authMiddleware,
+    updateProfile
+);
+
+
+// Delete account
 router.delete(
     "/profile",
     authMiddleware,
