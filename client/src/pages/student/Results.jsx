@@ -18,7 +18,7 @@ function Results() {
                 setError("");
 
                 const token =
-                    sessionStorage.getItem("token");
+                    localStorage.getItem("token");
 
                 if (!token) {
                     throw new Error(
@@ -58,7 +58,6 @@ function Results() {
         fetchResult();
     }, [id]);
 
-
     // ==========================================
     // LOADING
     // ==========================================
@@ -74,7 +73,6 @@ function Results() {
             </div>
         );
     }
-
 
     // ==========================================
     // ERROR
@@ -108,11 +106,9 @@ function Results() {
         );
     }
 
-
     if (!result) {
         return null;
     }
-
 
     // ==========================================
     // RESULT VALUES
@@ -124,15 +120,12 @@ function Results() {
     const passed =
         percentage >= 40;
 
-
     return (
         <div className="min-h-screen bg-slate-50 px-6 py-10">
 
             <div className="mx-auto max-w-5xl">
 
-                {/* ================================= */}
                 {/* HEADER */}
-                {/* ================================= */}
 
                 <div className="mb-8 text-center">
 
@@ -150,10 +143,7 @@ function Results() {
 
                 </div>
 
-
-                {/* ================================= */}
                 {/* SCORE CARD */}
-                {/* ================================= */}
 
                 <div
                     className={`overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ${
@@ -191,7 +181,6 @@ function Results() {
 
                         </div>
 
-
                         <h2
                             className={`mt-5 text-2xl font-bold ${
                                 passed
@@ -204,31 +193,22 @@ function Results() {
                                 : "Quiz Not Passed"}
                         </h2>
 
-
                         <p className="mt-2 text-sm text-slate-500">
-
                             You scored{" "}
-
                             <strong>
                                 {result.score}
                             </strong>{" "}
-
                             out of{" "}
-
                             <strong>
                                 {result.total_questions}
                             </strong>
-
                         </p>
 
                     </div>
 
                 </div>
 
-
-                {/* ================================= */}
                 {/* STATISTICS */}
-                {/* ================================= */}
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -245,7 +225,6 @@ function Results() {
 
                     </div>
 
-
                     <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
 
                         <p className="text-sm text-slate-500">
@@ -258,7 +237,6 @@ function Results() {
 
                     </div>
 
-
                     <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
 
                         <p className="text-sm text-slate-500">
@@ -270,7 +248,6 @@ function Results() {
                         </p>
 
                     </div>
-
 
                     <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
 
@@ -286,10 +263,7 @@ function Results() {
 
                 </div>
 
-
-                {/* ================================= */}
                 {/* ANSWER REVIEW */}
-                {/* ================================= */}
 
                 <div className="mt-8">
 
@@ -304,7 +278,6 @@ function Results() {
                         </p>
 
                     </div>
-
 
                     <div className="space-y-4">
 
@@ -336,7 +309,6 @@ function Results() {
                                                 {index + 1}
                                             </div>
 
-
                                             <div>
 
                                                 <h3 className="font-semibold leading-6 text-slate-900">
@@ -348,7 +320,6 @@ function Results() {
                                             </div>
 
                                         </div>
-
 
                                         <span
                                             className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
@@ -363,7 +334,6 @@ function Results() {
                                         </span>
 
                                     </div>
-
 
                                     <div className="mt-5 grid gap-3 sm:grid-cols-2">
 
@@ -385,7 +355,6 @@ function Results() {
                                             </p>
 
                                         </div>
-
 
                                         <div className="rounded-xl bg-green-50 p-4">
 
@@ -412,10 +381,7 @@ function Results() {
 
                 </div>
 
-
-                {/* ================================= */}
                 {/* ACTIONS */}
-                {/* ================================= */}
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
 
@@ -430,7 +396,6 @@ function Results() {
                     >
                         Take Another Quiz
                     </button>
-
 
                     <button
                         type="button"
