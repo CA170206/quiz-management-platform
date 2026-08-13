@@ -3,16 +3,47 @@ import express from "express";
 import {
     submitQuiz,
     getAttemptById,
-    getLeaderboard
+    getLeaderboard,
 } from "../controllers/attemptController.js";
+
+import authMiddleware from "../middleware/authMiddleware.js";
+
 
 const router = express.Router();
 
-router.post("/", submitQuiz);
 
-// IMPORTANT: leaderboard must come BEFORE /:id
-router.get("/leaderboard", getLeaderboard);
+// ==========================================
+// SUBMIT QUIZ
+// ==========================================
 
-router.get("/:id", getAttemptById);
+router.post(
+    "/",
+    authMiddleware,
+    submitQuiz
+);
+
+
+// ==========================================
+// LEADERBOARD
+// IMPORTANT: before /:id
+// ==========================================
+
+router.get(
+    "/leaderboard",
+    authMiddleware,
+    getLeaderboard
+);
+
+
+// ==========================================
+// GET ATTEMPT
+// ==========================================
+
+router.get(
+    "/:id",
+    authMiddleware,
+    getAttemptById
+);
+
 
 export default router;
