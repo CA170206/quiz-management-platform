@@ -15,7 +15,7 @@ function Leaderboard() {
                 setError("");
 
                 const token =
-                    localStorage.getItem("token");
+                    sessionStorage.getItem("token");
 
                 if (!token) {
                     throw new Error(

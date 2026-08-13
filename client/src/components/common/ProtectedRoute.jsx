@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 function ProtectedRoute({ allowedRole }) {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const user = JSON.parse(
-        localStorage.getItem("user") || "null"
+        sessionStorage.getItem("user") || "null"
     );
 
     // Not logged in

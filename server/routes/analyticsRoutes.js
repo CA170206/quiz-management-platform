@@ -2,6 +2,7 @@ import express from "express";
 
 import {
     getStudentAnalytics,
+    getAdminAnalytics,
 } from "../controllers/analyticsController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -17,6 +18,17 @@ router.get(
     "/student",
     authMiddleware,
     getStudentAnalytics
+);
+
+
+// ==========================================
+// ADMIN ANALYTICS
+// ==========================================
+
+router.get(
+    "/admin",
+    authMiddleware,
+    getAdminAnalytics
 );
 
 

@@ -57,11 +57,11 @@ function Login() {
             }
 
             // Store token
-            localStorage.setItem("token", data.token);
+            sessionStorage.setItem("token", data.token);
 
             // Store user information if backend returns it
             if (data.user) {
-                localStorage.setItem(
+                sessionStorage.setItem(
                     "user",
                     JSON.stringify(data.user)
                 );

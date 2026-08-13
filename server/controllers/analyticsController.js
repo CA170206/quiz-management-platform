@@ -9,10 +9,6 @@ export const getStudentAnalytics = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // ------------------------------------------
-        // Overall statistics
-        // ------------------------------------------
-
         const statsResult = await pool.query(
             `
             SELECT
@@ -63,10 +59,6 @@ export const getStudentAnalytics = async (req, res) => {
         );
 
 
-        // ------------------------------------------
-        // Last 10 attempts
-        // ------------------------------------------
-
         const attemptsResult = await pool.query(
             `
             SELECT
@@ -97,10 +89,6 @@ export const getStudentAnalytics = async (req, res) => {
         );
 
 
-        // ------------------------------------------
-        // Send response
-        // ------------------------------------------
-
         res.status(200).json({
             stats: statsResult.rows[0],
             attempts: attemptsResult.rows,
@@ -115,6 +103,238 @@ export const getStudentAnalytics = async (req, res) => {
         res.status(500).json({
             message:
                 "Failed to fetch student analytics",
+        });
+    }
+};
+
+
+// ==========================================
+// ADMIN ANALYTICS
+// ==========================================
+
+export const getAdminAnalytics = async (
+    req,
+    res
+) => {
+    try {
+
+        // ------------------------------------------
+        // Check admin role
+        // ------------------------------------------
+
+        if (req.user.role !== "admin") {
+            return res.status(403).json({
+                message:
+                    "Admin access required",
+            });
+        }
+
+
+        // ------------------------------------------
+        // Platform statistics
+        // ------------------------------------------
+
+        const statsResult = await pool.query(
+            `
+            SELECT
+
+                (
+                    SELECT COUNT(*)
+                    FROM users
+                    WHERE role = 'student'
+                )::integer AS total_students,
+
+                (
+                    SELECT COUNT(*)
+                    FROM users
+                )::integer AS total_users,
+
+                (
+                    SELECT COUNT(*)
+                    FROM quizzes
+                )::integer AS total_quizzes,
+
+                (
+                    SELECT COUNT(*)
+                    FROM questions
+                )::integer AS total_questions,
+
+                (
+                    SELECT COUNT(*)
+                    FROM categories
+                )::integer AS total_categories,
+
+                (
+                    SELECT COUNT(*)
+                    FROM attempts
+                )::integer AS total_attempts,
+
+                COALESCE(
+                    (
+                        SELECT ROUND(
+                            AVG(percentage),
+                            2
+                        )
+                        FROM attempts
+                    ),
+                    0
+                ) AS average_score,
+
+                COALESCE(
+                    (
+                        SELECT ROUND(
+                            (
+                                COUNT(*) FILTER (
+                                    WHERE percentage >= 40
+                                )::numeric
+                                /
+                                NULLIF(COUNT(*), 0)
+                            ) * 100,
+                            2
+                        )
+                        FROM attempts
+                    ),
+                    0
+                ) AS pass_rate
+            `
+        );
+
+
+        // ------------------------------------------
+        // Most attempted quizzes
+        // ------------------------------------------
+
+        const popularQuizzesResult =
+            await pool.query(
+                `
+                SELECT
+                    q.id,
+                    q.title,
+
+                    COUNT(a.id)::integer
+                        AS attempts,
+
+                    COALESCE(
+                        ROUND(
+                            AVG(a.percentage),
+                            2
+                        ),
+                        0
+                    ) AS average_score
+
+                FROM quizzes q
+
+                LEFT JOIN attempts a
+                    ON a.quiz_id = q.id
+
+                GROUP BY
+                    q.id,
+                    q.title
+
+                ORDER BY
+                    attempts DESC,
+                    average_score DESC
+
+                LIMIT 5
+                `
+            );
+
+
+        // ------------------------------------------
+        // Recent attempts
+        // ------------------------------------------
+
+        const recentAttemptsResult =
+            await pool.query(
+                `
+                SELECT
+                    a.id,
+                    u.full_name,
+                    u.email,
+                    q.title AS quiz_title,
+                    a.score,
+                    a.percentage,
+                    a.submitted_at
+
+                FROM attempts a
+
+                INNER JOIN users u
+                    ON u.id = a.user_id
+
+                INNER JOIN quizzes q
+                    ON q.id = a.quiz_id
+
+                ORDER BY
+                    a.submitted_at DESC
+
+                LIMIT 10
+                `
+            );
+
+
+        // ------------------------------------------
+        // Category statistics
+        // ------------------------------------------
+
+        const categoriesResult =
+            await pool.query(
+                `
+                SELECT
+                    c.id,
+                    c.name,
+
+                    COUNT(DISTINCT q.id)::integer
+                        AS quizzes,
+
+                    COUNT(a.id)::integer
+                        AS attempts
+
+                FROM categories c
+
+                LEFT JOIN quizzes q
+                    ON q.category_id = c.id
+
+                LEFT JOIN attempts a
+                    ON a.quiz_id = q.id
+
+                GROUP BY
+                    c.id,
+                    c.name
+
+                ORDER BY
+                    attempts DESC,
+                    c.name ASC
+                `
+            );
+
+
+        // ------------------------------------------
+        // Response
+        // ------------------------------------------
+
+        res.status(200).json({
+            stats: statsResult.rows[0],
+
+            popularQuizzes:
+                popularQuizzesResult.rows,
+
+            recentAttempts:
+                recentAttemptsResult.rows,
+
+            categories:
+                categoriesResult.rows,
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Admin analytics error:",
+            error
+        );
+
+        res.status(500).json({
+            message:
+                "Failed to fetch admin analytics",
         });
     }
 };

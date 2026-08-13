@@ -14,7 +14,7 @@ function Navbar() {
     const [deleting, setDeleting] = useState(false);
 
     const user = JSON.parse(
-        localStorage.getItem("user") || "null"
+        sessionStorage.getItem("user") || "null"
     );
 
     const isAdmin = user?.role === "admin";
@@ -26,8 +26,8 @@ function Navbar() {
     const handleLogout = () => {
         setOpen(false);
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
 
         navigate("/login");
     };
