@@ -9,6 +9,7 @@ import {
 import AuthPage from "../pages/auth/AuthPage";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
+import DeveloperLogin from "../pages/developer/DeveloperLogin";
 
 // Common
 import Navbar from "../components/common/Navbar";
@@ -41,6 +42,7 @@ function AppContent() {
         "/",
         "/login",
         "/register",
+        "/developer/login",
     ];
 
     const isPublicPage = publicPages.includes(
@@ -72,6 +74,12 @@ function AppContent() {
                     <Route
                         path="/register"
                         element={<Register />}
+                    />
+
+                    {/* Developer Login */}
+                    <Route
+                        path="/developer/login"
+                        element={<DeveloperLogin />}
                     />
 
 
