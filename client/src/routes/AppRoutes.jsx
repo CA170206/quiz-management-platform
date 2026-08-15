@@ -53,9 +53,15 @@ function AppContent() {
         location.pathname
     );
 
+    // Developer pages use their own navigation
+    const isDeveloperPage =
+        location.pathname.startsWith("/developer");
+
     return (
         <>
-            {!isPublicPage && <Navbar />}
+            {!isPublicPage &&
+                !isDeveloperPage &&
+                <Navbar />}
 
             <main className="min-h-screen bg-slate-50">
 
