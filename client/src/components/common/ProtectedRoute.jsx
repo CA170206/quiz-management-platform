@@ -1,21 +1,53 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 function ProtectedRoute({ allowedRole }) {
-    const token = sessionStorage.getItem("token");
+    // Support both storage types
+    // Existing student/admin login uses sessionStorage,
+    // Developer login currently uses localStorage.
+    const token =
+        sessionStorage.getItem("token") ||
+        localStorage.getItem("token");
+
+    const storedUser =
+        sessionStorage.getItem("user") ||
+        localStorage.getItem("user");
+
     const user = JSON.parse(
-        sessionStorage.getItem("user") || "null"
+        storedUser || "null"
     );
 
-    // Not logged in
+    // ==========================================
+    // NOT LOGGED IN
+    // ==========================================
+
     if (!token || !user) {
-        return <Navigate to="/login" replace />;
+        return (
+            <Navigate
+                to="/login"
+                replace
+            />
+        );
     }
 
-    // Role restriction
+    // ==========================================
+    // ROLE RESTRICTION
+    // ==========================================
+
     if (
         allowedRole &&
         user.role !== allowedRole
     ) {
+        // Developer
+        if (user.role === "developer") {
+            return (
+                <Navigate
+                    to="/developer"
+                    replace
+                />
+            );
+        }
+
+        // Admin
         if (user.role === "admin") {
             return (
                 <Navigate
@@ -25,6 +57,7 @@ function ProtectedRoute({ allowedRole }) {
             );
         }
 
+        // Student
         return (
             <Navigate
                 to="/student/dashboard"
@@ -32,6 +65,10 @@ function ProtectedRoute({ allowedRole }) {
             />
         );
     }
+
+    // ==========================================
+    // AUTHORIZED
+    // ==========================================
 
     return <Outlet />;
 }

@@ -33,6 +33,9 @@ import Leaderboard from "../pages/student/Leaderboard";
 import Profile from "../pages/student/Profile";
 import Analytics from "../pages/student/Analytics";
 
+// developer
+
+import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
 
 function AppContent() {
     const location = useLocation();
@@ -43,6 +46,7 @@ function AppContent() {
         "/login",
         "/register",
         "/developer/login",
+        "/developer",
     ];
 
     const isPublicPage = publicPages.includes(
@@ -81,7 +85,22 @@ function AppContent() {
                         path="/developer/login"
                         element={<DeveloperLogin />}
                     />
+                    {/* ================================= */}
+{/* DEVELOPER PROTECTED ROUTES */}
+{/* ================================= */}
 
+<Route
+    element={
+        <ProtectedRoute
+            allowedRole="developer"
+        />
+    }
+>
+    <Route
+        path="/developer"
+        element={<DeveloperDashboard />}
+    />
+</Route>
 
                     {/* ================================= */}
                     {/* ADMIN PROTECTED ROUTES */}
