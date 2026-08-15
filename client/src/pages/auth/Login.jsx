@@ -50,16 +50,20 @@ function Login() {
 
             const data = await response.json();
 
+            console.log("Login response:", data);
+
             if (!response.ok) {
-                throw new Error(
-                    data.message || "Login failed"
-                );
+                throw new Error(data.message || "Login failed");
             }
 
-            // Store token
+            // Make sure backend actually returned a token
+            if (!data.token) {
+                throw new Error("Login succeeded but no token was received.");
+            }
+
+            // Store authentication data in localStorage
             localStorage.setItem("token", data.token);
 
-            // Store user information if backend returns it
             if (data.user) {
                 localStorage.setItem(
                     "user",
@@ -67,29 +71,33 @@ function Login() {
                 );
             }
 
-            /*
-             * IMPORTANT:
-             * The selected login type is NOT trusted.
-             * The actual role comes from the backend.
-             */
+            // Keep sessionStorage too for compatibility
+            sessionStorage.setItem("token", data.token);
 
-            const role = data.user?.role;
-
-            if (role === "admin") {
-                navigate("/admin/dashboard");
-            } else if (role === "student") {
-                navigate("/student/dashboard");
-            } else {
-                // Fallback if backend doesn't return user yet
-                navigate(
-                    loginType === "admin"
-                        ? "/admin/dashboard"
-                        : "/student/dashboard"
+            if (data.user) {
+                sessionStorage.setItem(
+                    "user",
+                    JSON.stringify(data.user)
                 );
             }
 
+            // Get role from backend
+            const role = data.user?.role;
+
+            console.log("Logged in role:", role);
+
+            // Navigate based on backend role
+            if (role === "admin") {
+                window.location.href = "/admin/dashboard";
+            } else if (role === "student") {
+                window.location.href = "/student/dashboard";
+            } else {
+                throw new Error("Invalid user role received from server.");
+            }
+
         } catch (err) {
-            setError(err.message);
+            console.error("Login error:", err);
+            setError(err.message || "Something went wrong during login.");
         } finally {
             setLoading(false);
         }
@@ -126,9 +134,7 @@ function Login() {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleLoginTypeChange(
-                                        "student"
-                                    )
+                                    handleLoginTypeChange("student")
                                 }
                                 className={`rounded-lg px-4 py-3 text-sm font-semibold transition ${
                                     loginType === "student"
@@ -142,9 +148,7 @@ function Login() {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleLoginTypeChange(
-                                        "admin"
-                                    )
+                                    handleLoginTypeChange("admin")
                                 }
                                 className={`rounded-lg px-4 py-3 text-sm font-semibold transition ${
                                     loginType === "admin"
@@ -256,9 +260,7 @@ function Login() {
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        navigate(
-                                            "/register"
-                                        )
+                                        navigate("/register")
                                     }
                                     className="font-semibold text-blue-600 hover:text-blue-700"
                                 >
