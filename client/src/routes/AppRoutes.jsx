@@ -34,8 +34,9 @@ import Profile from "../pages/student/Profile";
 import Analytics from "../pages/student/Analytics";
 
 // developer
-
 import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
+import DeveloperUsers from "../pages/developer/Users";
+
 
 function AppContent() {
     const location = useLocation();
@@ -102,6 +103,23 @@ function AppContent() {
     />
 </Route>
 
+<Route
+    element={
+        <ProtectedRoute
+            allowedRole="developer"
+        />
+    }
+>
+    <Route
+        path="/developer"
+        element={<DeveloperDashboard />}
+    />
+
+    <Route
+        path="/developer/users"
+        element={<DeveloperUsers />}
+    />
+</Route>
                     {/* ================================= */}
                     {/* ADMIN PROTECTED ROUTES */}
                     {/* ================================= */}

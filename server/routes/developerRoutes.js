@@ -2,6 +2,7 @@ import express from "express";
 
 import {
     getAllUsers,
+    getUserById,
 } from "../controllers/developerController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -19,6 +20,14 @@ router.get(
     authMiddleware,
     requireDeveloper,
     getAllUsers
+);
+
+// Get single user
+router.get(
+    "/users/:id",
+    authMiddleware,
+    requireDeveloper,
+    getUserById
 );
 
 export default router;
