@@ -46,6 +46,8 @@ export const createQuestion = async (req, res) => {
             option_c,
             option_d,
             correct_answer,
+            explanation,
+            difficulty,
         } = req.body;
 
         if (
@@ -58,7 +60,26 @@ export const createQuestion = async (req, res) => {
             !correct_answer
         ) {
             return res.status(400).json({
-                message: "All fields are required",
+                message: "All required fields are required",
+            });
+        }
+
+        // Validate difficulty if provided
+        const validDifficulties = [
+            "beginner",
+            "medium",
+            "intermediate",
+        ];
+
+        if (
+            difficulty &&
+            !validDifficulties.includes(
+                difficulty.toLowerCase()
+            )
+        ) {
+            return res.status(400).json({
+                message:
+                    "Invalid difficulty. Use beginner, medium, or intermediate",
             });
         }
 
@@ -107,9 +128,12 @@ export const createQuestion = async (req, res) => {
                 option_b,
                 option_c,
                 option_d,
-                correct_answer
+                correct_answer,
+                explanation,
+                difficulty
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            VALUES
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING *
             `,
             [
@@ -121,6 +145,12 @@ export const createQuestion = async (req, res) => {
                 option_c.trim(),
                 option_d.trim(),
                 correct_answer.trim(),
+                explanation
+                    ? explanation.trim()
+                    : null,
+                difficulty
+                    ? difficulty.toLowerCase()
+                    : null,
             ]
         );
 
@@ -129,7 +159,10 @@ export const createQuestion = async (req, res) => {
             question: result.rows[0],
         });
     } catch (error) {
-        console.error("Create question error:", error);
+        console.error(
+            "Create question error:",
+            error
+        );
 
         res.status(500).json({
             message: "Failed to create question",
@@ -154,6 +187,8 @@ export const updateQuestion = async (req, res) => {
             option_c,
             option_d,
             correct_answer,
+            explanation,
+            difficulty,
         } = req.body;
 
         if (
@@ -166,7 +201,26 @@ export const updateQuestion = async (req, res) => {
             !correct_answer
         ) {
             return res.status(400).json({
-                message: "All fields are required",
+                message: "All required fields are required",
+            });
+        }
+
+        // Validate difficulty if provided
+        const validDifficulties = [
+            "beginner",
+            "medium",
+            "intermediate",
+        ];
+
+        if (
+            difficulty &&
+            !validDifficulties.includes(
+                difficulty.toLowerCase()
+            )
+        ) {
+            return res.status(400).json({
+                message:
+                    "Invalid difficulty. Use beginner, medium, or intermediate",
             });
         }
 
@@ -215,8 +269,10 @@ export const updateQuestion = async (req, res) => {
                 option_b = $5,
                 option_c = $6,
                 option_d = $7,
-                correct_answer = $8
-            WHERE id = $9
+                correct_answer = $8,
+                explanation = $9,
+                difficulty = $10
+            WHERE id = $11
             RETURNING *
             `,
             [
@@ -228,6 +284,12 @@ export const updateQuestion = async (req, res) => {
                 option_c.trim(),
                 option_d.trim(),
                 correct_answer.trim(),
+                explanation
+                    ? explanation.trim()
+                    : null,
+                difficulty
+                    ? difficulty.toLowerCase()
+                    : null,
                 id,
             ]
         );
@@ -243,7 +305,10 @@ export const updateQuestion = async (req, res) => {
             question: result.rows[0],
         });
     } catch (error) {
-        console.error("Update question error:", error);
+        console.error(
+            "Update question error:",
+            error
+        );
 
         res.status(500).json({
             message: "Failed to update question",
@@ -280,7 +345,10 @@ export const deleteQuestion = async (req, res) => {
             question: result.rows[0],
         });
     } catch (error) {
-        console.error("Delete question error:", error);
+        console.error(
+            "Delete question error:",
+            error
+        );
 
         res.status(500).json({
             message: "Failed to delete question",
@@ -293,7 +361,10 @@ export const deleteQuestion = async (req, res) => {
 // GET QUESTIONS BY QUIZ
 // ==========================================
 
-export const getQuestionsByQuiz = async (req, res) => {
+export const getQuestionsByQuiz = async (
+    req,
+    res
+) => {
     try {
         const { quizId } = req.params;
 
@@ -316,7 +387,8 @@ export const getQuestionsByQuiz = async (req, res) => {
         );
 
         res.status(500).json({
-            message: "Failed to fetch quiz questions",
+            message:
+                "Failed to fetch quiz questions",
         });
     }
 };

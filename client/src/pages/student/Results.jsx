@@ -392,6 +392,25 @@ function Results() {
 
                                     </div>
 
+
+                                    {/* Explanation */}
+
+                                    {answer.explanation && (
+                                        <div className="mt-4 rounded-xl bg-blue-50 p-4">
+
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                                                Explanation
+                                            </p>
+
+                                            <p className="mt-2 break-words text-sm leading-6 text-slate-700">
+                                                {
+                                                    answer.explanation
+                                                }
+                                            </p>
+
+                                        </div>
+                                    )}
+
                                 </div>
 
                             )

@@ -15,6 +15,8 @@ function Questions() {
         option_c: "",
         option_d: "",
         correct_answer: "",
+        explanation: "",
+        difficulty: "",
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -39,8 +41,7 @@ function Questions() {
             setLoading(true);
             setError("");
 
-            const response =
-                await fetch(API_URL);
+            const response = await fetch(API_URL);
 
             if (!response.ok) {
                 throw new Error(
@@ -48,8 +49,7 @@ function Questions() {
                 );
             }
 
-            const data =
-                await response.json();
+            const data = await response.json();
 
             const sortedQuestions = [...data].sort(
                 (a, b) => a.id - b.id
@@ -78,8 +78,7 @@ function Questions() {
                 );
             }
 
-            const data =
-                await response.json();
+            const data = await response.json();
 
             const sortedQuizzes = [...data].sort(
                 (a, b) => a.id - b.id
@@ -109,6 +108,8 @@ function Questions() {
             ...formData,
             [e.target.name]: e.target.value,
         });
+
+        setError("");
     };
 
     // =========================
@@ -154,6 +155,13 @@ function Questions() {
                 return;
             }
 
+            if (!formData.difficulty) {
+                setError(
+                    "Please select a difficulty level."
+                );
+                return;
+            }
+
             const options = [
                 formData.option_a.trim(),
                 formData.option_b.trim(),
@@ -190,43 +198,48 @@ function Questions() {
                 return;
             }
 
-            const response =
-                await fetch(url, {
-                    method,
+            const response = await fetch(url, {
+                method,
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
+                headers: {
+                    "Content-Type":
+                        "application/json",
 
-                        Authorization:
-                            `Bearer ${token}`,
-                    },
+                    Authorization:
+                        `Bearer ${token}`,
+                },
 
-                    body: JSON.stringify({
-                        quiz_id:
-                            Number(
-                                formData.quiz_id
-                            ),
+                body: JSON.stringify({
+                    quiz_id:
+                        Number(
+                            formData.quiz_id
+                        ),
 
-                        question_text:
-                            formData.question_text.trim(),
+                    question_text:
+                        formData.question_text.trim(),
 
-                        option_a:
-                            formData.option_a.trim(),
+                    option_a:
+                        formData.option_a.trim(),
 
-                        option_b:
-                            formData.option_b.trim(),
+                    option_b:
+                        formData.option_b.trim(),
 
-                        option_c:
-                            formData.option_c.trim(),
+                    option_c:
+                        formData.option_c.trim(),
 
-                        option_d:
-                            formData.option_d.trim(),
+                    option_d:
+                        formData.option_d.trim(),
 
-                        correct_answer:
-                            correctAnswer,
-                    }),
-                });
+                    correct_answer:
+                        correctAnswer,
+
+                    explanation:
+                        formData.explanation.trim(),
+
+                    difficulty:
+                        formData.difficulty,
+                }),
+            });
 
             const data =
                 await response.json();
@@ -275,7 +288,15 @@ function Questions() {
 
             correct_answer:
                 question.correct_answer || "",
+
+            explanation:
+                question.explanation || "",
+
+            difficulty:
+                question.difficulty || "",
         });
+
+        setError("");
 
         window.scrollTo({
             top: 0,
@@ -325,18 +346,17 @@ function Questions() {
                 return;
             }
 
-            const response =
-                await fetch(
-                    `${API_URL}/${deleteId}`,
-                    {
-                        method: "DELETE",
+            const response = await fetch(
+                `${API_URL}/${deleteId}`,
+                {
+                    method: "DELETE",
 
-                        headers: {
-                            Authorization:
-                                `Bearer ${token}`,
-                        },
-                    }
-                );
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+                }
+            );
 
             const data =
                 await response.json();
@@ -375,6 +395,8 @@ function Questions() {
             option_c: "",
             option_d: "",
             correct_answer: "",
+            explanation: "",
+            difficulty: "",
         });
 
         setError("");
@@ -394,6 +416,46 @@ function Questions() {
             quiz?.title ||
             "Unknown Quiz"
         );
+    };
+
+    // =========================
+    // DIFFICULTY DISPLAY
+    // =========================
+
+    const getDifficultyClasses = (
+        difficulty
+    ) => {
+        if (difficulty === "beginner") {
+            return "bg-green-50 text-green-700";
+        }
+
+        if (difficulty === "medium") {
+            return "bg-yellow-50 text-yellow-700";
+        }
+
+        if (difficulty === "intermediate") {
+            return "bg-red-50 text-red-700";
+        }
+
+        return "bg-slate-100 text-slate-600";
+    };
+
+    const getDifficultyLabel = (
+        difficulty
+    ) => {
+        if (difficulty === "beginner") {
+            return "Beginner";
+        }
+
+        if (difficulty === "medium") {
+            return "Medium";
+        }
+
+        if (difficulty === "intermediate") {
+            return "Intermediate";
+        }
+
+        return "Not set";
     };
 
     // =========================
@@ -644,6 +706,71 @@ function Questions() {
                         </div>
 
 
+                        {/* Explanation */}
+
+                        <div>
+
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Explanation
+                            </label>
+
+                            <textarea
+                                name="explanation"
+                                placeholder="Explain why this is the correct answer..."
+                                value={
+                                    formData.explanation
+                                }
+                                onChange={
+                                    handleChange
+                                }
+                                rows={3}
+                                className="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            />
+
+                        </div>
+
+
+                        {/* Difficulty */}
+
+                        <div>
+
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Difficulty
+                            </label>
+
+                            <select
+                                name="difficulty"
+                                value={
+                                    formData.difficulty
+                                }
+                                onChange={
+                                    handleChange
+                                }
+                                required
+                                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            >
+
+                                <option value="">
+                                    Select Difficulty
+                                </option>
+
+                                <option value="beginner">
+                                    Beginner
+                                </option>
+
+                                <option value="medium">
+                                    Medium
+                                </option>
+
+                                <option value="intermediate">
+                                    Intermediate
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
                         {/* Error */}
 
                         {error && (
@@ -777,6 +904,16 @@ function Questions() {
                                                     "Category"}
                                             </span>
 
+                                            <span
+                                                className={`rounded-full px-3 py-1 text-xs font-semibold ${getDifficultyClasses(
+                                                    question.difficulty
+                                                )}`}
+                                            >
+                                                {getDifficultyLabel(
+                                                    question.difficulty
+                                                )}
+                                            </span>
+
                                         </div>
 
                                         <span className="shrink-0 text-xs font-medium text-slate-400">
@@ -880,6 +1017,25 @@ function Questions() {
                                         )}
 
                                     </div>
+
+
+                                    {/* Explanation */}
+
+                                    {question.explanation && (
+                                        <div className="mt-4 rounded-lg bg-slate-50 px-3 py-3">
+
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                Explanation
+                                            </p>
+
+                                            <p className="mt-1 break-words text-sm leading-5 text-slate-600">
+                                                {
+                                                    question.explanation
+                                                }
+                                            </p>
+
+                                        </div>
+                                    )}
 
 
                                     {/* Actions */}

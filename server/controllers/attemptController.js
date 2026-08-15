@@ -43,7 +43,8 @@ export const submitQuiz = async (req, res) => {
 
         if (questions.length === 0) {
             return res.status(404).json({
-                message: "No questions found for this quiz",
+                message:
+                    "No questions found for this quiz",
             });
         }
 
@@ -71,7 +72,8 @@ export const submitQuiz = async (req, res) => {
             }
         });
 
-        const totalQuestions = questions.length;
+        const totalQuestions =
+            questions.length;
 
         const score = correctAnswers;
 
@@ -129,7 +131,8 @@ export const submitQuiz = async (req, res) => {
             ]
         );
 
-        const attempt = attemptResult.rows[0];
+        const attempt =
+            attemptResult.rows[0];
 
         // ------------------------------------------
         // Save individual answers
@@ -169,7 +172,8 @@ export const submitQuiz = async (req, res) => {
         // ------------------------------------------
 
         res.status(201).json({
-            message: "Quiz submitted successfully",
+            message:
+                "Quiz submitted successfully",
             attempt,
         });
 
@@ -180,7 +184,8 @@ export const submitQuiz = async (req, res) => {
         );
 
         res.status(500).json({
-            message: "Failed to submit quiz",
+            message:
+                "Failed to submit quiz",
         });
     }
 };
@@ -226,11 +231,13 @@ export const getAttemptById = async (
 
         if (result.rows.length === 0) {
             return res.status(404).json({
-                message: "Attempt not found",
+                message:
+                    "Attempt not found",
             });
         }
 
-        const attempt = result.rows[0];
+        const attempt =
+            result.rows[0];
 
         // ------------------------------------------
         // Get answers
@@ -243,7 +250,9 @@ export const getAttemptById = async (
                 answers.selected_answer,
                 answers.is_correct,
                 questions.question_text,
-                questions.correct_answer
+                questions.correct_answer,
+                questions.explanation,
+                questions.difficulty
 
             FROM answers
 
@@ -258,6 +267,10 @@ export const getAttemptById = async (
             [id]
         );
 
+        // ------------------------------------------
+        // Response
+        // ------------------------------------------
+
         res.status(200).json({
             ...attempt,
             answers: answersResult.rows,
@@ -270,7 +283,8 @@ export const getAttemptById = async (
         );
 
         res.status(500).json({
-            message: "Failed to fetch result",
+            message:
+                "Failed to fetch result",
         });
     }
 };
@@ -325,7 +339,8 @@ export const getLeaderboard = async (
         );
 
         res.status(500).json({
-            message: "Failed to fetch leaderboard",
+            message:
+                "Failed to fetch leaderboard",
         });
     }
 };
