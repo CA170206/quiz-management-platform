@@ -33,7 +33,7 @@ import Leaderboard from "../pages/student/Leaderboard";
 import Profile from "../pages/student/Profile";
 import Analytics from "../pages/student/Analytics";
 
-// developer
+// Developer
 import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
 import DeveloperUsers from "../pages/developer/Users";
 
@@ -47,7 +47,6 @@ function AppContent() {
         "/login",
         "/register",
         "/developer/login",
-        "/developer",
     ];
 
     const isPublicPage = publicPages.includes(
@@ -86,40 +85,33 @@ function AppContent() {
                         path="/developer/login"
                         element={<DeveloperLogin />}
                     />
+
+
                     {/* ================================= */}
-{/* DEVELOPER PROTECTED ROUTES */}
-{/* ================================= */}
+                    {/* DEVELOPER PROTECTED ROUTES */}
+                    {/* ================================= */}
 
-<Route
-    element={
-        <ProtectedRoute
-            allowedRole="developer"
-        />
-    }
->
-    <Route
-        path="/developer"
-        element={<DeveloperDashboard />}
-    />
-</Route>
+                    <Route
+                        element={
+                            <ProtectedRoute
+                                allowedRole="developer"
+                            />
+                        }
+                    >
 
-<Route
-    element={
-        <ProtectedRoute
-            allowedRole="developer"
-        />
-    }
->
-    <Route
-        path="/developer"
-        element={<DeveloperDashboard />}
-    />
+                        <Route
+                            path="/developer"
+                            element={<DeveloperDashboard />}
+                        />
 
-    <Route
-        path="/developer/users"
-        element={<DeveloperUsers />}
-    />
-</Route>
+                        <Route
+                            path="/developer/users"
+                            element={<DeveloperUsers />}
+                        />
+
+                    </Route>
+
+
                     {/* ================================= */}
                     {/* ADMIN PROTECTED ROUTES */}
                     {/* ================================= */}

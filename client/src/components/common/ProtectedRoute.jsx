@@ -1,9 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 function ProtectedRoute({ allowedRole }) {
-    // Support both storage types
-    // Existing student/admin login uses sessionStorage,
-    // Developer login currently uses localStorage.
     const token =
         sessionStorage.getItem("token") ||
         localStorage.getItem("token");
@@ -21,6 +18,15 @@ function ProtectedRoute({ allowedRole }) {
     // ==========================================
 
     if (!token || !user) {
+        if (allowedRole === "developer") {
+            return (
+                <Navigate
+                    to="/developer/login"
+                    replace
+                />
+            );
+        }
+
         return (
             <Navigate
                 to="/login"
@@ -29,14 +35,16 @@ function ProtectedRoute({ allowedRole }) {
         );
     }
 
+
     // ==========================================
-    // ROLE RESTRICTION
+    // WRONG ROLE
     // ==========================================
 
     if (
         allowedRole &&
         user.role !== allowedRole
     ) {
+
         // Developer
         if (user.role === "developer") {
             return (
@@ -65,6 +73,7 @@ function ProtectedRoute({ allowedRole }) {
             />
         );
     }
+
 
     // ==========================================
     // AUTHORIZED
