@@ -6,6 +6,7 @@ import {
     createQuiz,
     updateQuiz,
     deleteQuiz,
+    publishQuiz,
 } from "../controllers/quizController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -20,6 +21,14 @@ const router = express.Router();
 
 // Get all quizzes
 router.get("/", getQuizzes);
+
+// Publish / Unpublish quiz
+router.patch(
+    "/:id/publish",
+    authMiddleware,
+    adminOnly,
+    publishQuiz
+);
 
 // Get single quiz
 router.get("/:id", getQuizById);
@@ -52,6 +61,5 @@ router.delete(
     adminOnly,
     deleteQuiz
 );
-
 
 export default router;
