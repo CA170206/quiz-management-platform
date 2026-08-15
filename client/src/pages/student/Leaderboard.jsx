@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const API_URL =
-    "http://localhost:5000/api/attempts/leaderboard";
+    `${import.meta.env.VITE_API_URL}/api/attempts/leaderboard`;
 
 function Leaderboard() {
     const [players, setPlayers] = useState([]);

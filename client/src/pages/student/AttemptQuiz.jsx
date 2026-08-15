@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const QUESTIONS_API = "http://localhost:5000/api/questions";
-const QUIZ_API = "http://localhost:5000/api/quizzes";
-const ATTEMPTS_API = "http://localhost:5000/api/attempts";
+const QUESTIONS_API = `${import.meta.env.VITE_API_URL}/api/questions`;
+const QUIZ_API = `${import.meta.env.VITE_API_URL}/api/quizzes`;
+const ATTEMPTS_API = `${import.meta.env.VITE_API_URL}/api/attempts`;
 
 function AttemptQuiz() {
     const { id } = useParams();

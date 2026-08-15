@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:5000/api/quizzes";
-const CATEGORY_API_URL = "http://localhost:5000/api/categories";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/quizzes`;
+const CATEGORY_API_URL = `${import.meta.env.VITE_API_URL}/api/categories`;
 
 function Quizzes() {
     const [quizzes, setQuizzes] = useState([]);

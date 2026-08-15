@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000/api/quizzes";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/quizzes`;
 const CATEGORY_API_URL =
-    "http://localhost:5000/api/categories";
+    `${import.meta.env.VITE_API_URL}/api/categories`;
 
 function QuizList() {
     const navigate = useNavigate();

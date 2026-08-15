@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const API_URL =
-    "http://localhost:5000/api/analytics/student";
+    `${import.meta.env.VITE_API_URL}/api/analytics/student`;
 
 function Analytics() {
     const [stats, setStats] = useState(null);
