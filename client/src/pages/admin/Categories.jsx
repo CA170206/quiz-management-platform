@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 
 const API_URL =
-    `${import.meta.env.VITE_API_URL}/api/questions`;
-
-const QUIZ_API_URL =
-    `${import.meta.env.VITE_API_URL}/api/quizzes`;
+    `${import.meta.env.VITE_API_URL}/api/categories`;
 
 function Categories() {
     const [categories, setCategories] = useState([]);
@@ -130,7 +127,7 @@ function Categories() {
             setName("");
             setEditingId(null);
 
-            fetchCategories();
+            await fetchCategories();
 
         } catch (err) {
             setError(err.message);
@@ -216,7 +213,7 @@ function Categories() {
             setDeleteId(null);
             setShowDeleteModal(false);
 
-            fetchCategories();
+            await fetchCategories();
 
         } catch (err) {
             setError(err.message);

@@ -37,6 +37,7 @@ import Analytics from "../pages/student/Analytics";
 import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
 import DeveloperUsers from "../pages/developer/Users";
 
+import DeveloperAdmins from "../pages/developer/Admins";
 
 function AppContent() {
     const location = useLocation();
@@ -114,7 +115,11 @@ function AppContent() {
                             path="/developer/users"
                             element={<DeveloperUsers />}
                         />
-
+                        
+                        <Route
+    path="/developer/admins"
+    element={<DeveloperAdmins />}
+/>
                     </Route>
 
 
