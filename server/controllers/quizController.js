@@ -1,13 +1,16 @@
 import pool from "../config/db.js";
 
 // ==========================================
-// GET ALL QUIZZES
+// GET ALL PUBLISHED QUIZZES
 // ==========================================
 
 export const getQuizzes = async (req, res) => {
     try {
         const result = await pool.query(
-            "SELECT * FROM quizzes ORDER BY id DESC"
+            `SELECT *
+             FROM quizzes
+             WHERE status = 'published'
+             ORDER BY id DESC`
         );
 
         res.status(200).json(result.rows);
@@ -42,7 +45,6 @@ export const createQuiz = async (req, res) => {
             });
         }
 
-        // Only allow valid quiz statuses
         const validStatuses = [
             "draft",
             "published",
@@ -53,8 +55,7 @@ export const createQuiz = async (req, res) => {
 
         if (!validStatuses.includes(quizStatus)) {
             return res.status(400).json({
-                message:
-                    "Invalid quiz status",
+                message: "Invalid quiz status",
             });
         }
 
@@ -80,8 +81,7 @@ export const createQuiz = async (req, res) => {
         );
 
         res.status(201).json({
-            message:
-                "Quiz created successfully",
+            message: "Quiz created successfully",
             quiz: result.rows[0],
         });
     } catch (error) {
@@ -91,8 +91,7 @@ export const createQuiz = async (req, res) => {
         );
 
         res.status(500).json({
-            message:
-                "Failed to create quiz",
+            message: "Failed to create quiz",
         });
     }
 };
@@ -121,7 +120,6 @@ export const updateQuiz = async (req, res) => {
             });
         }
 
-        // If status is provided, validate it
         if (
             status &&
             ![
@@ -131,8 +129,7 @@ export const updateQuiz = async (req, res) => {
             ].includes(status)
         ) {
             return res.status(400).json({
-                message:
-                    "Invalid quiz status",
+                message: "Invalid quiz status",
             });
         }
 
@@ -157,14 +154,12 @@ export const updateQuiz = async (req, res) => {
 
         if (result.rows.length === 0) {
             return res.status(404).json({
-                message:
-                    "Quiz not found",
+                message: "Quiz not found",
             });
         }
 
         res.status(200).json({
-            message:
-                "Quiz updated successfully",
+            message: "Quiz updated successfully",
             quiz: result.rows[0],
         });
     } catch (error) {
@@ -174,8 +169,7 @@ export const updateQuiz = async (req, res) => {
         );
 
         res.status(500).json({
-            message:
-                "Failed to update quiz",
+            message: "Failed to update quiz",
         });
     }
 };
@@ -198,16 +192,12 @@ export const publishQuiz = async (req, res) => {
 
         if (existingQuiz.rows.length === 0) {
             return res.status(404).json({
-                message:
-                    "Quiz not found",
+                message: "Quiz not found",
             });
         }
 
         const currentStatus =
             existingQuiz.rows[0].status;
-
-        // Published → Unpublished
-        // Draft/Unpublished → Published
 
         const newStatus =
             currentStatus === "published"
@@ -263,14 +253,12 @@ export const deleteQuiz = async (req, res) => {
 
         if (result.rows.length === 0) {
             return res.status(404).json({
-                message:
-                    "Quiz not found",
+                message: "Quiz not found",
             });
         }
 
         res.status(200).json({
-            message:
-                "Quiz deleted successfully",
+            message: "Quiz deleted successfully",
             quiz: result.rows[0],
         });
     } catch (error) {
@@ -280,8 +268,7 @@ export const deleteQuiz = async (req, res) => {
         );
 
         res.status(500).json({
-            message:
-                "Failed to delete quiz",
+            message: "Failed to delete quiz",
         });
     }
 };
@@ -304,8 +291,7 @@ export const getQuizById = async (req, res) => {
 
         if (result.rows.length === 0) {
             return res.status(404).json({
-                message:
-                    "Quiz not found",
+                message: "Quiz not found",
             });
         }
 
@@ -319,8 +305,7 @@ export const getQuizById = async (req, res) => {
         );
 
         res.status(500).json({
-            message:
-                "Failed to fetch quiz",
+            message: "Failed to fetch quiz",
         });
     }
 };
