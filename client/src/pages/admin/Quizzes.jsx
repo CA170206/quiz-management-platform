@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api/quizzes`;
+const ADMIN_API_URL = `${import.meta.env.VITE_API_URL}/api/quizzes/admin`;
 const CATEGORY_API_URL = `${import.meta.env.VITE_API_URL}/api/categories`;
 
 function Quizzes() {
@@ -24,6 +25,8 @@ function Quizzes() {
     const [deleteId, setDeleteId] = useState(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [publishingId, setPublishingId] = useState(null);
+
     // =========================
     // GET TOKEN
     // =========================
@@ -36,7 +39,8 @@ function Quizzes() {
     };
 
     // =========================
-    // FETCH QUIZZES
+    // FETCH ALL QUIZZES
+    // ADMIN ONLY
     // =========================
 
     const fetchQuizzes = async () => {
@@ -44,15 +48,32 @@ function Quizzes() {
             setLoading(true);
             setError("");
 
-            const response = await fetch(API_URL);
+            const token = getToken();
 
-            if (!response.ok) {
+            if (!token) {
                 throw new Error(
-                    "Failed to fetch quizzes"
+                    "Authentication required. Please login again."
                 );
             }
 
+            const response = await fetch(
+                ADMIN_API_URL,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+                }
+            );
+
             const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                        "Failed to fetch quizzes"
+                );
+            }
 
             const sortedQuizzes = [...data].sort(
                 (a, b) => a.id - b.id
@@ -236,6 +257,54 @@ function Quizzes() {
     };
 
     // =========================
+    // PUBLISH / UNPUBLISH
+    // =========================
+
+    const handlePublishToggle = async (quiz) => {
+        try {
+            setPublishingId(quiz.id);
+            setError("");
+
+            const token = getToken();
+
+            if (!token) {
+                throw new Error(
+                    "Authentication required. Please login again."
+                );
+            }
+
+            const response = await fetch(
+                `${API_URL}/${quiz.id}/publish`,
+                {
+                    method: "PATCH",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                        "Failed to update quiz status"
+                );
+            }
+
+            await fetchQuizzes();
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setPublishingId(null);
+        }
+    };
+
+    // =========================
     // DELETE MODAL
     // =========================
 
@@ -339,6 +408,34 @@ function Quizzes() {
     };
 
     // =========================
+    // STATUS DISPLAY
+    // =========================
+
+    const getStatusClasses = (status) => {
+        if (status === "published") {
+            return "bg-green-50 text-green-700";
+        }
+
+        if (status === "unpublished") {
+            return "bg-orange-50 text-orange-700";
+        }
+
+        return "bg-slate-100 text-slate-600";
+    };
+
+    const getStatusLabel = (status) => {
+        if (status === "published") {
+            return "Published";
+        }
+
+        if (status === "unpublished") {
+            return "Unpublished";
+        }
+
+        return "Draft";
+    };
+
+    // =========================
     // UI
     // =========================
 
@@ -362,8 +459,7 @@ function Quizzes() {
                     </h1>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
-                        Create, edit, and manage quizzes
-                        on the platform.
+                        Create, edit, publish, and manage quizzes on the platform.
                     </p>
 
                 </div>
@@ -670,11 +766,25 @@ function Quizzes() {
                                             {index + 1}
                                         </div>
 
-                                        <span className="max-w-[55%] truncate rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
-                                            {getCategoryName(
-                                                quiz.category_id
-                                            )}
-                                        </span>
+                                        <div className="flex max-w-[65%] flex-wrap justify-end gap-2">
+
+                                            <span className="max-w-[180px] truncate rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
+                                                {getCategoryName(
+                                                    quiz.category_id
+                                                )}
+                                            </span>
+
+                                            <span
+                                                className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClasses(
+                                                    quiz.status
+                                                )}`}
+                                            >
+                                                {getStatusLabel(
+                                                    quiz.status
+                                                )}
+                                            </span>
+
+                                        </div>
 
                                     </div>
 
@@ -734,30 +844,61 @@ function Quizzes() {
 
                                     {/* ACTIONS */}
 
-                                    <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 min-[400px]:flex-row">
+                                    <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4">
+
+                                        <div className="flex flex-col gap-2 min-[400px]:flex-row">
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleEdit(
+                                                        quiz
+                                                    )
+                                                }
+                                                className="flex-1 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
+                                            >
+                                                Edit
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    openDeleteModal(
+                                                        quiz.id
+                                                    )
+                                                }
+                                                className="flex-1 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </div>
 
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleEdit(
+                                                handlePublishToggle(
                                                     quiz
                                                 )
                                             }
-                                            className="flex-1 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
-                                        >
-                                            Edit
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                openDeleteModal(
-                                                    quiz.id
-                                                )
+                                            disabled={
+                                                publishingId ===
+                                                quiz.id
                                             }
-                                            className="flex-1 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                                            className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                                                quiz.status ===
+                                                "published"
+                                                    ? "bg-orange-50 text-orange-600 hover:bg-orange-100"
+                                                    : "bg-green-50 text-green-600 hover:bg-green-100"
+                                            }`}
                                         >
-                                            Delete
+                                            {publishingId ===
+                                            quiz.id
+                                                ? "Updating..."
+                                                : quiz.status ===
+                                                  "published"
+                                                ? "Unpublish Quiz"
+                                                : "Publish Quiz"}
                                         </button>
 
                                     </div>

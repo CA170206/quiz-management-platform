@@ -2,6 +2,7 @@ import express from "express";
 
 import {
     getQuizzes,
+    getAllQuizzesForAdmin,
     getQuizById,
     createQuiz,
     updateQuiz,
@@ -16,11 +17,26 @@ const router = express.Router();
 
 
 // ==========================================
-// PUBLIC / STUDENT ACCESS
+// STUDENT ACCESS
+// ==========================================
+
+// Get published quizzes only
+router.get("/", getQuizzes);
+
+
+// ==========================================
+// ADMIN ACCESS
 // ==========================================
 
 // Get all quizzes
-router.get("/", getQuizzes);
+// Includes draft, published and unpublished
+router.get(
+    "/admin",
+    authMiddleware,
+    adminOnly,
+    getAllQuizzesForAdmin
+);
+
 
 // Publish / Unpublish quiz
 router.patch(
@@ -30,13 +46,10 @@ router.patch(
     publishQuiz
 );
 
+
 // Get single quiz
 router.get("/:id", getQuizById);
 
-
-// ==========================================
-// ADMIN ONLY
-// ==========================================
 
 // Create quiz
 router.post(
@@ -46,6 +59,7 @@ router.post(
     createQuiz
 );
 
+
 // Update quiz
 router.put(
     "/:id",
@@ -54,6 +68,7 @@ router.put(
     updateQuiz
 );
 
+
 // Delete quiz
 router.delete(
     "/:id",
@@ -61,5 +76,6 @@ router.delete(
     adminOnly,
     deleteQuiz
 );
+
 
 export default router;

@@ -2,6 +2,7 @@ import pool from "../config/db.js";
 
 // ==========================================
 // GET ALL PUBLISHED QUIZZES
+// STUDENT ACCESS
 // ==========================================
 
 export const getQuizzes = async (req, res) => {
@@ -16,6 +17,33 @@ export const getQuizzes = async (req, res) => {
         res.status(200).json(result.rows);
     } catch (error) {
         console.error("Get quizzes error:", error);
+
+        res.status(500).json({
+            message: "Failed to fetch quizzes",
+        });
+    }
+};
+
+
+// ==========================================
+// GET ALL QUIZZES
+// ADMIN ACCESS
+// ==========================================
+
+export const getAllQuizzesForAdmin = async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT *
+             FROM quizzes
+             ORDER BY id DESC`
+        );
+
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(
+            "Get all quizzes for admin error:",
+            error
+        );
 
         res.status(500).json({
             message: "Failed to fetch quizzes",
@@ -295,9 +323,7 @@ export const getQuizById = async (req, res) => {
             });
         }
 
-        res.status(200).json(
-            result.rows[0]
-        );
+        res.status(200).json(result.rows[0]);
     } catch (error) {
         console.error(
             "Get quiz by ID error:",
@@ -330,9 +356,7 @@ export const getQuestionsByQuiz = async (
             [quizId]
         );
 
-        res.status(200).json(
-            result.rows
-        );
+        res.status(200).json(result.rows);
     } catch (error) {
         console.error(
             "Get questions by quiz error:",
