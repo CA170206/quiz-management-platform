@@ -1,5 +1,5 @@
 import pool from "../config/db.js";
-
+import bcrypt from "bcrypt";
 // ==========================================
 // GET ALL USERS
 // ==========================================
@@ -122,6 +122,83 @@ export const deleteUser = async (req, res) => {
 
         res.status(500).json({
             message: "Failed to delete user",
+        });
+    }
+};
+
+// ==========================================
+// CREATE ADMIN
+// ==========================================
+
+export const createAdmin = async (req, res) => {
+    try {
+        const {
+            full_name,
+            email,
+            password,
+        } = req.body;
+
+        // Validate input
+        if (!full_name || !email || !password) {
+            return res.status(400).json({
+                message:
+                    "Full name, email and password are required",
+            });
+        }
+
+        // Check if email already exists
+        const existingUser = await pool.query(
+            `SELECT id, role
+             FROM users
+             WHERE email = $1`,
+            [email]
+        );
+
+        if (existingUser.rows.length > 0) {
+            return res.status(400).json({
+                message:
+                    "An account with this email already exists",
+            });
+        }
+
+        // Hash password
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
+
+        // Create admin
+        const result = await pool.query(
+            `INSERT INTO users
+                (full_name, email, password, role)
+             VALUES
+                ($1, $2, $3, $4)
+             RETURNING
+                id,
+                full_name,
+                email,
+                role,
+                created_at`,
+            [
+                full_name.trim(),
+                email.trim().toLowerCase(),
+                hashedPassword,
+                "admin",
+            ]
+        );
+
+        res.status(201).json({
+            message:
+                "Admin created successfully",
+            user: result.rows[0],
+        });
+    } catch (error) {
+        console.error(
+            "Create admin error:",
+            error
+        );
+
+        res.status(500).json({
+            message:
+                "Failed to create admin",
         });
     }
 };

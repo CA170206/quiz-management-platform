@@ -4,6 +4,7 @@ import {
     getAllUsers,
     getUserById,
     deleteUser,
+    createAdmin,
 } from "../controllers/developerController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -39,4 +40,11 @@ router.delete(
     deleteUser
 );
 
+// Create admin
+router.post(
+    "/admins",
+    authMiddleware,
+    requireDeveloper,
+    createAdmin
+);
 export default router;
