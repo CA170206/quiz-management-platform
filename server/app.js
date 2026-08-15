@@ -8,7 +8,7 @@ import quizRoutes from "./routes/quizRoutes.js";
 import attemptRoutes from "./routes/attemptRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
-
+import developerRoutes from "./routes/developerRoutes.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 
 
@@ -70,5 +70,10 @@ app.get(
     }
 );
 
+// developer routes
+app.use(
+    "/api/developer",
+    developerRoutes
+);
 
 export default app;
