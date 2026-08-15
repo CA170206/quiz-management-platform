@@ -10,6 +10,15 @@ function Users() {
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
 
+    // Selected user for details modal
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [detailsLoading, setDetailsLoading] = useState(false);
+    const [detailsError, setDetailsError] = useState("");
+
+    // ==========================================
+    // FETCH ALL USERS
+    // ==========================================
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -50,6 +59,63 @@ function Users() {
 
         fetchUsers();
     }, []);
+
+    // ==========================================
+    // VIEW USER DETAILS
+    // ==========================================
+
+    const handleViewUser = async (userId) => {
+        try {
+            setDetailsLoading(true);
+            setDetailsError("");
+            setSelectedUser(null);
+
+            const token =
+                localStorage.getItem("token") ||
+                sessionStorage.getItem("token");
+
+            const response = await fetch(
+                `${API_URL}/${userId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    "Failed to fetch user details"
+                );
+            }
+
+            setSelectedUser(data.user);
+        } catch (err) {
+            console.error(
+                "Fetch user details error:",
+                err
+            );
+
+            setDetailsError(
+                err.message ||
+                "Failed to fetch user details"
+            );
+        } finally {
+            setDetailsLoading(false);
+        }
+    };
+
+    // ==========================================
+    // CLOSE DETAILS MODAL
+    // ==========================================
+
+    const closeDetails = () => {
+        setSelectedUser(null);
+        setDetailsError("");
+    };
 
     // ==========================================
     // FILTER USERS
@@ -111,7 +177,9 @@ function Users() {
         <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
 
-                {/* Header */}
+                {/* ================================= */}
+                {/* HEADER */}
+                {/* ================================= */}
 
                 <div className="mb-8">
                     <p className="text-sm font-semibold text-blue-600">
@@ -128,7 +196,9 @@ function Users() {
                 </div>
 
 
-                {/* Statistics */}
+                {/* ================================= */}
+                {/* STATISTICS */}
+                {/* ================================= */}
 
                 <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -178,7 +248,9 @@ function Users() {
                 </div>
 
 
-                {/* Main Card */}
+                {/* ================================= */}
+                {/* MAIN CARD */}
+                {/* ================================= */}
 
                 <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
 
@@ -240,7 +312,9 @@ function Users() {
                     </div>
 
 
-                    {/* Loading */}
+                    {/* ================================= */}
+                    {/* LOADING */}
+                    {/* ================================= */}
 
                     {loading && (
                         <div className="p-10 text-center">
@@ -253,7 +327,9 @@ function Users() {
                     )}
 
 
-                    {/* Error */}
+                    {/* ================================= */}
+                    {/* ERROR */}
+                    {/* ================================= */}
 
                     {!loading && error && (
                         <div className="p-6">
@@ -264,7 +340,9 @@ function Users() {
                     )}
 
 
-                    {/* Empty */}
+                    {/* ================================= */}
+                    {/* EMPTY */}
+                    {/* ================================= */}
 
                     {!loading &&
                         !error &&
@@ -287,7 +365,9 @@ function Users() {
                         )}
 
 
-                    {/* Desktop Table */}
+                    {/* ================================= */}
+                    {/* DESKTOP TABLE */}
+                    {/* ================================= */}
 
                     {!loading &&
                         !error &&
@@ -297,7 +377,9 @@ function Users() {
                                 <table className="w-full text-left">
 
                                     <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+
                                         <tr>
+
                                             <th className="px-6 py-4 font-semibold">
                                                 User
                                             </th>
@@ -317,18 +399,29 @@ function Users() {
                                             <th className="px-6 py-4 font-semibold">
                                                 Created
                                             </th>
+
+                                            <th className="px-6 py-4 text-right font-semibold">
+                                                Action
+                                            </th>
+
                                         </tr>
+
                                     </thead>
+
 
                                     <tbody className="divide-y divide-slate-100">
 
                                         {filteredUsers.map((user) => (
+
                                             <tr
                                                 key={user.id}
                                                 className="transition hover:bg-slate-50"
                                             >
 
+                                                {/* User */}
+
                                                 <td className="px-6 py-4">
+
                                                     <div className="flex items-center gap-3">
 
                                                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 font-bold text-blue-600">
@@ -338,19 +431,26 @@ function Users() {
                                                         </div>
 
                                                         <div>
+
                                                             <p className="font-semibold text-slate-900">
                                                                 {user.full_name}
                                                             </p>
+
                                                         </div>
 
                                                     </div>
+
                                                 </td>
 
+
+                                                {/* Email */}
 
                                                 <td className="px-6 py-4 text-sm text-slate-600">
                                                     {user.email}
                                                 </td>
 
+
+                                                {/* Role */}
 
                                                 <td className="px-6 py-4">
 
@@ -365,10 +465,14 @@ function Users() {
                                                 </td>
 
 
+                                                {/* ID */}
+
                                                 <td className="px-6 py-4 text-sm font-medium text-slate-500">
                                                     #{user.id}
                                                 </td>
 
+
+                                                {/* Created */}
 
                                                 <td className="px-6 py-4 text-sm text-slate-500">
                                                     {user.created_at
@@ -378,7 +482,26 @@ function Users() {
                                                         : "—"}
                                                 </td>
 
+
+                                                {/* View */}
+
+                                                <td className="px-6 py-4 text-right">
+
+                                                    <button
+                                                        onClick={() =>
+                                                            handleViewUser(
+                                                                user.id
+                                                            )
+                                                        }
+                                                        className="rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
+                                                    >
+                                                        View
+                                                    </button>
+
+                                                </td>
+
                                             </tr>
+
                                         ))}
 
                                     </tbody>
@@ -389,7 +512,9 @@ function Users() {
                         )}
 
 
-                    {/* Mobile Cards */}
+                    {/* ================================= */}
+                    {/* MOBILE CARDS */}
+                    {/* ================================= */}
 
                     {!loading &&
                         !error &&
@@ -397,6 +522,7 @@ function Users() {
                             <div className="divide-y divide-slate-100 md:hidden">
 
                                 {filteredUsers.map((user) => (
+
                                     <div
                                         key={user.id}
                                         className="p-5"
@@ -404,7 +530,7 @@ function Users() {
 
                                         <div className="flex items-start justify-between gap-4">
 
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex min-w-0 items-center gap-3">
 
                                                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 font-bold text-blue-600">
                                                     {user.full_name
@@ -426,6 +552,7 @@ function Users() {
 
                                             </div>
 
+
                                             <span
                                                 className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold capitalize ${getRoleStyle(
                                                     user.role
@@ -437,23 +564,40 @@ function Users() {
                                         </div>
 
 
-                                        <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
+                                        <div className="mt-4 flex items-center justify-between">
 
-                                            <span>
-                                                ID #{user.id}
-                                            </span>
+                                            <div className="flex items-center gap-4 text-xs text-slate-500">
 
-                                            <span>
-                                                {user.created_at
-                                                    ? new Date(
-                                                          user.created_at
-                                                      ).toLocaleDateString()
-                                                    : "—"}
-                                            </span>
+                                                <span>
+                                                    ID #{user.id}
+                                                </span>
+
+                                                <span>
+                                                    {user.created_at
+                                                        ? new Date(
+                                                              user.created_at
+                                                          ).toLocaleDateString()
+                                                        : "—"}
+                                                </span>
+
+                                            </div>
+
+
+                                            <button
+                                                onClick={() =>
+                                                    handleViewUser(
+                                                        user.id
+                                                    )
+                                                }
+                                                className="rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
+                                            >
+                                                View
+                                            </button>
 
                                         </div>
 
                                     </div>
+
                                 ))}
 
                             </div>
@@ -462,6 +606,186 @@ function Users() {
                 </div>
 
             </div>
+
+
+            {/* ==========================================
+                USER DETAILS MODAL
+            ========================================== */}
+
+            {(detailsLoading ||
+                selectedUser ||
+                detailsError) && (
+
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4 py-6"
+                    onClick={closeDetails}
+                >
+
+                    <div
+                        className="w-full max-w-lg rounded-2xl bg-white shadow-2xl"
+                        onClick={(e) =>
+                            e.stopPropagation()
+                        }
+                    >
+
+                        {/* Modal Header */}
+
+                        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+
+                            <div>
+
+                                <p className="text-sm font-semibold text-blue-600">
+                                    Developer Tools
+                                </p>
+
+                                <h2 className="mt-1 text-xl font-bold text-slate-900">
+                                    User Details
+                                </h2>
+
+                            </div>
+
+
+                            <button
+                                onClick={closeDetails}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                            >
+                                ×
+                            </button>
+
+                        </div>
+
+
+                        {/* Modal Body */}
+
+                        <div className="p-6">
+
+                            {detailsLoading && (
+                                <div className="py-10 text-center">
+
+                                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+
+                                    <p className="mt-4 text-sm text-slate-500">
+                                        Loading user details...
+                                    </p>
+
+                                </div>
+                            )}
+
+
+                            {detailsError && (
+                                <div className="rounded-xl bg-red-50 px-5 py-4 text-sm text-red-600">
+                                    {detailsError}
+                                </div>
+                            )}
+
+
+                            {selectedUser && !detailsLoading && (
+
+                                <div>
+
+                                    {/* Profile */}
+
+                                    <div className="mb-6 flex items-center gap-4">
+
+                                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-2xl font-bold text-blue-600">
+                                            {selectedUser.full_name
+                                                ?.charAt(0)
+                                                .toUpperCase()}
+                                        </div>
+
+                                        <div>
+
+                                            <h3 className="text-xl font-bold text-slate-900">
+                                                {selectedUser.full_name}
+                                            </h3>
+
+                                            <span
+                                                className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${getRoleStyle(
+                                                    selectedUser.role
+                                                )}`}
+                                            >
+                                                {selectedUser.role}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    {/* Information */}
+
+                                    <div className="space-y-4">
+
+                                        <div className="rounded-xl bg-slate-50 p-4">
+
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                User ID
+                                            </p>
+
+                                            <p className="mt-1 font-semibold text-slate-900">
+                                                #{selectedUser.id}
+                                            </p>
+
+                                        </div>
+
+
+                                        <div className="rounded-xl bg-slate-50 p-4">
+
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                Email Address
+                                            </p>
+
+                                            <p className="mt-1 break-all font-semibold text-slate-900">
+                                                {selectedUser.email}
+                                            </p>
+
+                                        </div>
+
+
+                                        <div className="rounded-xl bg-slate-50 p-4">
+
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                Account Created
+                                            </p>
+
+                                            <p className="mt-1 font-semibold text-slate-900">
+                                                {selectedUser.created_at
+                                                    ? new Date(
+                                                          selectedUser.created_at
+                                                      ).toLocaleString()
+                                                    : "—"}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+
+                        {/* Modal Footer */}
+
+                        <div className="border-t border-slate-200 px-6 py-4 text-right">
+
+                            <button
+                                onClick={closeDetails}
+                                className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                            >
+                                Close
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
         </div>
     );
 }

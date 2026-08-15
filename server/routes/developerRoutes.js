@@ -3,6 +3,7 @@ import express from "express";
 import {
     getAllUsers,
     getUserById,
+    deleteUser,
 } from "../controllers/developerController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -28,6 +29,14 @@ router.get(
     authMiddleware,
     requireDeveloper,
     getUserById
+);
+
+// Delete user
+router.delete(
+    "/users/:id",
+    authMiddleware,
+    requireDeveloper,
+    deleteUser
 );
 
 export default router;
