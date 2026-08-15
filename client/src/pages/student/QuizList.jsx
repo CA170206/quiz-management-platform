@@ -41,12 +41,12 @@ function QuizList() {
                 );
             }
 
-            const quizData = await quizResponse.json();
+            const quizData =
+                await quizResponse.json();
 
             const categoryData =
                 await categoryResponse.json();
 
-            // Keep quizzes in ID order
             const sortedQuizzes = [...quizData].sort(
                 (a, b) => a.id - b.id
             );
@@ -104,20 +104,26 @@ function QuizList() {
         selectedCategory,
     ]);
 
+    // ==========================================
+    // LOADING
+    // ==========================================
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-10">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
+
                 <div className="mx-auto max-w-7xl">
 
-                    <div className="mb-8">
+                    <div className="mb-7">
                         <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
 
-                        <div className="mt-3 h-9 w-72 animate-pulse rounded bg-slate-200" />
+                        <div className="mt-3 h-8 w-64 animate-pulse rounded bg-slate-200 sm:h-9 sm:w-72" />
 
-                        <div className="mt-3 h-5 w-96 max-w-full animate-pulse rounded bg-slate-200" />
+                        <div className="mt-3 h-5 w-full max-w-md animate-pulse rounded bg-slate-200" />
                     </div>
 
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
                         {[1, 2, 3, 4, 5, 6].map(
                             (item) => (
                                 <div
@@ -126,40 +132,57 @@ function QuizList() {
                                 />
                             )
                         )}
+
                     </div>
 
                 </div>
+
             </div>
         );
     }
 
+    // ==========================================
+    // UI
+    // ==========================================
+
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-10">
+        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
+
             <div className="mx-auto max-w-7xl">
 
+                {/* ================================= */}
                 {/* HEADER */}
-                <div className="mb-8">
+                {/* ================================= */}
+
+                <div className="mb-6 sm:mb-8">
+
                     <p className="text-sm font-semibold text-blue-600">
                         Student Portal
                     </p>
 
-                    <h1 className="mt-2 text-3xl font-bold text-slate-900">
+                    <h1 className="mt-2 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">
                         Available Quizzes
                     </h1>
 
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
                         Choose a quiz, test your knowledge,
                         and improve your score.
                     </p>
+
                 </div>
 
-                {/* SEARCH + FILTER */}
-                <div className="mb-8 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
 
-                    <div className="flex flex-col gap-4 lg:flex-row">
+                {/* ================================= */}
+                {/* SEARCH + FILTER */}
+                {/* ================================= */}
+
+                <div className="mb-6 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:mb-8 sm:p-5">
+
+                    <div className="flex flex-col gap-3 lg:flex-row lg:gap-4">
 
                         {/* Search */}
-                        <div className="relative flex-1">
+
+                        <div className="relative min-w-0 flex-1">
 
                             <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                                 🔍
@@ -179,7 +202,9 @@ function QuizList() {
 
                         </div>
 
+
                         {/* Category */}
+
                         <select
                             value={selectedCategory}
                             onChange={(e) =>
@@ -187,8 +212,9 @@ function QuizList() {
                                     e.target.value
                                 )
                             }
-                            className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 lg:w-56"
                         >
+
                             <option value="all">
                                 All Categories
                             </option>
@@ -203,12 +229,15 @@ function QuizList() {
                                     </option>
                                 )
                             )}
+
                         </select>
 
                     </div>
 
+
                     {/* Results count */}
-                    <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
 
                         <p className="text-sm text-slate-500">
                             Showing{" "}
@@ -225,6 +254,7 @@ function QuizList() {
                         {(search ||
                             selectedCategory !==
                                 "all") && (
+
                             <button
                                 type="button"
                                 onClick={() => {
@@ -233,26 +263,37 @@ function QuizList() {
                                         "all"
                                     );
                                 }}
-                                className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                                className="shrink-0 text-xs font-semibold text-blue-600 hover:text-blue-700"
                             >
                                 Clear Filters
                             </button>
+
                         )}
 
                     </div>
+
                 </div>
 
+
+                {/* ================================= */}
                 {/* ERROR */}
+                {/* ================================= */}
+
                 {error && (
-                    <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-600">
+                    <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-4 text-sm text-red-600 sm:px-5">
                         {error}
                     </div>
                 )}
 
+
+                {/* ================================= */}
                 {/* EMPTY */}
+                {/* ================================= */}
+
                 {!error &&
                 filteredQuizzes.length === 0 ? (
-                    <div className="rounded-2xl bg-white px-6 py-16 text-center shadow-sm ring-1 ring-slate-200">
+
+                    <div className="rounded-2xl bg-white px-5 py-12 text-center shadow-sm ring-1 ring-slate-200 sm:px-6 sm:py-16">
 
                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-2xl">
                             🔍
@@ -275,35 +316,42 @@ function QuizList() {
                                     "all"
                                 );
                             }}
-                            className="mt-6 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                            className="mt-6 w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
                         >
                             Show All Quizzes
                         </button>
 
                     </div>
+
                 ) : (
+
+                    /* ================================= */
                     /* QUIZZES */
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    /* ================================= */
+
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
                         {filteredQuizzes.map(
                             (quiz) => (
+
                                 <div
                                     key={quiz.id}
-                                    className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+                                    className="group flex min-w-0 flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition duration-200 hover:-translate-y-1 hover:shadow-lg"
                                 >
 
                                     {/* TOP */}
-                                    <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 px-6 py-7">
+
+                                    <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 px-5 py-6 sm:px-6 sm:py-7">
 
                                         <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/5" />
 
                                         <div className="relative flex items-start justify-between gap-3">
 
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 text-lg font-bold text-white backdrop-blur-sm">
+                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15 text-lg font-bold text-white backdrop-blur-sm sm:h-12 sm:w-12">
                                                 Q
                                             </div>
 
-                                            <span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
+                                            <span className="max-w-[65%] truncate rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
                                                 {getCategoryName(
                                                     quiz.category_id
                                                 )}
@@ -311,24 +359,29 @@ function QuizList() {
 
                                         </div>
 
-                                        <h2 className="relative mt-6 line-clamp-2 min-h-[56px] text-xl font-bold leading-7 text-white">
+                                        <h2 className="relative mt-5 line-clamp-2 min-h-[52px] break-words text-lg font-bold leading-7 text-white sm:mt-6 sm:min-h-[56px] sm:text-xl">
                                             {quiz.title}
                                         </h2>
 
                                     </div>
 
-                                    {/* BODY */}
-                                    <div className="flex flex-1 flex-col px-6 py-6">
 
-                                        <p className="line-clamp-3 min-h-[72px] text-sm leading-6 text-slate-500">
+                                    {/* BODY */}
+
+                                    <div className="flex flex-1 flex-col px-5 py-5 sm:px-6 sm:py-6">
+
+                                        <p className="line-clamp-3 min-h-[72px] break-words text-sm leading-6 text-slate-500">
                                             {quiz.description ||
                                                 "Test your knowledge with this quiz."}
                                         </p>
 
-                                        {/* INFO */}
-                                        <div className="mt-6 grid grid-cols-2 gap-3 border-t border-slate-100 pt-5">
 
-                                            <div className="rounded-xl bg-slate-50 p-3">
+                                        {/* INFO */}
+
+                                        <div className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-5">
+
+                                            <div className="min-w-0 rounded-xl bg-slate-50 p-3">
+
                                                 <p className="text-xs text-slate-400">
                                                     Duration
                                                 </p>
@@ -337,9 +390,12 @@ function QuizList() {
                                                     {quiz.duration}{" "}
                                                     min
                                                 </p>
+
                                             </div>
 
-                                            <div className="rounded-xl bg-slate-50 p-3">
+
+                                            <div className="min-w-0 rounded-xl bg-slate-50 p-3">
+
                                                 <p className="text-xs text-slate-400">
                                                     Category
                                                 </p>
@@ -349,11 +405,14 @@ function QuizList() {
                                                         quiz.category_id
                                                     )}
                                                 </p>
+
                                             </div>
 
                                         </div>
 
+
                                         {/* BUTTON */}
+
                                         <button
                                             type="button"
                                             onClick={() =>
@@ -364,21 +423,26 @@ function QuizList() {
                                             className="mt-5 w-full rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
                                         >
                                             View Quiz
+
                                             <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
                                                 →
                                             </span>
+
                                         </button>
 
                                     </div>
 
                                 </div>
+
                             )
                         )}
 
                     </div>
+
                 )}
 
             </div>
+
         </div>
     );
 }

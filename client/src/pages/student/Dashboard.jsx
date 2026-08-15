@@ -2,19 +2,21 @@ import { Link } from "react-router-dom";
 
 function Dashboard() {
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-10">
+        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
             <div className="mx-auto max-w-7xl">
 
                 {/* Welcome */}
-                <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 px-7 py-8 text-white shadow-sm sm:px-10">
-                    <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+                <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 px-5 py-6 text-white shadow-sm sm:px-10 sm:py-8">
 
-                        <div>
+                    <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-6">
+
+                        <div className="min-w-0">
+
                             <p className="text-sm font-semibold text-blue-100">
                                 Student Dashboard
                             </p>
 
-                            <h1 className="mt-2 text-3xl font-bold">
+                            <h1 className="mt-2 text-2xl font-bold leading-tight sm:text-3xl">
                                 Welcome back 👋
                             </h1>
 
@@ -22,99 +24,120 @@ function Dashboard() {
                                 Continue learning, attempt quizzes,
                                 and track your performance.
                             </p>
+
                         </div>
 
                         <Link
                             to="/student/quizzes"
-                            className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                            className="inline-flex w-full shrink-0 items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 sm:w-auto"
                         >
                             Browse Quizzes →
                         </Link>
 
                     </div>
+
                 </div>
 
-                {/* Stats */}
-                <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                {/* Stats */}
+                <div className="mt-5 grid gap-4 sm:mt-6 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
                         <div className="flex items-center justify-between">
                             <span className="text-2xl">📝</span>
+
                             <span className="text-xs font-semibold text-blue-600">
                                 Total
                             </span>
                         </div>
 
-                        <p className="mt-5 text-sm text-slate-500">
+                        <p className="mt-4 text-sm text-slate-500 sm:mt-5">
                             Quizzes Attempted
                         </p>
 
                         <p className="mt-1 text-3xl font-bold text-slate-900">
                             12
                         </p>
+
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
                         <div className="flex items-center justify-between">
                             <span className="text-2xl">🎯</span>
+
                             <span className="text-xs font-semibold text-green-600">
                                 Average
                             </span>
                         </div>
 
-                        <p className="mt-5 text-sm text-slate-500">
+                        <p className="mt-4 text-sm text-slate-500 sm:mt-5">
                             Average Score
                         </p>
 
                         <p className="mt-1 text-3xl font-bold text-slate-900">
                             78%
                         </p>
+
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
                         <div className="flex items-center justify-between">
                             <span className="text-2xl">🏆</span>
+
                             <span className="text-xs font-semibold text-purple-600">
                                 Best
                             </span>
                         </div>
 
-                        <p className="mt-5 text-sm text-slate-500">
+                        <p className="mt-4 text-sm text-slate-500 sm:mt-5">
                             Highest Score
                         </p>
 
                         <p className="mt-1 text-3xl font-bold text-slate-900">
                             95%
                         </p>
+
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
                         <div className="flex items-center justify-between">
                             <span className="text-2xl">📈</span>
+
                             <span className="text-xs font-semibold text-orange-600">
                                 Current
                             </span>
                         </div>
 
-                        <p className="mt-5 text-sm text-slate-500">
+                        <p className="mt-4 text-sm text-slate-500 sm:mt-5">
                             Pass Rate
                         </p>
 
                         <p className="mt-1 text-3xl font-bold text-slate-900">
                             83%
                         </p>
+
                     </div>
 
                 </div>
 
+
                 {/* Main Content */}
-                <div className="mt-6 grid gap-6 lg:grid-cols-3">
+                <div className="mt-5 grid gap-5 sm:mt-6 sm:gap-6 lg:grid-cols-3">
 
                     {/* Recent Activity */}
-                    <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 lg:col-span-2">
+                    <div className="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 lg:col-span-2">
 
-                        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-                            <div>
+                        <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+
+                            <div className="min-w-0">
+
                                 <h2 className="text-lg font-bold text-slate-900">
                                     Recent Activity
                                 </h2>
@@ -122,15 +145,18 @@ function Dashboard() {
                                 <p className="mt-1 text-sm text-slate-500">
                                     Your latest quiz attempts
                                 </p>
+
                             </div>
 
                             <Link
                                 to="/student/analytics"
-                                className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+                                className="shrink-0 text-sm font-semibold text-blue-600 hover:text-blue-700"
                             >
                                 View Analytics →
                             </Link>
+
                         </div>
+
 
                         <div className="divide-y divide-slate-100">
 
@@ -154,29 +180,34 @@ function Dashboard() {
                                     status: "Passed",
                                 },
                             ].map((item, index) => (
+
                                 <div
                                     key={index}
-                                    className="flex items-center justify-between gap-4 px-6 py-5 transition hover:bg-slate-50"
+                                    className="flex items-center justify-between gap-3 px-5 py-4 transition hover:bg-slate-50 sm:gap-4 sm:px-6 sm:py-5"
                                 >
-                                    <div className="flex items-center gap-4">
 
-                                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-600">
+                                    <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-600 sm:h-11 sm:w-11">
                                             Q
                                         </div>
 
-                                        <div>
-                                            <p className="font-semibold text-slate-900">
+                                        <div className="min-w-0">
+
+                                            <p className="truncate font-semibold text-slate-900">
                                                 {item.name}
                                             </p>
 
                                             <p className="mt-1 text-xs text-slate-400">
                                                 Quiz attempt
                                             </p>
+
                                         </div>
 
                                     </div>
 
-                                    <div className="text-right">
+
+                                    <div className="shrink-0 text-right">
 
                                         <p className="font-bold text-slate-900">
                                             {item.percentage}
@@ -187,15 +218,18 @@ function Dashboard() {
                                         </span>
 
                                     </div>
+
                                 </div>
+
                             ))}
 
                         </div>
 
                     </div>
 
+
                     {/* Quick Actions */}
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                    <div className="min-w-0 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                         <h2 className="text-lg font-bold text-slate-900">
                             Quick Actions
@@ -205,17 +239,18 @@ function Dashboard() {
                             Jump straight to what you need.
                         </p>
 
-                        <div className="mt-6 space-y-3">
+                        <div className="mt-5 space-y-3 sm:mt-6">
 
                             <Link
                                 to="/student/quizzes"
-                                className="flex items-center gap-4 rounded-xl border border-slate-200 p-4 transition hover:border-blue-200 hover:bg-blue-50"
+                                className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50 sm:gap-4 sm:p-4"
                             >
-                                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100">
                                     📝
                                 </span>
 
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-sm font-semibold text-slate-900">
                                         Take a Quiz
                                     </p>
@@ -224,17 +259,20 @@ function Dashboard() {
                                         Test your knowledge
                                     </p>
                                 </div>
+
                             </Link>
+
 
                             <Link
                                 to="/student/leaderboard"
-                                className="flex items-center gap-4 rounded-xl border border-slate-200 p-4 transition hover:border-blue-200 hover:bg-blue-50"
+                                className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50 sm:gap-4 sm:p-4"
                             >
-                                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100">
+
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-100">
                                     🏆
                                 </span>
 
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-sm font-semibold text-slate-900">
                                         Leaderboard
                                     </p>
@@ -243,17 +281,20 @@ function Dashboard() {
                                         Check your ranking
                                     </p>
                                 </div>
+
                             </Link>
+
 
                             <Link
                                 to="/student/analytics"
-                                className="flex items-center gap-4 rounded-xl border border-slate-200 p-4 transition hover:border-blue-200 hover:bg-blue-50"
+                                className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50 sm:gap-4 sm:p-4"
                             >
-                                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
+
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-100">
                                     📊
                                 </span>
 
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-sm font-semibold text-slate-900">
                                         My Analytics
                                     </p>
@@ -262,17 +303,20 @@ function Dashboard() {
                                         Track your progress
                                     </p>
                                 </div>
+
                             </Link>
+
 
                             <Link
                                 to="/student/profile"
-                                className="flex items-center gap-4 rounded-xl border border-slate-200 p-4 transition hover:border-blue-200 hover:bg-blue-50"
+                                className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50 sm:gap-4 sm:p-4"
                             >
-                                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
+
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
                                     👤
                                 </span>
 
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-sm font-semibold text-slate-900">
                                         My Profile
                                     </p>
@@ -281,21 +325,26 @@ function Dashboard() {
                                         Manage your account
                                     </p>
                                 </div>
+
                             </Link>
 
                         </div>
+
                     </div>
 
                 </div>
 
+
                 {/* Performance */}
-                <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                <div className="mt-5 grid gap-5 sm:mt-6 sm:gap-6 lg:grid-cols-2">
 
                     {/* Progress */}
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
-                        <div className="flex items-center justify-between">
-                            <div>
+                        <div className="flex items-start justify-between gap-4">
+
+                            <div className="min-w-0">
+
                                 <h2 className="text-lg font-bold text-slate-900">
                                     Overall Performance
                                 </h2>
@@ -303,11 +352,13 @@ function Dashboard() {
                                 <p className="mt-1 text-sm text-slate-500">
                                     Your current progress
                                 </p>
+
                             </div>
 
-                            <span className="text-2xl font-bold text-blue-600">
+                            <span className="shrink-0 text-2xl font-bold text-blue-600">
                                 78%
                             </span>
+
                         </div>
 
                         <div className="mt-6 h-3 overflow-hidden rounded-full bg-slate-100">
@@ -322,8 +373,9 @@ function Dashboard() {
 
                     </div>
 
+
                     {/* CTA */}
-                    <div className="rounded-2xl bg-slate-900 p-6 text-white">
+                    <div className="rounded-2xl bg-slate-900 p-5 text-white sm:p-6">
 
                         <p className="text-sm font-semibold text-blue-400">
                             Keep Going
@@ -340,7 +392,7 @@ function Dashboard() {
 
                         <Link
                             to="/student/quizzes"
-                            className="mt-6 inline-flex rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                            className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
                         >
                             Find a Quiz →
                         </Link>

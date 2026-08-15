@@ -24,7 +24,8 @@ function Profile() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const token = localStorage.getItem("token");
+                const token =
+                    localStorage.getItem("token");
 
                 if (!token) {
                     throw new Error(
@@ -35,7 +36,8 @@ function Profile() {
                 const response = await fetch(API_URL, {
                     method: "GET",
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization:
+                            `Bearer ${token}`,
                     },
                 });
 
@@ -55,9 +57,9 @@ function Profile() {
                     email: data.email || "",
                 });
 
-                // Keep localStorage user information updated
                 const storedUser = JSON.parse(
-                    localStorage.getItem("user") || "null"
+                    localStorage.getItem("user") ||
+                        "null"
                 );
 
                 if (storedUser) {
@@ -82,7 +84,6 @@ function Profile() {
         fetchProfile();
     }, []);
 
-
     // ==========================================
     // HANDLE INPUT
     // ==========================================
@@ -97,7 +98,6 @@ function Profile() {
         setSuccess("");
     };
 
-
     // ==========================================
     // SAVE PROFILE
     // ==========================================
@@ -108,7 +108,8 @@ function Profile() {
             setError("");
             setSuccess("");
 
-            const token = localStorage.getItem("token");
+            const token =
+                localStorage.getItem("token");
 
             if (!token) {
                 throw new Error(
@@ -128,8 +129,10 @@ function Profile() {
             const response = await fetch(API_URL, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    "Content-Type":
+                        "application/json",
+                    Authorization:
+                        `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     full_name:
@@ -148,7 +151,6 @@ function Profile() {
                 );
             }
 
-            // Backend returns updated user
             setProfile(data.user);
 
             setFormData({
@@ -156,9 +158,9 @@ function Profile() {
                 email: data.user.email,
             });
 
-            // Update stored user
             const storedUser = JSON.parse(
-                localStorage.getItem("user") || "null"
+                localStorage.getItem("user") ||
+                    "null"
             );
 
             if (storedUser) {
@@ -167,7 +169,8 @@ function Profile() {
                     JSON.stringify({
                         ...storedUser,
                         id: data.user.id,
-                        full_name: data.user.full_name,
+                        full_name:
+                            data.user.full_name,
                         email: data.user.email,
                         role: data.user.role,
                     })
@@ -186,7 +189,6 @@ function Profile() {
         }
     };
 
-
     // ==========================================
     // CANCEL EDIT
     // ==========================================
@@ -202,31 +204,33 @@ function Profile() {
         setEditing(false);
     };
 
-
     // ==========================================
     // LOADING
     // ==========================================
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-10">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
+
                 <div className="mx-auto max-w-4xl">
 
                     <div className="animate-pulse">
+
                         <div className="h-4 w-20 rounded bg-slate-200" />
 
-                        <div className="mt-3 h-9 w-48 rounded bg-slate-200" />
+                        <div className="mt-3 h-8 w-44 rounded bg-slate-200 sm:h-9 sm:w-48" />
 
-                        <div className="mt-2 h-5 w-72 rounded bg-slate-200" />
+                        <div className="mt-2 h-5 w-full max-w-xs rounded bg-slate-200 sm:w-72" />
+
                     </div>
 
-                    <div className="mt-8 h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
+                    <div className="mt-6 h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 sm:mt-8" />
 
                 </div>
+
             </div>
         );
     }
-
 
     // ==========================================
     // ERROR
@@ -234,45 +238,46 @@ function Profile() {
 
     if (error && !profile) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-10">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
+
                 <div className="mx-auto max-w-4xl">
 
-                    <div className="rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-600">
+                    <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-4 text-sm text-red-600 sm:px-5">
                         {error}
                     </div>
 
                 </div>
+
             </div>
         );
     }
 
-
     if (!profile) {
         return null;
     }
-
 
     // ==========================================
     // UI
     // ==========================================
 
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-10">
+        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
 
             <div className="mx-auto max-w-4xl">
 
                 {/* Header */}
-                <div className="mb-8">
+
+                <div className="mb-6 sm:mb-8">
 
                     <p className="text-sm font-semibold text-blue-600">
                         Account
                     </p>
 
-                    <h1 className="mt-1 text-3xl font-bold text-slate-900">
+                    <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
                         User Profile
                     </h1>
 
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-2 text-sm leading-6 text-slate-500 sm:text-base">
                         View and manage your account information.
                     </p>
 
@@ -280,14 +285,17 @@ function Profile() {
 
 
                 {/* Profile Card */}
+
                 <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
 
                     {/* Profile Header */}
-                    <div className="border-b border-slate-100 px-8 py-8">
 
-                        <div className="flex items-center gap-5">
+                    <div className="border-b border-slate-100 px-5 py-6 sm:px-8 sm:py-8">
+
+                        <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:gap-5 sm:text-left">
 
                             {/* Avatar */}
+
                             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white">
 
                                 {profile.full_name
@@ -298,13 +306,14 @@ function Profile() {
 
 
                             {/* Name */}
-                            <div>
 
-                                <h2 className="text-2xl font-bold text-slate-900">
+                            <div className="min-w-0">
+
+                                <h2 className="break-words text-xl font-bold text-slate-900 sm:text-2xl">
                                     {profile.full_name}
                                 </h2>
 
-                                <p className="mt-1 text-slate-500">
+                                <p className="mt-1 break-all text-sm text-slate-500 sm:text-base">
                                     {profile.email}
                                 </p>
 
@@ -320,33 +329,37 @@ function Profile() {
 
 
                     {/* Account Details */}
-                    <div className="px-8 py-8">
 
-                        <h3 className="mb-6 text-lg font-bold text-slate-900">
+                    <div className="px-5 py-6 sm:px-8 sm:py-8">
+
+                        <h3 className="mb-5 text-lg font-bold text-slate-900 sm:mb-6">
                             Account Information
                         </h3>
 
 
                         {/* Success */}
+
                         {success && (
-                            <div className="mb-6 rounded-lg border border-green-100 bg-green-50 px-4 py-3 text-sm text-green-600">
+                            <div className="mb-5 rounded-lg border border-green-100 bg-green-50 px-4 py-3 text-sm text-green-600 sm:mb-6">
                                 {success}
                             </div>
                         )}
 
 
                         {/* Error */}
+
                         {error && (
-                            <div className="mb-6 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                            <div className="mb-5 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600 sm:mb-6">
                                 {error}
                             </div>
                         )}
 
 
-                        <div className="grid gap-6 sm:grid-cols-2">
+                        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
 
                             {/* Full Name */}
-                            <div>
+
+                            <div className="min-w-0">
 
                                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                                     Full Name
@@ -362,14 +375,15 @@ function Profile() {
                                     onChange={
                                         handleChange
                                     }
-                                    className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                                    className="w-full min-w-0 rounded-lg border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                                 />
 
                             </div>
 
 
                             {/* Email */}
-                            <div>
+
+                            <div className="min-w-0">
 
                                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                                     Email Address
@@ -385,14 +399,15 @@ function Profile() {
                                     onChange={
                                         handleChange
                                     }
-                                    className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                                    className="w-full min-w-0 rounded-lg border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                                 />
 
                             </div>
 
 
                             {/* Role */}
-                            <div>
+
+                            <div className="min-w-0">
 
                                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                                     Role
@@ -403,14 +418,15 @@ function Profile() {
                                         profile.role
                                     }
                                     disabled
-                                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm capitalize text-slate-500"
+                                    className="w-full min-w-0 rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm capitalize text-slate-500"
                                 />
 
                             </div>
 
 
                             {/* User ID */}
-                            <div>
+
+                            <div className="min-w-0">
 
                                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                                     User ID
@@ -419,7 +435,7 @@ function Profile() {
                                 <input
                                     value={`#${profile.id}`}
                                     disabled
-                                    className="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-500"
+                                    className="w-full min-w-0 rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-500"
                                 />
 
                             </div>
@@ -428,7 +444,8 @@ function Profile() {
 
 
                         {/* Buttons */}
-                        <div className="mt-8 flex gap-3">
+
+                        <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
 
                             {!editing ? (
 
@@ -437,7 +454,7 @@ function Profile() {
                                     onClick={() =>
                                         setEditing(true)
                                     }
-                                    className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                    className="w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
                                 >
                                     Edit Profile
                                 </button>
@@ -452,7 +469,7 @@ function Profile() {
                                             handleSave
                                         }
                                         disabled={saving}
-                                        className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                        className="w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                                     >
                                         {saving
                                             ? "Saving..."
@@ -466,7 +483,7 @@ function Profile() {
                                             handleCancel
                                         }
                                         disabled={saving}
-                                        className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                        className="w-full rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                                     >
                                         Cancel
                                     </button>

@@ -2,32 +2,34 @@ import { Link } from "react-router-dom";
 
 function AdminDashboard() {
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-10">
+        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
             <div className="mx-auto max-w-7xl">
 
                 {/* Header */}
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                     <p className="text-sm font-semibold text-blue-600">
                         Administration
                     </p>
 
-                    <h1 className="mt-1 text-3xl font-bold text-slate-900">
+                    <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
                         Admin Dashboard
                     </h1>
 
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
                         Manage quizzes, questions, categories, and platform activity.
                     </p>
                 </div>
 
-                {/* Stats */}
-                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-                        <div className="flex items-center justify-between">
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-xl">
+                {/* Stats */}
+                <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                        <div className="flex items-center justify-between gap-3">
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-xl">
                                 👥
                             </span>
+
                             <span className="text-xs font-semibold text-blue-600">
                                 Users
                             </span>
@@ -42,11 +44,13 @@ function AdminDashboard() {
                         </p>
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-                        <div className="flex items-center justify-between">
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 text-xl">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                        <div className="flex items-center justify-between gap-3">
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-xl">
                                 📝
                             </span>
+
                             <span className="text-xs font-semibold text-purple-600">
                                 Quizzes
                             </span>
@@ -61,11 +65,13 @@ function AdminDashboard() {
                         </p>
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-                        <div className="flex items-center justify-between">
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-xl">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                        <div className="flex items-center justify-between gap-3">
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 text-xl">
                                 ❓
                             </span>
+
                             <span className="text-xs font-semibold text-green-600">
                                 Questions
                             </span>
@@ -80,11 +86,13 @@ function AdminDashboard() {
                         </p>
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-                        <div className="flex items-center justify-between">
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-xl">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                        <div className="flex items-center justify-between gap-3">
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-xl">
                                 📊
                             </span>
+
                             <span className="text-xs font-semibold text-orange-600">
                                 Attempts
                             </span>
@@ -101,8 +109,9 @@ function AdminDashboard() {
 
                 </div>
 
+
                 {/* Quick Actions */}
-                <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mt-6 sm:p-6">
 
                     <div>
                         <h2 className="text-lg font-bold text-slate-900">
@@ -114,11 +123,12 @@ function AdminDashboard() {
                         </p>
                     </div>
 
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+                    <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
 
                         <Link
                             to="/admin/quizzes"
-                            className="group rounded-xl border border-slate-200 p-5 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50"
+                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 sm:p-5"
                         >
                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-xl">
                                 📝
@@ -137,9 +147,10 @@ function AdminDashboard() {
                             </p>
                         </Link>
 
+
                         <Link
                             to="/admin/questions"
-                            className="group rounded-xl border border-slate-200 p-5 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50"
+                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50 sm:p-5"
                         >
                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-xl">
                                 ❓
@@ -158,9 +169,10 @@ function AdminDashboard() {
                             </p>
                         </Link>
 
+
                         <Link
                             to="/admin/categories"
-                            className="group rounded-xl border border-slate-200 p-5 transition hover:-translate-y-0.5 hover:border-purple-200 hover:bg-purple-50"
+                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-purple-200 hover:bg-purple-50 sm:p-5"
                         >
                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-100 text-xl">
                                 🗂️
@@ -179,9 +191,10 @@ function AdminDashboard() {
                             </p>
                         </Link>
 
+
                         <Link
                             to="/admin/questions"
-                            className="group rounded-xl border border-slate-200 p-5 transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50"
+                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50 sm:p-5"
                         >
                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-100 text-xl">
                                 📊
@@ -203,13 +216,14 @@ function AdminDashboard() {
                     </div>
                 </div>
 
+
                 {/* Activity + System Status */}
-                <div className="mt-6 grid gap-6 lg:grid-cols-3">
+                <div className="mt-5 grid gap-5 sm:mt-6 sm:gap-6 lg:grid-cols-3">
 
                     {/* Activity */}
-                    <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 lg:col-span-2">
+                    <div className="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 lg:col-span-2">
 
-                        <div className="border-b border-slate-100 px-6 py-5">
+                        <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
                             <h2 className="text-lg font-bold text-slate-900">
                                 Recent Activity
                             </h2>
@@ -218,6 +232,7 @@ function AdminDashboard() {
                                 Latest platform activity.
                             </p>
                         </div>
+
 
                         <div className="divide-y divide-slate-100">
 
@@ -247,35 +262,40 @@ function AdminDashboard() {
                                     time: "2 hours ago",
                                 },
                             ].map((activity, index) => (
+
                                 <div
                                     key={index}
-                                    className="flex items-center gap-4 px-6 py-5"
+                                    className="flex items-start gap-3 px-5 py-4 sm:items-center sm:gap-4 sm:px-6 sm:py-5"
                                 >
+
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
                                         {activity.icon}
                                     </div>
 
                                     <div className="min-w-0 flex-1">
-                                        <p className="font-semibold text-slate-900">
+                                        <p className="break-words font-semibold text-slate-900">
                                             {activity.title}
                                         </p>
 
-                                        <p className="mt-1 text-xs text-slate-500">
+                                        <p className="mt-1 break-words text-xs text-slate-500">
                                             {activity.description}
                                         </p>
                                     </div>
 
-                                    <span className="shrink-0 text-xs text-slate-400">
+                                    <span className="shrink-0 text-right text-[11px] leading-4 text-slate-400 sm:text-xs">
                                         {activity.time}
                                     </span>
+
                                 </div>
+
                             ))}
 
                         </div>
                     </div>
 
+
                     {/* Status */}
-                    <div className="rounded-2xl bg-slate-900 p-6 text-white">
+                    <div className="rounded-2xl bg-slate-900 p-5 text-white sm:p-6">
 
                         <p className="text-sm font-semibold text-blue-400">
                             System
@@ -285,36 +305,39 @@ function AdminDashboard() {
                             Platform Status
                         </h2>
 
-                        <div className="mt-6 space-y-4">
 
-                            <div className="flex items-center justify-between rounded-xl bg-white/5 p-4">
+                        <div className="mt-5 space-y-3 sm:mt-6 sm:space-y-4">
+
+                            <div className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4">
                                 <span className="text-sm text-slate-300">
                                     API Server
                                 </span>
 
-                                <span className="flex items-center gap-2 text-xs font-semibold text-green-400">
+                                <span className="flex shrink-0 items-center gap-2 text-xs font-semibold text-green-400">
                                     <span className="h-2 w-2 rounded-full bg-green-400" />
                                     Online
                                 </span>
                             </div>
 
-                            <div className="flex items-center justify-between rounded-xl bg-white/5 p-4">
+
+                            <div className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4">
                                 <span className="text-sm text-slate-300">
                                     Database
                                 </span>
 
-                                <span className="flex items-center gap-2 text-xs font-semibold text-green-400">
+                                <span className="flex shrink-0 items-center gap-2 text-xs font-semibold text-green-400">
                                     <span className="h-2 w-2 rounded-full bg-green-400" />
                                     Connected
                                 </span>
                             </div>
 
-                            <div className="flex items-center justify-between rounded-xl bg-white/5 p-4">
+
+                            <div className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4">
                                 <span className="text-sm text-slate-300">
                                     Authentication
                                 </span>
 
-                                <span className="flex items-center gap-2 text-xs font-semibold text-green-400">
+                                <span className="flex shrink-0 items-center gap-2 text-xs font-semibold text-green-400">
                                     <span className="h-2 w-2 rounded-full bg-green-400" />
                                     Active
                                 </span>
@@ -322,7 +345,8 @@ function AdminDashboard() {
 
                         </div>
 
-                        <div className="mt-6 border-t border-white/10 pt-5">
+
+                        <div className="mt-5 border-t border-white/10 pt-5 sm:mt-6">
                             <p className="text-xs leading-5 text-slate-400">
                                 These statistics are currently UI placeholders.
                                 We will connect them to your backend after the

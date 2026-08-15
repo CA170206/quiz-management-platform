@@ -5,10 +5,8 @@ const API_URL =
 
 function Analytics() {
     const [data, setData] = useState(null);
-
     const [loading, setLoading] =
         useState(true);
-
     const [error, setError] =
         useState("");
 
@@ -19,6 +17,7 @@ function Analytics() {
                 setError("");
 
                 const token =
+                    localStorage.getItem("token") ||
                     sessionStorage.getItem("token");
 
                 if (!token) {
@@ -59,21 +58,24 @@ function Analytics() {
         fetchAnalytics();
     }, []);
 
+    // ==========================================
+    // LOADING
+    // ==========================================
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-10">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
                 <div className="mx-auto max-w-7xl">
 
-                    <div className="mb-8 animate-pulse">
+                    <div className="mb-6 animate-pulse sm:mb-8">
                         <div className="h-4 w-28 rounded bg-slate-200" />
 
-                        <div className="mt-3 h-9 w-64 rounded bg-slate-200" />
+                        <div className="mt-3 h-8 w-56 rounded bg-slate-200 sm:h-9 sm:w-64" />
 
-                        <div className="mt-2 h-5 w-96 rounded bg-slate-200" />
+                        <div className="mt-2 h-5 w-full max-w-sm rounded bg-slate-200" />
                     </div>
 
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
 
                         {[1, 2, 3, 4].map(
                             (item) => (
@@ -91,23 +93,23 @@ function Analytics() {
         );
     }
 
+    // ==========================================
+    // ERROR
+    // ==========================================
 
     if (error) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-10">
-
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
                 <div className="mx-auto max-w-7xl">
 
-                    <div className="rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-600">
+                    <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-4 text-sm text-red-600 sm:px-5">
                         {error}
                     </div>
 
                 </div>
-
             </div>
         );
     }
-
 
     const stats =
         data?.stats || {};
@@ -121,42 +123,26 @@ function Analytics() {
     const categories =
         data?.categories || [];
 
-
     const totalStudents =
-        Number(
-            stats.total_students || 0
-        );
+        Number(stats.total_students || 0);
 
     const totalQuizzes =
-        Number(
-            stats.total_quizzes || 0
-        );
+        Number(stats.total_quizzes || 0);
 
     const totalQuestions =
-        Number(
-            stats.total_questions || 0
-        );
+        Number(stats.total_questions || 0);
 
     const totalAttempts =
-        Number(
-            stats.total_attempts || 0
-        );
+        Number(stats.total_attempts || 0);
 
     const totalCategories =
-        Number(
-            stats.total_categories || 0
-        );
+        Number(stats.total_categories || 0);
 
     const averageScore =
-        Number(
-            stats.average_score || 0
-        );
+        Number(stats.average_score || 0);
 
     const passRate =
-        Number(
-            stats.pass_rate || 0
-        );
-
+        Number(stats.pass_rate || 0);
 
     const cards = [
         {
@@ -189,51 +175,46 @@ function Analytics() {
         },
     ];
 
-
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-10">
+        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
 
             <div className="mx-auto max-w-7xl">
 
-                {/* ================================= */}
                 {/* HEADER */}
-                {/* ================================= */}
 
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
 
                     <p className="text-sm font-semibold text-blue-600">
                         Administration
                     </p>
 
-                    <h1 className="mt-1 text-3xl font-bold text-slate-900">
+                    <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
                         Platform Analytics
                     </h1>
 
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-2 text-sm leading-6 text-slate-500 sm:text-base">
                         Real-time overview of QuizMaster activity.
                     </p>
 
                 </div>
 
 
-                {/* ================================= */}
                 {/* STAT CARDS */}
-                {/* ================================= */}
 
-                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
 
                     {cards.map((card) => (
 
                         <div
                             key={card.title}
-                            className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200"
+                            className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6"
                         >
 
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-xl sm:h-12 sm:w-12">
                                 {card.icon}
                             </div>
 
-                            <p className="mt-6 text-sm font-medium text-slate-500">
+                            <p className="mt-5 text-sm font-medium text-slate-500 sm:mt-6">
                                 {card.title}
                             </p>
 
@@ -252,13 +233,11 @@ function Analytics() {
                 </div>
 
 
-                {/* ================================= */}
                 {/* SECONDARY STATS */}
-                {/* ================================= */}
 
-                <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-5 grid gap-4 sm:mt-6 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                         <p className="text-sm font-medium text-slate-500">
                             Pass Rate
@@ -275,7 +254,7 @@ function Analytics() {
                     </div>
 
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                         <p className="text-sm font-medium text-slate-500">
                             Question Bank
@@ -292,7 +271,7 @@ function Analytics() {
                     </div>
 
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6 sm:max-sm:col-span-2">
 
                         <p className="text-sm font-medium text-slate-500">
                             Categories
@@ -311,13 +290,11 @@ function Analytics() {
                 </div>
 
 
-                {/* ================================= */}
                 {/* POPULAR QUIZZES */}
-                {/* ================================= */}
 
-                <div className="mt-6 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                <div className="mt-5 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 sm:mt-6">
 
-                    <div className="border-b border-slate-100 px-6 py-5">
+                    <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
 
                         <h2 className="text-lg font-bold text-slate-900">
                             Most Popular Quizzes
@@ -332,7 +309,7 @@ function Analytics() {
 
                     {popularQuizzes.length === 0 ? (
 
-                        <div className="px-6 py-10 text-center text-sm text-slate-500">
+                        <div className="px-5 py-10 text-center text-sm text-slate-500 sm:px-6">
                             No quiz attempts yet.
                         </div>
 
@@ -345,12 +322,12 @@ function Analytics() {
 
                                     <div
                                         key={quiz.id}
-                                        className="flex items-center justify-between gap-5 px-6 py-5"
+                                        className="flex items-center justify-between gap-3 px-5 py-4 sm:gap-5 sm:px-6 sm:py-5"
                                     >
 
-                                        <div className="flex min-w-0 items-center gap-4">
+                                        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
 
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600">
+                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600 sm:h-10 sm:w-10">
                                                 {index + 1}
                                             </div>
 
@@ -368,10 +345,9 @@ function Analytics() {
 
                                         </div>
 
-                                        <span className="shrink-0 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-600">
+                                        <span className="shrink-0 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-600 sm:px-3">
                                             {Number(
-                                                quiz.average_score ||
-                                                    0
+                                                quiz.average_score || 0
                                             ).toFixed(0)}
                                             % avg
                                         </span>
@@ -388,13 +364,11 @@ function Analytics() {
                 </div>
 
 
-                {/* ================================= */}
                 {/* RECENT ATTEMPTS */}
-                {/* ================================= */}
 
-                <div className="mt-6 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                <div className="mt-5 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 sm:mt-6">
 
-                    <div className="border-b border-slate-100 px-6 py-5">
+                    <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
 
                         <h2 className="text-lg font-bold text-slate-900">
                             Recent Quiz Activity
@@ -409,7 +383,7 @@ function Analytics() {
 
                     {recentAttempts.length === 0 ? (
 
-                        <div className="px-6 py-10 text-center text-sm text-slate-500">
+                        <div className="px-5 py-10 text-center text-sm text-slate-500 sm:px-6">
                             No quiz activity yet.
                         </div>
 
@@ -417,25 +391,25 @@ function Analytics() {
 
                         <div className="overflow-x-auto">
 
-                            <table className="w-full text-left text-sm">
+                            <table className="w-full min-w-[650px] text-left text-sm">
 
                                 <thead className="bg-slate-50 text-xs uppercase text-slate-500">
 
                                     <tr>
 
-                                        <th className="px-6 py-4">
+                                        <th className="px-5 py-4 sm:px-6">
                                             Student
                                         </th>
 
-                                        <th className="px-6 py-4">
+                                        <th className="px-5 py-4 sm:px-6">
                                             Quiz
                                         </th>
 
-                                        <th className="px-6 py-4">
+                                        <th className="px-5 py-4 sm:px-6">
                                             Score
                                         </th>
 
-                                        <th className="px-6 py-4">
+                                        <th className="px-5 py-4 sm:px-6">
                                             Percentage
                                         </th>
 
@@ -451,59 +425,45 @@ function Analytics() {
 
                                             const percentage =
                                                 Number(
-                                                    attempt.percentage ||
-                                                        0
+                                                    attempt.percentage || 0
                                                 );
 
                                             return (
                                                 <tr
-                                                    key={
-                                                        attempt.id
-                                                    }
+                                                    key={attempt.id}
                                                     className="hover:bg-slate-50"
                                                 >
 
-                                                    <td className="px-6 py-4">
+                                                    <td className="max-w-[240px] px-5 py-4 sm:px-6">
 
-                                                        <p className="font-semibold text-slate-900">
-                                                            {
-                                                                attempt.full_name
-                                                            }
+                                                        <p className="truncate font-semibold text-slate-900">
+                                                            {attempt.full_name}
                                                         </p>
 
-                                                        <p className="text-xs text-slate-400">
-                                                            {
-                                                                attempt.email
-                                                            }
+                                                        <p className="truncate text-xs text-slate-400">
+                                                            {attempt.email}
                                                         </p>
 
                                                     </td>
 
-                                                    <td className="px-6 py-4 font-medium text-slate-700">
-                                                        {
-                                                            attempt.quiz_title
-                                                        }
+                                                    <td className="max-w-[220px] truncate px-5 py-4 font-medium text-slate-700 sm:px-6">
+                                                        {attempt.quiz_title}
                                                     </td>
 
-                                                    <td className="px-6 py-4 text-slate-600">
-                                                        {
-                                                            attempt.score
-                                                        }
+                                                    <td className="px-5 py-4 text-slate-600 sm:px-6">
+                                                        {attempt.score}
                                                     </td>
 
-                                                    <td className="px-6 py-4">
+                                                    <td className="px-5 py-4 sm:px-6">
 
                                                         <span
-                                                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                                                percentage >=
-                                                                40
+                                                            className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${
+                                                                percentage >= 40
                                                                     ? "bg-green-50 text-green-600"
                                                                     : "bg-red-50 text-red-600"
                                                             }`}
                                                         >
-                                                            {
-                                                                percentage
-                                                            }%
+                                                            {percentage}%
                                                         </span>
 
                                                     </td>
@@ -524,13 +484,11 @@ function Analytics() {
                 </div>
 
 
-                {/* ================================= */}
                 {/* CATEGORIES */}
-                {/* ================================= */}
 
-                <div className="mt-6 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                <div className="mt-5 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 sm:mt-6">
 
-                    <div className="border-b border-slate-100 px-6 py-5">
+                    <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
 
                         <h2 className="text-lg font-bold text-slate-900">
                             Category Activity
@@ -543,7 +501,7 @@ function Analytics() {
                     </div>
 
 
-                    <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-3 p-4 sm:grid-cols-2 sm:gap-4 sm:p-6 lg:grid-cols-3">
 
                         {categories.map(
                             (category) => {
@@ -553,8 +511,7 @@ function Analytics() {
                                         ...categories.map(
                                             (item) =>
                                                 Number(
-                                                    item.attempts ||
-                                                        0
+                                                    item.attempts || 0
                                                 )
                                         ),
                                         1
@@ -565,8 +522,7 @@ function Analytics() {
                                         100,
                                         (
                                             (Number(
-                                                category.attempts ||
-                                                    0
+                                                category.attempts || 0
                                             ) /
                                                 maxAttempts) *
                                             100
@@ -575,34 +531,24 @@ function Analytics() {
 
                                 return (
                                     <div
-                                        key={
-                                            category.id
-                                        }
-                                        className="rounded-xl border border-slate-100 p-5"
+                                        key={category.id}
+                                        className="min-w-0 rounded-xl border border-slate-100 p-4 sm:p-5"
                                     >
 
-                                        <div className="flex justify-between gap-3">
+                                        <div className="flex items-start justify-between gap-3">
 
-                                            <p className="font-semibold text-slate-900">
-                                                {
-                                                    category.name
-                                                }
+                                            <p className="min-w-0 break-words font-semibold text-slate-900">
+                                                {category.name}
                                             </p>
 
-                                            <span className="text-xs font-semibold text-blue-600">
-                                                {
-                                                    category.attempts
-                                                }{" "}
-                                                attempts
+                                            <span className="shrink-0 text-right text-xs font-semibold text-blue-600">
+                                                {category.attempts} attempts
                                             </span>
 
                                         </div>
 
                                         <p className="mt-1 text-xs text-slate-500">
-                                            {
-                                                category.quizzes
-                                            }{" "}
-                                            quizzes
+                                            {category.quizzes} quizzes
                                         </p>
 
                                         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">

@@ -17,7 +17,8 @@ function AttemptQuiz() {
     const [error, setError] = useState("");
     const [timeLeft, setTimeLeft] = useState(0);
     const [submitting, setSubmitting] = useState(false);
-    const [showSubmitModal, setShowSubmitModal] = useState(false);
+    const [showSubmitModal, setShowSubmitModal] =
+        useState(false);
 
     // ==========================================
     // FETCH QUIZ + QUESTIONS
@@ -29,14 +30,18 @@ function AttemptQuiz() {
                 setLoading(true);
                 setError("");
 
-                const [quizResponse, questionsResponse] =
-                    await Promise.all([
-                        fetch(`${QUIZ_API}/${id}`),
-                        fetch(`${QUESTIONS_API}/quiz/${id}`),
-                    ]);
+                const [
+                    quizResponse,
+                    questionsResponse,
+                ] = await Promise.all([
+                    fetch(`${QUIZ_API}/${id}`),
+                    fetch(`${QUESTIONS_API}/quiz/${id}`),
+                ]);
 
                 if (!quizResponse.ok) {
-                    throw new Error("Failed to fetch quiz");
+                    throw new Error(
+                        "Failed to fetch quiz"
+                    );
                 }
 
                 if (!questionsResponse.ok) {
@@ -111,7 +116,6 @@ function AttemptQuiz() {
             setSubmitting(true);
             setError("");
 
-            // Token is stored in localStorage during login
             const token =
                 localStorage.getItem("token");
 
@@ -158,10 +162,8 @@ function AttemptQuiz() {
                 );
             }
 
-            // Close modal
             setShowSubmitModal(false);
 
-            // Go to result page
             navigate(
                 `/student/results/${data.attempt.id}`
             );
@@ -180,9 +182,11 @@ function AttemptQuiz() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-12">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-12">
                 <div className="mx-auto max-w-4xl">
+
                     <div className="h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
+
                 </div>
             </div>
         );
@@ -194,10 +198,12 @@ function AttemptQuiz() {
 
     if (error && !quiz) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-12">
-                <div className="mx-auto max-w-4xl rounded-xl bg-red-50 p-5 text-red-600">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-12">
+
+                <div className="mx-auto max-w-4xl rounded-xl bg-red-50 p-4 text-sm text-red-600 sm:p-5">
                     {error}
                 </div>
+
             </div>
         );
     }
@@ -212,18 +218,19 @@ function AttemptQuiz() {
 
     if (questions.length === 0) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-12">
-                <div className="mx-auto max-w-4xl rounded-2xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
+            <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 sm:py-12">
+
+                <div className="mx-auto max-w-4xl rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:p-10">
 
                     <div className="text-4xl">
                         📝
                     </div>
 
-                    <h1 className="mt-4 text-2xl font-bold text-slate-900">
+                    <h1 className="mt-4 text-xl font-bold text-slate-900 sm:text-2xl">
                         No Questions Available
                     </h1>
 
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-2 text-sm text-slate-500">
                         This quiz does not have any questions yet.
                     </p>
 
@@ -233,12 +240,13 @@ function AttemptQuiz() {
                                 "/student/quizzes"
                             )
                         }
-                        className="mt-6 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                        className="mt-6 w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
                     >
                         Back to Quizzes
                     </button>
 
                 </div>
+
             </div>
         );
     }
@@ -276,30 +284,34 @@ function AttemptQuiz() {
     // ==========================================
 
     return (
-        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6">
+        <div className="min-h-screen bg-slate-50 px-4 py-5 sm:px-6 sm:py-6">
 
             <div className="mx-auto max-w-5xl">
 
+                {/* ================================= */}
                 {/* HEADER */}
+                {/* ================================= */}
 
-                <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                <div className="mb-5 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:mb-6 sm:p-5">
 
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-                        <div>
+                        <div className="min-w-0">
+
                             <p className="text-sm font-semibold text-blue-600">
                                 Quiz Attempt
                             </p>
 
-                            <h1 className="mt-1 text-xl font-bold text-slate-900">
+                            <h1 className="mt-1 break-words text-lg font-bold leading-tight text-slate-900 sm:text-xl">
                                 {quiz.title}
                             </h1>
+
                         </div>
 
                         {/* Timer */}
 
                         <div
-                            className={`rounded-xl px-5 py-3 text-center ${
+                            className={`w-full shrink-0 rounded-xl px-4 py-3 text-center sm:w-auto sm:min-w-[150px] sm:px-5 ${
                                 timeLeft <= 60
                                     ? "bg-red-50 text-red-600"
                                     : "bg-blue-50 text-blue-600"
@@ -322,7 +334,7 @@ function AttemptQuiz() {
 
                     <div className="mt-5">
 
-                        <div className="mb-2 flex justify-between text-xs font-medium text-slate-500">
+                        <div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-medium text-slate-500">
 
                             <span>
                                 Question{" "}
@@ -352,26 +364,30 @@ function AttemptQuiz() {
 
                 </div>
 
+
                 {/* ERROR */}
 
                 {error && (
-                    <div className="mb-5 rounded-xl bg-red-50 px-5 py-4 text-sm text-red-600">
+                    <div className="mb-5 rounded-xl bg-red-50 px-4 py-4 text-sm text-red-600 sm:px-5">
                         {error}
                     </div>
                 )}
 
+
+                {/* ================================= */}
                 {/* QUESTION */}
+                {/* ================================= */}
 
-                <div className="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
 
-                    <div className="border-b border-slate-100 px-6 py-6 sm:px-8">
+                    <div className="border-b border-slate-100 px-5 py-5 sm:px-8 sm:py-6">
 
                         <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
                             Question{" "}
                             {currentIndex + 1}
                         </span>
 
-                        <h2 className="mt-5 text-xl font-bold leading-8 text-slate-900 sm:text-2xl">
+                        <h2 className="mt-4 break-words text-lg font-bold leading-7 text-slate-900 sm:mt-5 sm:text-2xl sm:leading-8">
                             {
                                 currentQuestion.question_text
                             }
@@ -379,9 +395,12 @@ function AttemptQuiz() {
 
                     </div>
 
-                    {/* Options */}
 
-                    <div className="space-y-3 px-6 py-6 sm:px-8">
+                    {/* ================================= */}
+                    {/* OPTIONS */}
+                    {/* ================================= */}
+
+                    <div className="space-y-3 px-5 py-5 sm:px-8 sm:py-6">
 
                         {[
                             currentQuestion.option_a,
@@ -407,7 +426,7 @@ function AttemptQuiz() {
                                 return (
                                     <label
                                         key={index}
-                                        className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition ${
+                                        className={`flex min-w-0 cursor-pointer items-start gap-3 rounded-xl border p-3 transition sm:items-center sm:gap-4 sm:p-4 ${
                                             selected
                                                 ? "border-blue-500 bg-blue-50 ring-2 ring-blue-100"
                                                 : "border-slate-200 hover:border-blue-300 hover:bg-slate-50"
@@ -430,7 +449,7 @@ function AttemptQuiz() {
                                         />
 
                                         <span
-                                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
+                                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold sm:h-10 sm:w-10 ${
                                                 selected
                                                     ? "bg-blue-600 text-white"
                                                     : "bg-slate-100 text-slate-600"
@@ -442,7 +461,7 @@ function AttemptQuiz() {
                                         </span>
 
                                         <span
-                                            className={`text-sm font-medium leading-6 ${
+                                            className={`min-w-0 break-words text-sm font-medium leading-6 ${
                                                 selected
                                                     ? "text-blue-900"
                                                     : "text-slate-700"
@@ -458,9 +477,12 @@ function AttemptQuiz() {
 
                     </div>
 
-                    {/* Navigation */}
 
-                    <div className="border-t border-slate-100 px-6 py-5 sm:px-8">
+                    {/* ================================= */}
+                    {/* NAVIGATION */}
+                    {/* ================================= */}
+
+                    <div className="border-t border-slate-100 px-5 py-4 sm:px-8 sm:py-5">
 
                         <div className="flex items-center justify-between gap-3">
 
@@ -476,10 +498,11 @@ function AttemptQuiz() {
                                             1
                                     )
                                 }
-                                className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                                className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:px-5"
                             >
                                 ← Previous
                             </button>
+
 
                             {!isLastQuestion ? (
 
@@ -491,7 +514,7 @@ function AttemptQuiz() {
                                                 1
                                         )
                                     }
-                                    className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                    className="flex-1 rounded-lg bg-blue-600 px-3 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:flex-none sm:px-6"
                                 >
                                     Next →
                                 </button>
@@ -505,7 +528,7 @@ function AttemptQuiz() {
                                             true
                                         )
                                     }
-                                    className="rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-700"
+                                    className="flex-1 rounded-lg bg-green-600 px-3 py-3 text-sm font-semibold text-white transition hover:bg-green-700 sm:flex-none sm:px-6"
                                 >
                                     Submit Quiz
                                 </button>
@@ -518,15 +541,18 @@ function AttemptQuiz() {
 
                 </div>
 
-                {/* QUESTION NAVIGATION */}
 
-                <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                {/* ================================= */}
+                {/* QUESTION NAVIGATION */}
+                {/* ================================= */}
+
+                <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mt-6 sm:p-6">
 
                     <h3 className="text-sm font-bold text-slate-900">
                         Question Navigation
                     </h3>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <div className="mt-4 grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
 
                         {questions.map(
                             (
@@ -554,7 +580,7 @@ function AttemptQuiz() {
                                                 index
                                             )
                                         }
-                                        className={`h-10 w-10 rounded-lg text-sm font-semibold transition ${
+                                        className={`h-10 w-full rounded-lg text-sm font-semibold transition sm:w-10 ${
                                             current
                                                 ? "bg-blue-600 text-white ring-2 ring-blue-200"
                                                 : answered
@@ -570,7 +596,8 @@ function AttemptQuiz() {
 
                     </div>
 
-                    <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
+
+                    <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500">
 
                         <span className="flex items-center gap-2">
                             <span className="h-3 w-3 rounded bg-blue-600" />
@@ -593,13 +620,16 @@ function AttemptQuiz() {
 
             </div>
 
-            {/* SUBMIT MODAL */}
+
+            {/* ==========================================
+                SUBMIT MODAL
+            ========================================== */}
 
             {showSubmitModal && (
 
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-5">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
 
-                    <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-2xl">
+                    <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
 
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-xl">
                             📝
@@ -627,7 +657,8 @@ function AttemptQuiz() {
 
                         </p>
 
-                        <div className="mt-7 flex justify-end gap-3">
+
+                        <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-7 sm:flex-row sm:justify-end">
 
                             <button
                                 type="button"
@@ -639,7 +670,7 @@ function AttemptQuiz() {
                                         false
                                     )
                                 }
-                                className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                                className="w-full rounded-lg border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto sm:py-2.5"
                             >
                                 Continue Quiz
                             </button>
@@ -652,7 +683,7 @@ function AttemptQuiz() {
                                 onClick={
                                     handleSubmit
                                 }
-                                className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                                className="w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60 sm:w-auto sm:py-2.5"
                             >
                                 {submitting
                                     ? "Submitting..."

@@ -64,11 +64,9 @@ function Results() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-12">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-12">
                 <div className="mx-auto max-w-5xl">
-
                     <div className="h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
-
                 </div>
             </div>
         );
@@ -80,11 +78,11 @@ function Results() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-slate-50 px-6 py-12">
+            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-12">
 
                 <div className="mx-auto max-w-5xl">
 
-                    <div className="rounded-xl border border-red-100 bg-red-50 p-5 text-red-600">
+                    <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-600 sm:p-5">
                         {error}
                     </div>
 
@@ -95,7 +93,7 @@ function Results() {
                                 "/student/quizzes"
                             )
                         }
-                        className="mt-5 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                        className="mt-5 w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
                     >
                         Back to Quizzes
                     </button>
@@ -121,29 +119,34 @@ function Results() {
         percentage >= 40;
 
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-10">
+        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
 
             <div className="mx-auto max-w-5xl">
 
+                {/* ================================= */}
                 {/* HEADER */}
+                {/* ================================= */}
 
-                <div className="mb-8 text-center">
+                <div className="mb-6 text-center sm:mb-8">
 
                     <p className="text-sm font-semibold text-blue-600">
                         Quiz Completed
                     </p>
 
-                    <h1 className="mt-2 text-3xl font-bold text-slate-900">
+                    <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
                         Your Result
                     </h1>
 
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-2 break-words text-sm text-slate-500 sm:text-base">
                         {result.quiz_title}
                     </p>
 
                 </div>
 
+
+                {/* ================================= */}
                 {/* SCORE CARD */}
+                {/* ================================= */}
 
                 <div
                     className={`overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ${
@@ -154,7 +157,7 @@ function Results() {
                 >
 
                     <div
-                        className={`px-6 py-8 text-center ${
+                        className={`px-5 py-7 text-center sm:px-6 sm:py-8 ${
                             passed
                                 ? "bg-green-50"
                                 : "bg-red-50"
@@ -162,7 +165,7 @@ function Results() {
                     >
 
                         <div
-                            className={`mx-auto flex h-28 w-28 items-center justify-center rounded-full border-8 bg-white ${
+                            className={`mx-auto flex h-24 w-24 items-center justify-center rounded-full border-8 bg-white sm:h-28 sm:w-28 ${
                                 passed
                                     ? "border-green-200"
                                     : "border-red-200"
@@ -170,7 +173,7 @@ function Results() {
                         >
 
                             <p
-                                className={`text-3xl font-bold ${
+                                className={`text-2xl font-bold sm:text-3xl ${
                                     passed
                                         ? "text-green-600"
                                         : "text-red-600"
@@ -182,7 +185,7 @@ function Results() {
                         </div>
 
                         <h2
-                            className={`mt-5 text-2xl font-bold ${
+                            className={`mt-5 break-words text-xl font-bold sm:text-2xl ${
                                 passed
                                     ? "text-green-700"
                                     : "text-red-700"
@@ -208,11 +211,14 @@ function Results() {
 
                 </div>
 
+
+                {/* ================================= */}
                 {/* STATISTICS */}
+                {/* ================================= */}
 
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                         <p className="text-sm text-slate-500">
                             Score
@@ -225,7 +231,8 @@ function Results() {
 
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                         <p className="text-sm text-slate-500">
                             Correct
@@ -237,7 +244,8 @@ function Results() {
 
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                         <p className="text-sm text-slate-500">
                             Incorrect
@@ -249,7 +257,8 @@ function Results() {
 
                     </div>
 
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+
+                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                         <p className="text-sm text-slate-500">
                             Time Taken
@@ -263,21 +272,25 @@ function Results() {
 
                 </div>
 
+
+                {/* ================================= */}
                 {/* ANSWER REVIEW */}
+                {/* ================================= */}
 
-                <div className="mt-8">
+                <div className="mt-7 sm:mt-8">
 
-                    <div className="mb-5">
+                    <div className="mb-4 sm:mb-5">
 
                         <h2 className="text-xl font-bold text-slate-900">
                             Answer Review
                         </h2>
 
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 text-sm leading-6 text-slate-500">
                             Review your answers and see the correct responses.
                         </p>
 
                     </div>
+
 
                     <div className="space-y-4">
 
@@ -288,16 +301,18 @@ function Results() {
                                     key={
                                         answer.question_id
                                     }
-                                    className={`rounded-2xl bg-white p-6 shadow-sm ring-1 ${
+                                    className={`min-w-0 overflow-hidden rounded-2xl bg-white p-4 shadow-sm ring-1 sm:p-6 ${
                                         answer.is_correct
                                             ? "ring-green-100"
                                             : "ring-red-100"
                                     }`}
                                 >
 
-                                    <div className="flex items-start justify-between gap-4">
+                                    {/* Question header */}
 
-                                        <div className="flex gap-4">
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                                        <div className="flex min-w-0 gap-3 sm:gap-4">
 
                                             <div
                                                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
@@ -309,9 +324,9 @@ function Results() {
                                                 {index + 1}
                                             </div>
 
-                                            <div>
+                                            <div className="min-w-0">
 
-                                                <h3 className="font-semibold leading-6 text-slate-900">
+                                                <h3 className="break-words font-semibold leading-6 text-slate-900">
                                                     {
                                                         answer.question_text
                                                     }
@@ -321,8 +336,9 @@ function Results() {
 
                                         </div>
 
+
                                         <span
-                                            className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                                            className={`self-start rounded-full px-3 py-1 text-xs font-semibold sm:shrink-0 ${
                                                 answer.is_correct
                                                     ? "bg-green-50 text-green-600"
                                                     : "bg-red-50 text-red-600"
@@ -335,10 +351,13 @@ function Results() {
 
                                     </div>
 
-                                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+
+                                    {/* Answers */}
+
+                                    <div className="mt-4 grid gap-3 sm:mt-5 sm:grid-cols-2">
 
                                         <div
-                                            className={`rounded-xl p-4 ${
+                                            className={`min-w-0 rounded-xl p-4 ${
                                                 answer.is_correct
                                                     ? "bg-green-50"
                                                     : "bg-red-50"
@@ -349,20 +368,21 @@ function Results() {
                                                 Your Answer
                                             </p>
 
-                                            <p className="mt-2 text-sm font-medium text-slate-900">
+                                            <p className="mt-2 break-words text-sm font-medium leading-6 text-slate-900">
                                                 {answer.selected_answer ||
                                                     "Not Answered"}
                                             </p>
 
                                         </div>
 
-                                        <div className="rounded-xl bg-green-50 p-4">
+
+                                        <div className="min-w-0 rounded-xl bg-green-50 p-4">
 
                                             <p className="text-xs font-semibold uppercase text-slate-500">
                                                 Correct Answer
                                             </p>
 
-                                            <p className="mt-2 text-sm font-medium text-green-700">
+                                            <p className="mt-2 break-words text-sm font-medium leading-6 text-green-700">
                                                 {
                                                     answer.correct_answer
                                                 }
@@ -381,9 +401,12 @@ function Results() {
 
                 </div>
 
-                {/* ACTIONS */}
 
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                {/* ================================= */}
+                {/* ACTIONS */}
+                {/* ================================= */}
+
+                <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:justify-center">
 
                     <button
                         type="button"
@@ -392,7 +415,7 @@ function Results() {
                                 "/student/quizzes"
                             )
                         }
-                        className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                        className="w-full rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
                     >
                         Take Another Quiz
                     </button>
@@ -404,7 +427,7 @@ function Results() {
                                 "/student/leaderboard"
                             )
                         }
-                        className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
                     >
                         View Leaderboard
                     </button>
