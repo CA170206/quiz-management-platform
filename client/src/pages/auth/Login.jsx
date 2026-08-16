@@ -45,7 +45,10 @@ function Login() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    loginType,
+                }),
             });
 
             const data = await response.json();
@@ -58,7 +61,9 @@ function Login() {
 
             // Make sure backend actually returned a token
             if (!data.token) {
-                throw new Error("Login succeeded but no token was received.");
+                throw new Error(
+                    "Login succeeded but no token was received."
+                );
             }
 
             // Store authentication data in localStorage
@@ -92,12 +97,17 @@ function Login() {
             } else if (role === "student") {
                 window.location.href = "/student/dashboard";
             } else {
-                throw new Error("Invalid user role received from server.");
+                throw new Error(
+                    "Invalid user role received from server."
+                );
             }
 
         } catch (err) {
             console.error("Login error:", err);
-            setError(err.message || "Something went wrong during login.");
+            setError(
+                err.message ||
+                "Something went wrong during login."
+            );
         } finally {
             setLoading(false);
         }
