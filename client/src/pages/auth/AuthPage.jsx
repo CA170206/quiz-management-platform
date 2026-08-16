@@ -11,18 +11,20 @@ function AuthPage() {
 
                     {/* Left */}
                     <div className="flex flex-col justify-center">
+
                         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 text-2xl font-bold text-white">
-                            Q
+                            T
                         </div>
 
                         <h1 className="text-4xl font-bold text-slate-900">
-                            QuizMaster
+                            TryQuizzers
                         </h1>
 
                         <p className="mt-4 max-w-md text-lg text-slate-500">
                             Test your knowledge, track your performance,
                             and compete with other students.
                         </p>
+
                     </div>
 
                     {/* Auth Card */}

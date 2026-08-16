@@ -193,7 +193,7 @@ function Analytics() {
                     </h1>
 
                     <p className="mt-2 text-sm leading-6 text-slate-500 sm:text-base">
-                        Real-time overview of QuizMaster activity.
+                        Real-time overview of TryQuizzers activity.
                     </p>
 
                 </div>

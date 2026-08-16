@@ -76,7 +76,7 @@ function Register() {
                     <div className="mb-8 text-center">
 
                         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
-                            Q
+                            T
                         </div>
 
                         <h1 className="mt-5 text-2xl font-bold text-slate-900">

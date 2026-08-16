@@ -324,7 +324,33 @@ function Results() {
                                                 {index + 1}
                                             </div>
 
-                                            <div className="min-w-0">
+                                            <div className="min-w-0 flex-1">
+
+                                                {/* Difficulty Badge */}
+
+                                                {answer.difficulty && (
+                                                    <div className="mb-2">
+                                                        <span
+                                                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                                                answer.difficulty ===
+                                                                "beginner"
+                                                                    ? "bg-green-50 text-green-700"
+                                                                    : answer.difficulty ===
+                                                                      "medium"
+                                                                    ? "bg-yellow-50 text-yellow-700"
+                                                                    : "bg-red-50 text-red-700"
+                                                            }`}
+                                                        >
+                                                            {answer.difficulty ===
+                                                            "beginner"
+                                                                ? "Beginner"
+                                                                : answer.difficulty ===
+                                                                  "medium"
+                                                                ? "Medium"
+                                                                : "Intermediate"}
+                                                        </span>
+                                                    </div>
+                                                )}
 
                                                 <h3 className="break-words font-semibold leading-6 text-slate-900">
                                                     {

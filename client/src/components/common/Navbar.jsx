@@ -138,9 +138,9 @@ function Navbar() {
                         onClick={closeMenus}
                         className="shrink-0 text-xl font-bold"
                     >
-                        Quiz
+                        Try
                         <span className="text-blue-400">
-                            Master
+                            Quizzers
                         </span>
                     </Link>
 
@@ -355,7 +355,7 @@ function Navbar() {
             {deleteOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
 
-                    <div className="w-full max-w-md rounded-2xl bg-white p-5 sm:p-6 shadow-2xl">
+                    <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
 
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl">
                             ⚠️

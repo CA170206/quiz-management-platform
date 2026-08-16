@@ -113,7 +113,7 @@ function Login() {
                     <div className="mb-7 text-center">
 
                         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
-                            Q
+                            T
                         </div>
 
                         <h1 className="mt-5 text-2xl font-bold text-slate-900">
@@ -121,7 +121,7 @@ function Login() {
                         </h1>
 
                         <p className="mt-2 text-sm text-slate-500">
-                            Sign in to continue to QuizMaster.
+                            Sign in to continue to TryQuizzers.
                         </p>
 
                     </div>
@@ -208,7 +208,7 @@ function Login() {
                                 onChange={handleChange}
                                 placeholder={
                                     loginType === "admin"
-                                        ? "admin@quizmaster.com"
+                                        ? "admin@tryquizzers.com"
                                         : "you@example.com"
                                 }
                                 className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"

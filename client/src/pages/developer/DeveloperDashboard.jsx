@@ -64,7 +64,7 @@ function DeveloperDashboard() {
                             </h1>
 
                             <p className="mt-2 text-sm text-slate-400">
-                                Manage and monitor the QuizMaster platform.
+                                Manage and monitor the TryQuizzers platform.
                             </p>
                         </div>
 

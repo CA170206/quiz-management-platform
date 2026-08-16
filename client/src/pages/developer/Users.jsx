@@ -300,7 +300,7 @@ function Users() {
                     </h1>
 
                     <p className="mt-2 text-sm text-slate-500">
-                        View and manage accounts registered on QuizMaster.
+                        View and manage accounts registered on TryQuizzers.
                     </p>
 
                 </div>
