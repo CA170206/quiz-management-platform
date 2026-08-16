@@ -19,6 +19,10 @@ function Admins() {
     const [confirmPassword, setConfirmPassword] =
         useState("");
 
+    // NEW
+    const [recipientEmail, setRecipientEmail] =
+        useState("");
+
     const [showPassword, setShowPassword] =
         useState(false);
 
@@ -128,13 +132,17 @@ function Admins() {
         const trimmedEmail =
             email.trim().toLowerCase();
 
+        const trimmedRecipientEmail =
+            recipientEmail.trim().toLowerCase();
+
         // Validation
 
         if (
             !trimmedName ||
             !trimmedEmail ||
             !password ||
-            !confirmPassword
+            !confirmPassword ||
+            !trimmedRecipientEmail
         ) {
             setError(
                 "All fields are required."
@@ -184,9 +192,17 @@ function Admins() {
                     body: JSON.stringify({
                         full_name:
                             trimmedName,
+
+                        // Login email
                         email:
                             trimmedEmail,
+
                         password,
+
+                        // NEW:
+                        // Where credentials should be sent
+                        recipient_email:
+                            trimmedRecipientEmail,
                     }),
                 });
 
@@ -201,7 +217,7 @@ function Admins() {
             }
 
             setSuccess(
-                "Admin account created successfully."
+                `Admin account created successfully. Login credentials have been sent to ${trimmedRecipientEmail}.`
             );
 
             // Clear form
@@ -210,6 +226,7 @@ function Admins() {
             setEmail("");
             setPassword("");
             setConfirmPassword("");
+            setRecipientEmail("");
 
             // Refresh list
 
@@ -413,7 +430,7 @@ function Admins() {
                             </div>
 
 
-                            {/* Email */}
+                            {/* Login Email */}
 
                             <div>
 
@@ -519,6 +536,36 @@ function Admins() {
                                 />
 
                             </div>
+
+                        </div>
+
+
+                        {/* ================================= */}
+                        {/* CREDENTIAL DELIVERY EMAIL */}
+                        {/* ================================= */}
+
+                        <div className="mt-5">
+
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Personal / Official Email
+                            </label>
+
+                            <input
+                                type="email"
+                                value={recipientEmail}
+                                onChange={(e) =>
+                                    setRecipientEmail(
+                                        e.target.value
+                                    )
+                                }
+                                placeholder="Enter personal or official email"
+                                disabled={creating}
+                                className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50"
+                            />
+
+                            <p className="mt-2 text-xs text-slate-400">
+                                Login credentials will be sent to this email address.
+                            </p>
 
                         </div>
 
