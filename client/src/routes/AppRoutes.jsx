@@ -36,8 +36,10 @@ import Analytics from "../pages/student/Analytics";
 // Developer
 import DeveloperDashboard from "../pages/developer/DeveloperDashboard";
 import DeveloperUsers from "../pages/developer/Users";
-
 import DeveloperAdmins from "../pages/developer/Admins";
+import DeveloperDatabase from "../pages/developer/Database";
+import DeveloperAnalytics from "../pages/developer/Analytics";
+
 
 function AppContent() {
     const location = useLocation();
@@ -88,6 +90,7 @@ function AppContent() {
                     />
 
                     {/* Developer Login */}
+
                     <Route
                         path="/developer/login"
                         element={<DeveloperLogin />}
@@ -115,11 +118,22 @@ function AppContent() {
                             path="/developer/users"
                             element={<DeveloperUsers />}
                         />
-                        
+
                         <Route
-    path="/developer/admins"
-    element={<DeveloperAdmins />}
-/>
+                            path="/developer/admins"
+                            element={<DeveloperAdmins />}
+                        />
+
+                        <Route
+                            path="/developer/database"
+                            element={<DeveloperDatabase />}
+                        />
+
+                        <Route
+                            path="/developer/analytics"
+                            element={<DeveloperAnalytics />}
+                        />
+
                     </Route>
 
 
