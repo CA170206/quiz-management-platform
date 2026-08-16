@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Navbar() {
     const navigate = useNavigate();
@@ -13,10 +13,112 @@ function Navbar() {
     const [deleteError, setDeleteError] = useState("");
     const [deleting, setDeleting] = useState(false);
 
+    // =========================================================
+    // GLOBAL THEME
+    // =========================================================
+
+    const [darkMode, setDarkMode] = useState(() => {
+        try {
+            return (
+                localStorage.getItem(
+                    "tryquizzers-theme"
+                ) === "dark"
+            );
+        } catch {
+            return false;
+        }
+    });
+
+    useEffect(() => {
+        const handleThemeChange = (event) => {
+            if (
+                event?.detail &&
+                typeof event.detail.darkMode === "boolean"
+            ) {
+                setDarkMode(event.detail.darkMode);
+                return;
+            }
+
+            try {
+                setDarkMode(
+                    localStorage.getItem(
+                        "tryquizzers-theme"
+                    ) === "dark"
+                );
+            } catch {
+                // Ignore storage errors
+            }
+        };
+
+        window.addEventListener(
+            "tryquizzers-theme-change",
+            handleThemeChange
+        );
+
+        return () => {
+            window.removeEventListener(
+                "tryquizzers-theme-change",
+                handleThemeChange
+            );
+        };
+    }, []);
+
+    const handleThemeToggle = () => {
+        const newDarkMode = !darkMode;
+
+        setDarkMode(newDarkMode);
+
+        try {
+            localStorage.setItem(
+                "tryquizzers-theme",
+                newDarkMode ? "dark" : "light"
+            );
+        } catch {
+            // Ignore storage errors
+        }
+
+        document.documentElement.classList.toggle(
+            "dark",
+            newDarkMode
+        );
+
+        document.documentElement.style.colorScheme =
+            newDarkMode ? "dark" : "light";
+
+        document.body.style.backgroundColor =
+            newDarkMode
+                ? "#0a0a0a"
+                : "#ffffff";
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "tryquizzers-theme-change",
+                {
+                    detail: {
+                        darkMode: newDarkMode,
+                    },
+                }
+            )
+        );
+
+        // Also update the global function used by App.jsx
+        if (
+            typeof window.toggleTryQuizzersTheme ===
+            "function"
+        ) {
+            // App.jsx owns the global state.
+            // The event above keeps all components synced.
+        }
+    };
+
+    // =========================================================
+    // USER
+    // =========================================================
+
     const user = JSON.parse(
         localStorage.getItem("user") ||
-        sessionStorage.getItem("user") ||
-        "null"
+            sessionStorage.getItem("user") ||
+            "null"
     );
 
     const isAdmin = user?.role === "admin";
@@ -33,10 +135,18 @@ function Navbar() {
         ? "/admin/dashboard"
         : "/student/dashboard";
 
+    // =========================================================
+    // CLOSE MENUS
+    // =========================================================
+
     const closeMenus = () => {
         setOpen(false);
         setMobileOpen(false);
     };
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
 
     const handleLogout = () => {
         closeMenus();
@@ -49,6 +159,10 @@ function Navbar() {
 
         navigate("/login");
     };
+
+    // =========================================================
+    // DELETE ACCOUNT
+    // =========================================================
 
     const handleOpenDelete = () => {
         closeMenus();
@@ -124,7 +238,6 @@ function Navbar() {
             setPassword("");
 
             navigate("/login");
-
         } catch (error) {
             setDeleteError(
                 error.message ||
@@ -135,9 +248,17 @@ function Navbar() {
         }
     };
 
+    // =========================================================
+    // ACTIVE ROUTE
+    // =========================================================
+
     const isActive = (path) => {
         return location.pathname === path;
     };
+
+    // =========================================================
+    // UI
+    // =========================================================
 
     return (
         <>
@@ -147,7 +268,22 @@ function Navbar() {
 
             <div className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
 
-                <nav className="mx-auto max-w-7xl rounded-2xl bg-white/90 shadow-[0_10px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+                <nav
+                    className={`
+                        mx-auto
+                        max-w-7xl
+                        rounded-2xl
+                        shadow-[0_10px_35px_rgba(15,23,42,0.08)]
+                        backdrop-blur-xl
+                        transition-all
+                        duration-300
+                        ${
+                            darkMode
+                                ? "bg-[#151515]/95 shadow-black/40 ring-1 ring-white/10"
+                                : "bg-white/90"
+                        }
+                    `}
+                >
 
                     <div className="flex min-h-[64px] items-center justify-between px-4 sm:px-6 lg:px-7">
 
@@ -163,18 +299,46 @@ function Navbar() {
 
                             <div className="leading-none">
 
-                                <div className="text-xl font-extrabold tracking-tight text-black sm:text-[22px]">
+                                <div
+                                    className={`
+                                        text-xl
+                                        font-extrabold
+                                        tracking-tight
+                                        transition-colors
+                                        duration-300
+                                        sm:text-[22px]
+                                        ${
+                                            darkMode
+                                                ? "text-white"
+                                                : "text-black"
+                                        }
+                                    `}
+                                >
                                     TryQuizzers
                                 </div>
 
-                                <div className="mt-0.5 hidden text-[10px] font-medium text-slate-400 sm:block">
+                                <div
+                                    className={`
+                                        mt-0.5
+                                        hidden
+                                        text-[10px]
+                                        font-medium
+                                        transition-colors
+                                        duration-300
+                                        sm:block
+                                        ${
+                                            darkMode
+                                                ? "text-slate-500"
+                                                : "text-slate-400"
+                                        }
+                                    `}
+                                >
                                     Learn. Practice. Improve.
                                 </div>
 
                             </div>
 
                         </Link>
-
 
                         {/* ================================================= */}
                         {/* DESKTOP NAVIGATION */}
@@ -192,6 +356,9 @@ function Navbar() {
                                         onClick={
                                             closeMenus
                                         }
+                                        darkMode={
+                                            darkMode
+                                        }
                                     >
                                         Dashboard
                                     </NavItem>
@@ -203,6 +370,9 @@ function Navbar() {
                                         )}
                                         onClick={
                                             closeMenus
+                                        }
+                                        darkMode={
+                                            darkMode
                                         }
                                     >
                                         Categories
@@ -216,6 +386,9 @@ function Navbar() {
                                         onClick={
                                             closeMenus
                                         }
+                                        darkMode={
+                                            darkMode
+                                        }
                                     >
                                         Questions
                                     </NavItem>
@@ -227,6 +400,9 @@ function Navbar() {
                                         )}
                                         onClick={
                                             closeMenus
+                                        }
+                                        darkMode={
+                                            darkMode
                                         }
                                     >
                                         Quizzes
@@ -242,6 +418,9 @@ function Navbar() {
                                         onClick={
                                             closeMenus
                                         }
+                                        darkMode={
+                                            darkMode
+                                        }
                                     >
                                         Dashboard
                                     </NavItem>
@@ -253,6 +432,9 @@ function Navbar() {
                                         )}
                                         onClick={
                                             closeMenus
+                                        }
+                                        darkMode={
+                                            darkMode
                                         }
                                     >
                                         Quizzes
@@ -266,12 +448,54 @@ function Navbar() {
                                         onClick={
                                             closeMenus
                                         }
+                                        darkMode={
+                                            darkMode
+                                        }
                                     >
                                         Leaderboard
                                     </NavItem>
                                 </>
                             )}
 
+                            {/* ================================================= */}
+                            {/* THEME TOGGLE */}
+                            {/* ================================================= */}
+
+                            <button
+                                type="button"
+                                onClick={
+                                    handleThemeToggle
+                                }
+                                aria-label={
+                                    darkMode
+                                        ? "Switch to light mode"
+                                        : "Switch to dark mode"
+                                }
+                                title={
+                                    darkMode
+                                        ? "Light mode"
+                                        : "Dark mode"
+                                }
+                                className={`
+                                    ml-2
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    text-base
+                                    transition-all
+                                    duration-300
+                                    ${
+                                        darkMode
+                                            ? "bg-white/10 text-white hover:bg-white hover:text-black"
+                                            : "bg-slate-100 text-slate-700 hover:bg-black hover:text-white"
+                                    }
+                                `}
+                            >
+                                {darkMode ? "☀" : "☾"}
+                            </button>
 
                             {/* ================================================= */}
                             {/* PROFILE */}
@@ -286,21 +510,22 @@ function Navbar() {
                                             !open
                                         )
                                     }
-                                    className="
+                                    className={`
                                         flex
                                         h-10
                                         w-10
                                         items-center
                                         justify-center
                                         rounded-full
-                                        bg-slate-100
                                         text-sm
                                         font-bold
-                                        text-black
                                         transition
-                                        hover:bg-black
-                                        hover:text-white
-                                    "
+                                        ${
+                                            darkMode
+                                                ? "bg-white/10 text-white hover:bg-white hover:text-black"
+                                                : "bg-slate-100 text-black hover:bg-black hover:text-white"
+                                        }
+                                    `}
                                 >
                                     {user?.full_name
                                         ?.charAt(
@@ -309,7 +534,6 @@ function Navbar() {
                                         ?.toUpperCase() ||
                                         "U"}
                                 </button>
-
 
                                 {open && (
                                     <ProfileMenu
@@ -329,6 +553,9 @@ function Navbar() {
                                         handleOpenDelete={
                                             handleOpenDelete
                                         }
+                                        darkMode={
+                                            darkMode
+                                        }
                                     />
                                 )}
 
@@ -336,51 +563,111 @@ function Navbar() {
 
                         </div>
 
-
                         {/* ================================================= */}
-                        {/* MOBILE BUTTON */}
+                        {/* MOBILE BUTTONS */}
                         {/* ================================================= */}
 
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setMobileOpen(
-                                    !mobileOpen
-                                )
-                            }
-                            className="
-                                flex
-                                h-10
-                                w-10
-                                items-center
-                                justify-center
-                                rounded-xl
-                                bg-slate-100
-                                text-lg
-                                text-black
-                                transition
-                                hover:bg-black
-                                hover:text-white
-                                md:hidden
-                            "
-                            aria-label="Toggle navigation menu"
-                        >
-                            {mobileOpen
-                                ? "✕"
-                                : "☰"}
-                        </button>
+                        <div className="flex items-center gap-2 md:hidden">
+
+                            {/* THEME */}
+
+                            <button
+                                type="button"
+                                onClick={
+                                    handleThemeToggle
+                                }
+                                aria-label={
+                                    darkMode
+                                        ? "Switch to light mode"
+                                        : "Switch to dark mode"
+                                }
+                                className={`
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-xl
+                                    text-base
+                                    transition
+                                    ${
+                                        darkMode
+                                            ? "bg-white/10 text-white hover:bg-white hover:text-black"
+                                            : "bg-slate-100 text-black hover:bg-black hover:text-white"
+                                    }
+                                `}
+                            >
+                                {darkMode ? "☀" : "☾"}
+                            </button>
+
+                            {/* MOBILE MENU */}
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setMobileOpen(
+                                        !mobileOpen
+                                    )
+                                }
+                                className={`
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-xl
+                                    text-lg
+                                    transition
+                                    ${
+                                        darkMode
+                                            ? "bg-white/10 text-white hover:bg-white hover:text-black"
+                                            : "bg-slate-100 text-black hover:bg-black hover:text-white"
+                                    }
+                                `}
+                                aria-label="Toggle navigation menu"
+                            >
+                                {mobileOpen
+                                    ? "✕"
+                                    : "☰"}
+                            </button>
+
+                        </div>
 
                     </div>
-
 
                     {/* ================================================= */}
                     {/* MOBILE NAVIGATION */}
                     {/* ================================================= */}
 
                     {mobileOpen && (
-                        <div className="border-t border-slate-100 px-3 pb-3 pt-2 md:hidden">
+                        <div
+                            className={`
+                                border-t
+                                px-3
+                                pb-3
+                                pt-2
+                                transition-colors
+                                duration-300
+                                md:hidden
+                                ${
+                                    darkMode
+                                        ? "border-white/10"
+                                        : "border-slate-100"
+                                }
+                            `}
+                        >
 
-                            <div className="rounded-xl bg-slate-50 p-2">
+                            <div
+                                className={`
+                                    rounded-xl
+                                    p-2
+                                    ${
+                                        darkMode
+                                            ? "bg-[#1c1c1c]"
+                                            : "bg-slate-50"
+                                    }
+                                `}
+                            >
 
                                 {isAdmin ? (
                                     <>
@@ -391,6 +678,9 @@ function Navbar() {
                                             )}
                                             onClick={
                                                 closeMenus
+                                            }
+                                            darkMode={
+                                                darkMode
                                             }
                                         >
                                             Dashboard
@@ -404,6 +694,9 @@ function Navbar() {
                                             onClick={
                                                 closeMenus
                                             }
+                                            darkMode={
+                                                darkMode
+                                            }
                                         >
                                             Categories
                                         </MobileNavItem>
@@ -416,6 +709,9 @@ function Navbar() {
                                             onClick={
                                                 closeMenus
                                             }
+                                            darkMode={
+                                                darkMode
+                                            }
                                         >
                                             Questions
                                         </MobileNavItem>
@@ -427,6 +723,9 @@ function Navbar() {
                                             )}
                                             onClick={
                                                 closeMenus
+                                            }
+                                            darkMode={
+                                                darkMode
                                             }
                                         >
                                             Quizzes
@@ -442,6 +741,9 @@ function Navbar() {
                                             onClick={
                                                 closeMenus
                                             }
+                                            darkMode={
+                                                darkMode
+                                            }
                                         >
                                             Dashboard
                                         </MobileNavItem>
@@ -453,6 +755,9 @@ function Navbar() {
                                             )}
                                             onClick={
                                                 closeMenus
+                                            }
+                                            darkMode={
+                                                darkMode
                                             }
                                         >
                                             Quizzes
@@ -466,20 +771,34 @@ function Navbar() {
                                             onClick={
                                                 closeMenus
                                             }
+                                            darkMode={
+                                                darkMode
+                                            }
                                         >
                                             Leaderboard
                                         </MobileNavItem>
                                     </>
                                 )}
 
-
-                                <div className="my-2 border-t border-slate-200" />
-
+                                <div
+                                    className={`
+                                        my-2
+                                        border-t
+                                        ${
+                                            darkMode
+                                                ? "border-white/10"
+                                                : "border-slate-200"
+                                        }
+                                    `}
+                                />
 
                                 <MobileNavItem
                                     to={profilePath}
                                     onClick={
                                         closeMenus
+                                    }
+                                    darkMode={
+                                        darkMode
                                     }
                                 >
                                     Profile
@@ -490,17 +809,19 @@ function Navbar() {
                                     onClick={
                                         closeMenus
                                     }
+                                    darkMode={
+                                        darkMode
+                                    }
                                 >
                                     Analytics
                                 </MobileNavItem>
-
 
                                 <button
                                     type="button"
                                     onClick={
                                         handleLogout
                                     }
-                                    className="
+                                    className={`
                                         w-full
                                         rounded-lg
                                         px-3
@@ -508,21 +829,24 @@ function Navbar() {
                                         text-left
                                         text-sm
                                         font-medium
-                                        text-red-600
+                                        text-red-500
                                         transition
-                                        hover:bg-red-50
-                                    "
+                                        ${
+                                            darkMode
+                                                ? "hover:bg-red-500/10"
+                                                : "hover:bg-red-50"
+                                        }
+                                    `}
                                 >
                                     Logout
                                 </button>
-
 
                                 <button
                                     type="button"
                                     onClick={
                                         handleOpenDelete
                                     }
-                                    className="
+                                    className={`
                                         w-full
                                         rounded-lg
                                         px-3
@@ -530,10 +854,14 @@ function Navbar() {
                                         text-left
                                         text-sm
                                         font-medium
-                                        text-red-600
+                                        text-red-500
                                         transition
-                                        hover:bg-red-50
-                                    "
+                                        ${
+                                            darkMode
+                                                ? "hover:bg-red-500/10"
+                                                : "hover:bg-red-50"
+                                        }
+                                    `}
                                 >
                                     Delete Account
                                 </button>
@@ -547,25 +875,62 @@ function Navbar() {
 
             </div>
 
-
             {/* ================================================= */}
             {/* DELETE ACCOUNT MODAL */}
             {/* ================================================= */}
 
             {deleteOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
 
-                    <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+                    <div
+                        className={`
+                            w-full
+                            max-w-md
+                            rounded-2xl
+                            p-5
+                            shadow-2xl
+                            transition-colors
+                            duration-300
+                            sm:p-6
+                            ${
+                                darkMode
+                                    ? "bg-[#151515] ring-1 ring-white/10"
+                                    : "bg-white"
+                            }
+                        `}
+                    >
 
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl">
                             ⚠️
                         </div>
 
-                        <h2 className="mt-5 text-xl font-bold text-slate-900">
+                        <h2
+                            className={`
+                                mt-5
+                                text-xl
+                                font-bold
+                                ${
+                                    darkMode
+                                        ? "text-white"
+                                        : "text-slate-900"
+                                }
+                            `}
+                        >
                             Delete Account?
                         </h2>
 
-                        <p className="mt-2 text-sm leading-6 text-slate-500">
+                        <p
+                            className={`
+                                mt-2
+                                text-sm
+                                leading-6
+                                ${
+                                    darkMode
+                                        ? "text-slate-400"
+                                        : "text-slate-500"
+                                }
+                            `}
+                        >
                             This action is permanent.
                             Your account and associated
                             data will be permanently
@@ -574,7 +939,19 @@ function Navbar() {
 
                         <div className="mt-5">
 
-                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                            <label
+                                className={`
+                                    mb-2
+                                    block
+                                    text-sm
+                                    font-semibold
+                                    ${
+                                        darkMode
+                                            ? "text-slate-300"
+                                            : "text-slate-700"
+                                    }
+                                `}
+                            >
                                 Enter your password
                             </label>
 
@@ -599,36 +976,37 @@ function Navbar() {
                                 disabled={
                                     deleting
                                 }
-                                className="
+                                className={`
                                     w-full
                                     rounded-lg
                                     border
-                                    border-slate-300
                                     px-4
                                     py-3
                                     text-sm
-                                    text-slate-900
                                     outline-none
                                     transition
-                                    placeholder:text-slate-400
+                                    placeholder:text-slate-500
                                     focus:border-black
                                     focus:ring-2
-                                    focus:ring-slate-200
-                                    disabled:bg-slate-50
-                                "
+                                    focus:ring-slate-300
+                                    disabled:opacity-50
+                                    ${
+                                        darkMode
+                                            ? "border-white/10 bg-[#0f0f0f] text-white"
+                                            : "border-slate-300 bg-white text-slate-900"
+                                    }
+                                `}
                             />
 
                         </div>
 
-
                         {deleteError && (
-                            <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                            <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
                                 {
                                     deleteError
                                 }
                             </div>
                         )}
-
 
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
 
@@ -640,26 +1018,26 @@ function Navbar() {
                                 onClick={
                                     handleCloseDelete
                                 }
-                                className="
+                                className={`
                                     flex-1
                                     rounded-lg
                                     border
-                                    border-slate-300
-                                    bg-white
                                     px-4
                                     py-3
                                     text-sm
                                     font-semibold
-                                    text-slate-700
                                     transition
-                                    hover:bg-slate-50
                                     disabled:cursor-not-allowed
                                     disabled:opacity-50
-                                "
+                                    ${
+                                        darkMode
+                                            ? "border-white/10 bg-white/5 text-white hover:bg-white/10"
+                                            : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                                    }
+                                `}
                             >
                                 Cancel
                             </button>
-
 
                             <button
                                 type="button"
@@ -701,7 +1079,6 @@ function Navbar() {
     );
 }
 
-
 /* ========================================================= */
 /* DESKTOP NAV ITEM */
 /* ========================================================= */
@@ -711,6 +1088,7 @@ function NavItem({
     active,
     onClick,
     children,
+    darkMode,
 }) {
     return (
         <Link
@@ -728,6 +1106,8 @@ function NavItem({
                 ${
                     active
                         ? "bg-black text-white"
+                        : darkMode
+                        ? "text-slate-400 hover:bg-white/10 hover:text-white"
                         : "text-slate-500 hover:bg-slate-100 hover:text-black"
                 }
             `}
@@ -736,7 +1116,6 @@ function NavItem({
         </Link>
     );
 }
-
 
 /* ========================================================= */
 /* MOBILE NAV ITEM */
@@ -747,6 +1126,7 @@ function MobileNavItem({
     active,
     onClick,
     children,
+    darkMode,
 }) {
     return (
         <Link
@@ -763,6 +1143,8 @@ function MobileNavItem({
                 ${
                     active
                         ? "bg-black text-white"
+                        : darkMode
+                        ? "text-slate-400 hover:bg-white/10 hover:text-white"
                         : "text-slate-600 hover:bg-white hover:text-black"
                 }
             `}
@@ -771,7 +1153,6 @@ function MobileNavItem({
         </Link>
     );
 }
-
 
 /* ========================================================= */
 /* PROFILE DROPDOWN */
@@ -784,11 +1165,42 @@ function ProfileMenu({
     setOpen,
     handleLogout,
     handleOpenDelete,
+    darkMode,
 }) {
     return (
-        <div className="absolute right-0 top-12 z-50 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl bg-white shadow-[0_15px_40px_rgba(15,23,42,0.15)] ring-1 ring-slate-200">
+        <div
+            className={`
+                absolute
+                right-0
+                top-12
+                z-50
+                w-64
+                max-w-[calc(100vw-2rem)]
+                overflow-hidden
+                rounded-2xl
+                shadow-[0_15px_40px_rgba(15,23,42,0.15)]
+                transition-colors
+                duration-300
+                ${
+                    darkMode
+                        ? "bg-[#151515] shadow-black/50 ring-1 ring-white/10"
+                        : "bg-white ring-1 ring-slate-200"
+                }
+            `}
+        >
 
-            <div className="border-b border-slate-100 px-4 py-4">
+            <div
+                className={`
+                    border-b
+                    px-4
+                    py-4
+                    ${
+                        darkMode
+                            ? "border-white/10"
+                            : "border-slate-100"
+                    }
+                `}
+            >
 
                 <div className="flex items-center gap-3">
 
@@ -801,12 +1213,32 @@ function ProfileMenu({
 
                     <div className="min-w-0">
 
-                        <p className="truncate font-semibold text-slate-900">
+                        <p
+                            className={`
+                                truncate
+                                font-semibold
+                                ${
+                                    darkMode
+                                        ? "text-white"
+                                        : "text-slate-900"
+                                }
+                            `}
+                        >
                             {user?.full_name ||
                                 "User"}
                         </p>
 
-                        <p className="truncate text-xs text-slate-500">
+                        <p
+                            className={`
+                                truncate
+                                text-xs
+                                ${
+                                    darkMode
+                                        ? "text-slate-500"
+                                        : "text-slate-500"
+                                }
+                            `}
+                        >
                             {user?.email ||
                                 ""}
                         </p>
@@ -815,14 +1247,28 @@ function ProfileMenu({
 
                 </div>
 
-
-                <span className="mt-3 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold capitalize text-slate-600">
+                <span
+                    className={`
+                        mt-3
+                        inline-flex
+                        rounded-full
+                        px-2.5
+                        py-1
+                        text-xs
+                        font-semibold
+                        capitalize
+                        ${
+                            darkMode
+                                ? "bg-white/10 text-slate-300"
+                                : "bg-slate-100 text-slate-600"
+                        }
+                    `}
+                >
                     {user?.role ||
                         "student"}
                 </span>
 
             </div>
-
 
             <div className="p-2">
 
@@ -831,7 +1277,7 @@ function ProfileMenu({
                     onClick={() =>
                         setOpen(false)
                     }
-                    className="
+                    className={`
                         flex
                         items-center
                         gap-3
@@ -840,22 +1286,23 @@ function ProfileMenu({
                         py-2.5
                         text-sm
                         font-medium
-                        text-slate-700
                         transition
-                        hover:bg-slate-100
-                        hover:text-black
-                    "
+                        ${
+                            darkMode
+                                ? "text-slate-300 hover:bg-white/10 hover:text-white"
+                                : "text-slate-700 hover:bg-slate-100 hover:text-black"
+                        }
+                    `}
                 >
                     Profile
                 </Link>
-
 
                 <Link
                     to={analyticsPath}
                     onClick={() =>
                         setOpen(false)
                     }
-                    className="
+                    className={`
                         flex
                         items-center
                         gap-3
@@ -864,25 +1311,35 @@ function ProfileMenu({
                         py-2.5
                         text-sm
                         font-medium
-                        text-slate-700
                         transition
-                        hover:bg-slate-100
-                        hover:text-black
-                    "
+                        ${
+                            darkMode
+                                ? "text-slate-300 hover:bg-white/10 hover:text-white"
+                                : "text-slate-700 hover:bg-slate-100 hover:text-black"
+                        }
+                    `}
                 >
                     Analytics
                 </Link>
 
-
-                <div className="my-2 border-t border-slate-100" />
-
+                <div
+                    className={`
+                        my-2
+                        border-t
+                        ${
+                            darkMode
+                                ? "border-white/10"
+                                : "border-slate-100"
+                        }
+                    `}
+                />
 
                 <button
                     type="button"
                     onClick={
                         handleLogout
                     }
-                    className="
+                    className={`
                         flex
                         w-full
                         items-center
@@ -893,21 +1350,24 @@ function ProfileMenu({
                         text-left
                         text-sm
                         font-medium
-                        text-red-600
+                        text-red-500
                         transition
-                        hover:bg-red-50
-                    "
+                        ${
+                            darkMode
+                                ? "hover:bg-red-500/10"
+                                : "hover:bg-red-50"
+                        }
+                    `}
                 >
                     Logout
                 </button>
-
 
                 <button
                     type="button"
                     onClick={
                         handleOpenDelete
                     }
-                    className="
+                    className={`
                         flex
                         w-full
                         items-center
@@ -918,10 +1378,14 @@ function ProfileMenu({
                         text-left
                         text-sm
                         font-medium
-                        text-red-600
+                        text-red-500
                         transition
-                        hover:bg-red-50
-                    "
+                        ${
+                            darkMode
+                                ? "hover:bg-red-500/10"
+                                : "hover:bg-red-50"
+                        }
+                    `}
                 >
                     Delete Account
                 </button>
