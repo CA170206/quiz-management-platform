@@ -5,7 +5,7 @@ function AuthPage() {
     const navigate = useNavigate();
 
     const [menuOpen, setMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+    const [activeSection, setActiveSection] = useState("home");
 
     const [stats, setStats] = useState({
         categories: 0,
@@ -16,15 +16,38 @@ function AuthPage() {
     const [loadingStats, setLoadingStats] = useState(true);
 
     /* =========================================================
-       NAVBAR SCROLL
+       ACTIVE NAVBAR SECTION
     ========================================================= */
 
     useEffect(() => {
+        const sections = [
+            "home",
+            "features",
+            "how-it-works",
+            "about",
+        ];
+
         const handleScroll = () => {
-            setScrolled(window.scrollY > 45);
+            const scrollPosition = window.scrollY + 180;
+
+            let currentSection = "home";
+
+            sections.forEach((id) => {
+                const section = document.getElementById(id);
+
+                if (section && section.offsetTop <= scrollPosition) {
+                    currentSection = id;
+                }
+            });
+
+            setActiveSection(currentSection);
         };
 
-        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("scroll", handleScroll, {
+            passive: true,
+        });
+
+        handleScroll();
 
         return () => {
             window.removeEventListener("scroll", handleScroll);
@@ -102,7 +125,7 @@ function AuthPage() {
 
 
     /* =========================================================
-       NAVIGATION
+       SCROLL TO SECTION
     ========================================================= */
 
     const scrollToSection = (id) => {
@@ -119,44 +142,52 @@ function AuthPage() {
     };
 
 
+    const navItems = [
+        {
+            id: "home",
+            label: "Home",
+        },
+        {
+            id: "features",
+            label: "Features",
+        },
+        {
+            id: "how-it-works",
+            label: "How It Works",
+        },
+        {
+            id: "about",
+            label: "About",
+        },
+    ];
+
+
     return (
-        <div className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-950">
+        <div className="min-h-screen overflow-x-hidden bg-[#f5f3ee] text-slate-950">
 
 
             {/* =====================================================
                 FLOATING NAVBAR
-                Inspired by the supplied video:
-                - floating pill
-                - no border
-                - matte background
-                - animated vertical light panels
-                - compact typography
-                - black CTA
             ===================================================== */}
 
             <header className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4 lg:px-8">
 
                 <div
-                    className={`
+                    className="
                         navbar-shimmer
-                        relative mx-auto flex items-center
-                        justify-between overflow-hidden
+                        relative mx-auto flex max-w-6xl
+                        items-center justify-between
+                        overflow-hidden
+                        rounded-full
                         bg-[#f5f3ee]/95
-                        backdrop-blur-xl
+                        px-4 py-2.5
                         shadow-[0_12px_35px_rgba(15,23,42,0.10)]
-                        transition-all duration-500 ease-out
-
-                        ${
-                            scrolled
-                                ? "max-w-5xl rounded-full px-4 py-2 sm:px-5"
-                                : "max-w-6xl rounded-full px-5 py-2.5 sm:px-7"
-                        }
-                    `}
+                        backdrop-blur-xl
+                        sm:px-6
+                    "
                 >
 
-                    {/* =================================================
-                        ANIMATED BACKGROUND
-                    ================================================= */}
+                    {/* Animated light */}
 
                     <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
@@ -167,29 +198,20 @@ function AuthPage() {
 
                     {/* =================================================
                         BRAND
-                        No icon — text only
                     ================================================= */}
 
                     <button
-                        onClick={() => {
-                            setMenuOpen(false);
-
-                            window.scrollTo({
-                                top: 0,
-                                behavior: "smooth",
-                            });
-                        }}
+                        onClick={() => scrollToSection("home")}
                         className="relative z-10 shrink-0 rounded-full px-1 py-1"
                     >
 
                         <span
                             className="
                                 block
+                                text-[18px]
                                 font-black
                                 tracking-[-0.055em]
                                 text-slate-950
-                                transition-all duration-300
-                                text-[18px]
                                 sm:text-[20px]
                             "
                             style={{
@@ -204,92 +226,51 @@ function AuthPage() {
 
 
                     {/* =================================================
-                        DESKTOP NAV
+                        DESKTOP NAVIGATION
                     ================================================= */}
 
                     <nav className="relative z-10 hidden items-center gap-1 lg:flex">
 
-                        <button
-                            onClick={() => scrollToSection("home")}
-                            className="
-                                rounded-full
-                                bg-white/75
-                                px-4 py-2
-                                text-[12px]
-                                font-semibold
-                                tracking-[-0.01em]
-                                text-slate-950
-                                shadow-sm
-                                transition-all duration-300
-                                hover:bg-white
-                            "
-                        >
-                            Home
-                        </button>
+                        {navItems.map((item) => {
+                            const isActive =
+                                activeSection === item.id;
 
-                        <button
-                            onClick={() => scrollToSection("features")}
-                            className="
-                                rounded-full
-                                px-4 py-2
-                                text-[12px]
-                                font-medium
-                                tracking-[-0.01em]
-                                text-slate-500
-                                transition-all duration-300
-                                hover:bg-white/70
-                                hover:text-slate-950
-                            "
-                        >
-                            Features
-                        </button>
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() =>
+                                        scrollToSection(item.id)
+                                    }
+                                    className={`
+                                        relative
+                                        rounded-full
+                                        px-4 py-2
+                                        text-[12px]
+                                        font-semibold
+                                        transition-all
+                                        duration-300
+                                        ease-out
 
-                        <button
-                            onClick={() =>
-                                scrollToSection("how-it-works")
-                            }
-                            className="
-                                rounded-full
-                                px-4 py-2
-                                text-[12px]
-                                font-medium
-                                tracking-[-0.01em]
-                                text-slate-500
-                                transition-all duration-300
-                                hover:bg-white/70
-                                hover:text-slate-950
-                            "
-                        >
-                            How It Works
-                        </button>
-
-                        <button
-                            onClick={() =>
-                                scrollToSection("about")
-                            }
-                            className="
-                                rounded-full
-                                px-4 py-2
-                                text-[12px]
-                                font-medium
-                                tracking-[-0.01em]
-                                text-slate-500
-                                transition-all duration-300
-                                hover:bg-white/70
-                                hover:text-slate-950
-                            "
-                        >
-                            About
-                        </button>
+                                        ${
+                                            isActive
+                                                ? "bg-white text-black shadow-sm"
+                                                : "text-slate-500 hover:bg-white/80 hover:text-black"
+                                        }
+                                    `}
+                                >
+                                    {item.label}
+                                </button>
+                            );
+                        })}
 
                     </nav>
 
 
                     {/* =================================================
-                        RIGHT ACTION
+                        RIGHT ACTIONS
                     ================================================= */}
 
-                    <div className="relative z-10 hidden items-center gap-2 lg:flex">
+                    <div className="relative z-10 hidden items-center gap-1.5 lg:flex">
 
                         <button
                             onClick={() => navigate("/login")}
@@ -297,11 +278,12 @@ function AuthPage() {
                                 rounded-full
                                 px-4 py-2
                                 text-[12px]
-                                font-medium
-                                text-slate-600
-                                transition
-                                hover:bg-white/70
-                                hover:text-slate-950
+                                font-semibold
+                                text-slate-500
+                                transition-all
+                                duration-300
+                                hover:bg-white/80
+                                hover:text-black
                             "
                         >
                             Sign In
@@ -313,20 +295,30 @@ function AuthPage() {
                                 group
                                 flex items-center gap-2
                                 rounded-full
-                                bg-slate-950
+                                bg-black
                                 px-4 py-2.5
                                 text-[11px]
                                 font-bold
                                 tracking-wide
                                 text-white
                                 shadow-sm
-                                transition-all duration-300
+                                transition-all
+                                duration-300
                                 hover:bg-slate-800
                                 hover:shadow-lg
                             "
                         >
 
-                            <span className="h-1.5 w-1.5 rounded-full bg-white transition-transform duration-300 group-hover:scale-125" />
+                            <span
+                                className="
+                                    h-1.5 w-1.5
+                                    rounded-full
+                                    bg-white
+                                    transition-transform
+                                    duration-300
+                                    group-hover:scale-125
+                                "
+                            />
 
                             Start a Quiz
 
@@ -377,7 +369,7 @@ function AuthPage() {
 
 
                 {/* =================================================
-                    MOBILE MENU
+                    MOBILE NAV
                 ================================================= */}
 
                 {menuOpen && (
@@ -395,72 +387,37 @@ function AuthPage() {
                         "
                     >
 
-                        <button
-                            onClick={() =>
-                                scrollToSection("home")
-                            }
-                            className="
-                                w-full rounded-2xl
-                                bg-slate-950
-                                px-4 py-3
-                                text-left
-                                text-sm font-semibold
-                                text-white
-                            "
-                        >
-                            Home
-                        </button>
+                        {navItems.map((item) => {
+                            const isActive =
+                                activeSection === item.id;
 
-                        <button
-                            onClick={() =>
-                                scrollToSection("features")
-                            }
-                            className="
-                                w-full rounded-2xl
-                                px-4 py-3
-                                text-left
-                                text-sm font-medium
-                                text-slate-600
-                                transition
-                                hover:bg-white
-                            "
-                        >
-                            Features
-                        </button>
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() =>
+                                        scrollToSection(item.id)
+                                    }
+                                    className={`
+                                        w-full
+                                        rounded-2xl
+                                        px-4 py-3
+                                        text-left
+                                        text-sm
+                                        font-semibold
+                                        transition-all
+                                        duration-300
 
-                        <button
-                            onClick={() =>
-                                scrollToSection("how-it-works")
-                            }
-                            className="
-                                w-full rounded-2xl
-                                px-4 py-3
-                                text-left
-                                text-sm font-medium
-                                text-slate-600
-                                transition
-                                hover:bg-white
-                            "
-                        >
-                            How It Works
-                        </button>
-
-                        <button
-                            onClick={() =>
-                                scrollToSection("about")
-                            }
-                            className="
-                                w-full rounded-2xl
-                                px-4 py-3
-                                text-left
-                                text-sm font-medium
-                                text-slate-600
-                                transition
-                                hover:bg-white
-                            "
-                        >
-                            About
-                        </button>
+                                        ${
+                                            isActive
+                                                ? "bg-black text-white"
+                                                : "text-slate-600 hover:bg-white hover:text-black"
+                                        }
+                                    `}
+                                >
+                                    {item.label}
+                                </button>
+                            );
+                        })}
 
 
                         <div className="mt-1 grid grid-cols-2 gap-2 p-1">
@@ -474,8 +431,12 @@ function AuthPage() {
                                     rounded-2xl
                                     bg-white
                                     px-4 py-3
-                                    text-sm font-semibold
+                                    text-sm
+                                    font-semibold
                                     text-slate-700
+                                    transition
+                                    hover:bg-slate-100
+                                    hover:text-black
                                 "
                             >
                                 Sign In
@@ -488,10 +449,13 @@ function AuthPage() {
                                 }}
                                 className="
                                     rounded-2xl
-                                    bg-slate-950
+                                    bg-black
                                     px-4 py-3
-                                    text-sm font-semibold
+                                    text-sm
+                                    font-semibold
                                     text-white
+                                    transition
+                                    hover:bg-slate-800
                                 "
                             >
                                 Get Started
@@ -507,7 +471,7 @@ function AuthPage() {
 
 
             {/* =====================================================
-                NAVBAR ANIMATION STYLES
+                NAVBAR ANIMATION
             ===================================================== */}
 
             <style>{`
@@ -529,8 +493,8 @@ function AuthPage() {
                             90deg,
                             rgba(255,255,255,0) 0px,
                             rgba(255,255,255,0) 22px,
-                            rgba(255,255,255,0.62) 23px,
-                            rgba(255,255,255,0.62) 48px,
+                            rgba(255,255,255,0.65) 23px,
+                            rgba(255,255,255,0.65) 48px,
                             rgba(255,255,255,0) 49px,
                             rgba(255,255,255,0) 72px
                         );
@@ -538,7 +502,8 @@ function AuthPage() {
                     filter: blur(1px);
 
                     animation:
-                        navbarSweep 7s
+                        navbarSweep
+                        7s
                         cubic-bezier(0.65, 0, 0.35, 1)
                         infinite;
                 }
@@ -566,7 +531,6 @@ function AuthPage() {
                         transform: translateX(330%);
                         opacity: 0;
                     }
-
                 }
 
                 @media (prefers-reduced-motion: reduce) {
@@ -594,14 +558,13 @@ function AuthPage() {
 
                 <section
                     id="home"
-                    className="scroll-mt-24 overflow-hidden"
+                    className="scroll-mt-24"
                 >
 
                     <div
                         className="
                             mx-auto grid max-w-7xl
-                            items-start
-                            gap-10
+                            items-start gap-10
                             px-4 py-7
                             sm:px-6 sm:py-9
                             lg:grid-cols-[0.95fr_1.05fr]
@@ -610,10 +573,7 @@ function AuthPage() {
                         "
                     >
 
-
-                        {/* =================================================
-                            LEFT HERO
-                        ================================================= */}
+                        {/* LEFT */}
 
                         <div className="max-w-2xl pt-4 sm:pt-6 lg:pt-10">
 
@@ -622,15 +582,17 @@ function AuthPage() {
                                     mb-5 inline-flex
                                     items-center gap-2
                                     rounded-full
-                                    bg-slate-100
+                                    bg-white
                                     px-4 py-2
-                                    text-xs font-semibold
-                                    text-slate-800
+                                    text-xs
+                                    font-semibold
+                                    text-black
+                                    shadow-sm
                                     sm:text-sm
                                 "
                             >
 
-                                <span className="h-2 w-2 rounded-full bg-slate-950" />
+                                <span className="h-2 w-2 rounded-full bg-black" />
 
                                 Smarter way to practice
 
@@ -643,7 +605,7 @@ function AuthPage() {
                                     font-black
                                     leading-[0.98]
                                     tracking-[-0.055em]
-                                    text-slate-950
+                                    text-black
                                     sm:text-5xl
                                     md:text-6xl
                                     lg:text-[3.7rem]
@@ -686,7 +648,7 @@ function AuthPage() {
                                     }
                                     className="
                                         rounded-xl
-                                        bg-slate-950
+                                        bg-black
                                         px-6 py-3.5
                                         text-sm font-semibold
                                         text-white
@@ -711,9 +673,9 @@ function AuthPage() {
                                         text-sm font-semibold
                                         text-slate-700
                                         shadow-sm
-                                        ring-1 ring-slate-200
                                         transition
-                                        hover:bg-slate-50
+                                        hover:bg-slate-100
+                                        hover:text-black
                                     "
                                 >
                                     Sign In
@@ -732,9 +694,7 @@ function AuthPage() {
                             >
 
                                 <span>✓ Practice quizzes</span>
-
                                 <span>✓ Instant results</span>
-
                                 <span>✓ Performance analytics</span>
 
                             </div>
@@ -742,15 +702,13 @@ function AuthPage() {
                         </div>
 
 
-                        {/* =================================================
-                            RIGHT PREVIEW
-                        ================================================= */}
+                        {/* RIGHT PREVIEW */}
 
                         <div className="relative w-full">
 
-                            <div className="absolute -right-10 -top-10 -z-10 h-40 w-40 rounded-full bg-slate-300/40 blur-3xl" />
+                            <div className="absolute -right-10 -top-10 -z-10 h-40 w-40 rounded-full bg-white/60 blur-3xl" />
 
-                            <div className="absolute -bottom-10 -left-10 -z-10 h-40 w-40 rounded-full bg-slate-300/40 blur-3xl" />
+                            <div className="absolute -bottom-10 -left-10 -z-10 h-40 w-40 rounded-full bg-white/60 blur-3xl" />
 
 
                             <div
@@ -760,27 +718,16 @@ function AuthPage() {
                                     bg-white
                                     p-4
                                     shadow-2xl
-                                    shadow-slate-200/70
-                                    ring-1 ring-slate-200/70
+                                    shadow-slate-300/40
                                     sm:p-5
                                 "
                             >
-
-
-                                {/* PREVIEW HEADER */}
 
                                 <div className="flex items-center justify-between">
 
                                     <div>
 
-                                        <p
-                                            className="
-                                                text-lg
-                                                font-black
-                                                tracking-[-0.04em]
-                                                text-slate-950
-                                            "
-                                        >
+                                        <p className="text-lg font-black tracking-[-0.04em] text-black">
                                             TryQuizzers
                                         </p>
 
@@ -790,7 +737,6 @@ function AuthPage() {
 
                                     </div>
 
-
                                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">
                                         🔔
                                     </div>
@@ -798,14 +744,12 @@ function AuthPage() {
                                 </div>
 
 
-                                {/* PREVIEW HERO */}
-
                                 <div
                                     className="
                                         mt-5
                                         rounded-2xl
                                         bg-gradient-to-br
-                                        from-slate-950
+                                        from-black
                                         via-slate-900
                                         to-slate-700
                                         p-5
@@ -823,8 +767,8 @@ function AuthPage() {
                                     </h2>
 
                                     <p className="mt-2 text-sm leading-6 text-slate-300 sm:text-base">
-                                        Take quizzes and get immediate
-                                        feedback on your answers.
+                                        Take quizzes and get immediate feedback
+                                        on your answers.
                                     </p>
 
                                     <button
@@ -838,10 +782,9 @@ function AuthPage() {
                                             px-4 py-2.5
                                             text-xs
                                             font-bold
-                                            text-slate-950
+                                            text-black
                                             transition
                                             hover:bg-slate-100
-                                            sm:text-sm
                                         "
                                     >
                                         Start Practicing →
@@ -849,8 +792,6 @@ function AuthPage() {
 
                                 </div>
 
-
-                                {/* FEATURES */}
 
                                 <div className="mt-5">
 
@@ -869,10 +810,9 @@ function AuthPage() {
 
                                     <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
 
+                                        <div className="rounded-2xl bg-[#f5f3ee] p-4">
 
-                                        <div className="rounded-2xl bg-slate-50 p-4">
-
-                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white">
                                                 📝
                                             </div>
 
@@ -887,9 +827,9 @@ function AuthPage() {
                                         </div>
 
 
-                                        <div className="rounded-2xl bg-slate-50 p-4">
+                                        <div className="rounded-2xl bg-[#f5f3ee] p-4">
 
-                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white">
                                                 📊
                                             </div>
 
@@ -904,9 +844,9 @@ function AuthPage() {
                                         </div>
 
 
-                                        <div className="rounded-2xl bg-slate-50 p-4">
+                                        <div className="rounded-2xl bg-[#f5f3ee] p-4">
 
-                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white">
                                                 🏆
                                             </div>
 
@@ -921,9 +861,9 @@ function AuthPage() {
                                         </div>
 
 
-                                        <div className="rounded-2xl bg-slate-50 p-4">
+                                        <div className="rounded-2xl bg-[#f5f3ee] p-4">
 
-                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white">
                                                 ✓
                                             </div>
 
@@ -944,15 +884,7 @@ function AuthPage() {
 
                                 {/* REAL DATA */}
 
-                                <div
-                                    className="
-                                        mt-4
-                                        rounded-2xl
-                                        bg-white
-                                        p-4
-                                        ring-1 ring-slate-100
-                                    "
-                                >
+                                <div className="mt-4 rounded-2xl bg-white p-4 shadow-sm">
 
                                     <div className="flex items-center justify-between">
 
@@ -977,9 +909,9 @@ function AuthPage() {
 
                                     <div className="mt-3 grid grid-cols-3 gap-2.5">
 
-                                        <div className="rounded-xl bg-slate-100 px-2 py-3 text-center">
+                                        <div className="rounded-xl bg-[#f5f3ee] px-2 py-3 text-center">
 
-                                            <p className="text-xl font-bold text-slate-950 sm:text-2xl">
+                                            <p className="text-xl font-bold text-black sm:text-2xl">
                                                 {loadingStats
                                                     ? "—"
                                                     : stats.categories}
@@ -992,9 +924,9 @@ function AuthPage() {
                                         </div>
 
 
-                                        <div className="rounded-xl bg-slate-100 px-2 py-3 text-center">
+                                        <div className="rounded-xl bg-[#f5f3ee] px-2 py-3 text-center">
 
-                                            <p className="text-xl font-bold text-slate-950 sm:text-2xl">
+                                            <p className="text-xl font-bold text-black sm:text-2xl">
                                                 {loadingStats
                                                     ? "—"
                                                     : stats.quizzes}
@@ -1007,9 +939,9 @@ function AuthPage() {
                                         </div>
 
 
-                                        <div className="rounded-xl bg-slate-100 px-2 py-3 text-center">
+                                        <div className="rounded-xl bg-[#f5f3ee] px-2 py-3 text-center">
 
-                                            <p className="text-xl font-bold text-slate-950 sm:text-2xl">
+                                            <p className="text-xl font-bold text-black sm:text-2xl">
                                                 {loadingStats
                                                     ? "—"
                                                     : stats.questions}
@@ -1040,7 +972,7 @@ function AuthPage() {
 
                 <section
                     id="features"
-                    className="scroll-mt-24 bg-white"
+                    className="scroll-mt-24 bg-[#f5f3ee]"
                 >
 
                     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -1051,7 +983,7 @@ function AuthPage() {
                                 Everything you need
                             </p>
 
-                            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">
+                            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
                                 Built for better learning
                             </h2>
 
@@ -1087,15 +1019,16 @@ function AuthPage() {
                                     key={title}
                                     className="
                                         rounded-2xl
-                                        bg-slate-50
+                                        bg-white
                                         p-6
+                                        shadow-sm
                                         transition
                                         hover:-translate-y-1
-                                        hover:shadow-lg
+                                        hover:shadow-xl
                                     "
                                 >
 
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-200 text-xl">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5f3ee] text-xl">
                                         {icon}
                                     </div>
 
@@ -1124,7 +1057,7 @@ function AuthPage() {
 
                 <section
                     id="how-it-works"
-                    className="scroll-mt-24 bg-slate-50"
+                    className="scroll-mt-24 bg-white"
                 >
 
                     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -1135,7 +1068,7 @@ function AuthPage() {
                                 Simple process
                             </p>
 
-                            <h2 className="mt-2 text-3xl font-bold">
+                            <h2 className="mt-2 text-3xl font-black tracking-tight">
                                 Start learning in three steps
                             </h2>
 
@@ -1164,10 +1097,16 @@ function AuthPage() {
 
                                 <div
                                     key={number}
-                                    className="rounded-2xl bg-white p-6 shadow-sm"
+                                    className="
+                                        rounded-2xl
+                                        bg-[#f5f3ee]
+                                        p-6
+                                        transition
+                                        hover:shadow-lg
+                                    "
                                 >
 
-                                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-xs font-bold text-white">
+                                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-xs font-bold text-white">
                                         {number}
                                     </span>
 
@@ -1196,7 +1135,7 @@ function AuthPage() {
 
                 <section
                     id="about"
-                    className="scroll-mt-24 bg-white"
+                    className="scroll-mt-24 bg-[#f5f3ee]"
                 >
 
                     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -1209,7 +1148,7 @@ function AuthPage() {
                                     About TryQuizzers
                                 </p>
 
-                                <h2 className="mt-2 text-3xl font-bold sm:text-4xl">
+                                <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
                                     A smarter way to prepare.
                                 </h2>
 
@@ -1227,7 +1166,7 @@ function AuthPage() {
                                     className="
                                         mt-6
                                         rounded-xl
-                                        bg-slate-950
+                                        bg-black
                                         px-6 py-3
                                         text-sm font-semibold
                                         text-white
@@ -1243,9 +1182,9 @@ function AuthPage() {
 
                             <div className="grid grid-cols-2 gap-4">
 
-                                <div className="rounded-2xl bg-slate-100 p-5">
+                                <div className="rounded-2xl bg-white p-5 shadow-sm">
 
-                                    <p className="text-3xl font-extrabold text-slate-950">
+                                    <p className="text-3xl font-black text-black">
                                         {loadingStats
                                             ? "—"
                                             : stats.categories}
@@ -1258,9 +1197,9 @@ function AuthPage() {
                                 </div>
 
 
-                                <div className="rounded-2xl bg-slate-100 p-5">
+                                <div className="rounded-2xl bg-white p-5 shadow-sm">
 
-                                    <p className="text-3xl font-extrabold text-slate-950">
+                                    <p className="text-3xl font-black text-black">
                                         {loadingStats
                                             ? "—"
                                             : stats.quizzes}
@@ -1273,9 +1212,9 @@ function AuthPage() {
                                 </div>
 
 
-                                <div className="rounded-2xl bg-slate-100 p-5">
+                                <div className="rounded-2xl bg-white p-5 shadow-sm">
 
-                                    <p className="text-3xl font-extrabold text-slate-950">
+                                    <p className="text-3xl font-black text-black">
                                         {loadingStats
                                             ? "—"
                                             : stats.questions}
@@ -1288,9 +1227,9 @@ function AuthPage() {
                                 </div>
 
 
-                                <div className="rounded-2xl bg-slate-100 p-5">
+                                <div className="rounded-2xl bg-white p-5 shadow-sm">
 
-                                    <p className="text-3xl font-extrabold text-slate-950">
+                                    <p className="text-3xl font-black text-black">
                                         ✓
                                     </p>
 
@@ -1313,23 +1252,24 @@ function AuthPage() {
                     CTA
                 ================================================= */}
 
-                <section className="bg-slate-50">
+                <section className="bg-[#f5f3ee]">
 
                     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
 
                         <div
                             className="
                                 rounded-[2rem]
-                                bg-slate-950
+                                bg-black
                                 px-5 py-12
-                                text-center text-white
+                                text-center
+                                text-white
                                 shadow-2xl
                                 shadow-slate-300/50
                                 sm:px-10
                             "
                         >
 
-                            <h2 className="text-2xl font-bold sm:text-3xl">
+                            <h2 className="text-2xl font-black sm:text-3xl">
                                 Ready to test yourself?
                             </h2>
 
@@ -1348,7 +1288,7 @@ function AuthPage() {
                                     bg-white
                                     px-7 py-3.5
                                     text-sm font-semibold
-                                    text-slate-950
+                                    text-black
                                     transition
                                     hover:bg-slate-100
                                 "
@@ -1369,7 +1309,7 @@ function AuthPage() {
                 FOOTER
             ===================================================== */}
 
-            <footer className="bg-white">
+            <footer className="bg-[#f5f3ee]">
 
                 <div
                     className="
@@ -1391,7 +1331,7 @@ function AuthPage() {
                         className="
                             font-black
                             tracking-[-0.045em]
-                            text-slate-700
+                            text-black
                         "
                     >
                         TryQuizzers

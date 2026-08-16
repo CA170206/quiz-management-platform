@@ -1,8 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function Navbar() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [open, setOpen] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -27,6 +28,10 @@ function Navbar() {
     const analyticsPath = isAdmin
         ? "/admin/analytics"
         : "/student/analytics";
+
+    const homePath = isAdmin
+        ? "/admin/dashboard"
+        : "/student/dashboard";
 
     const closeMenus = () => {
         setOpen(false);
@@ -63,7 +68,9 @@ function Navbar() {
 
     const handleDeleteAccount = async () => {
         if (!password) {
-            setDeleteError("Please enter your password.");
+            setDeleteError(
+                "Please enter your password."
+            );
             return;
         }
 
@@ -76,7 +83,9 @@ function Navbar() {
                 sessionStorage.getItem("token");
 
             if (!token) {
-                throw new Error("You are not logged in.");
+                throw new Error(
+                    "You are not logged in."
+                );
             }
 
             const response = await fetch(
@@ -84,8 +93,10 @@ function Navbar() {
                 {
                     method: "DELETE",
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
+                        "Content-Type":
+                            "application/json",
+                        Authorization:
+                            `Bearer ${token}`,
                     },
                     body: JSON.stringify({
                         password,
@@ -93,11 +104,13 @@ function Navbar() {
                 }
             );
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.message || "Failed to delete account"
+                    data.message ||
+                        "Failed to delete account"
                 );
             }
 
@@ -114,246 +127,433 @@ function Navbar() {
 
         } catch (error) {
             setDeleteError(
-                error.message || "Failed to delete account"
+                error.message ||
+                    "Failed to delete account"
             );
         } finally {
             setDeleting(false);
         }
     };
 
+    const isActive = (path) => {
+        return location.pathname === path;
+    };
+
     return (
         <>
-            <nav className="bg-slate-900 text-white shadow-lg">
+            {/* ================================================= */}
+            {/* FLOATING NAVBAR */}
+            {/* ================================================= */}
 
-                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+            <div className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
 
-                    {/* LOGO */}
+                <nav className="mx-auto max-w-7xl rounded-2xl bg-white/90 shadow-[0_10px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl">
 
-                    <Link
-                        to={
-                            isAdmin
-                                ? "/admin/dashboard"
-                                : "/student/dashboard"
-                        }
-                        onClick={closeMenus}
-                        className="shrink-0 text-xl font-bold"
-                    >
-                        Try
-                        <span className="text-blue-400">
-                            Quizzers
-                        </span>
-                    </Link>
+                    <div className="flex min-h-[64px] items-center justify-between px-4 sm:px-6 lg:px-7">
 
+                        {/* ================================================= */}
+                        {/* LOGO */}
+                        {/* ================================================= */}
 
-                    {/* DESKTOP NAVIGATION */}
+                        <Link
+                            to={homePath}
+                            onClick={closeMenus}
+                            className="group flex shrink-0 items-center"
+                        >
 
-                    <div className="hidden items-center gap-6 text-sm font-medium md:flex">
+                            <div className="leading-none">
 
-                        {isAdmin ? (
-                            <>
-                                <Link
-                                    to="/admin/dashboard"
-                                    className="text-slate-300 transition hover:text-white"
-                                >
-                                    Dashboard
-                                </Link>
+                                <div className="text-xl font-extrabold tracking-tight text-black sm:text-[22px]">
+                                    TryQuizzers
+                                </div>
 
-                                <Link
-                                    to="/admin/categories"
-                                    className="text-slate-300 transition hover:text-white"
-                                >
-                                    Categories
-                                </Link>
+                                <div className="mt-0.5 hidden text-[10px] font-medium text-slate-400 sm:block">
+                                    Learn. Practice. Improve.
+                                </div>
 
-                                <Link
-                                    to="/admin/questions"
-                                    className="text-slate-300 transition hover:text-white"
-                                >
-                                    Questions
-                                </Link>
+                            </div>
 
-                                <Link
-                                    to="/admin/quizzes"
-                                    className="text-slate-300 transition hover:text-white"
-                                >
-                                    Quizzes
-                                </Link>
-                            </>
-                        ) : (
-                            <>
-                                <Link
-                                    to="/student/dashboard"
-                                    className="text-slate-300 transition hover:text-white"
-                                >
-                                    Dashboard
-                                </Link>
-
-                                <Link
-                                    to="/student/quizzes"
-                                    className="text-slate-300 transition hover:text-white"
-                                >
-                                    Quizzes
-                                </Link>
-
-                                <Link
-                                    to="/student/leaderboard"
-                                    className="text-slate-300 transition hover:text-white"
-                                >
-                                    Leaderboard
-                                </Link>
-                            </>
-                        )}
-
-                        {/* PROFILE */}
-
-                        <div className="relative">
-
-                            <button
-                                type="button"
-                                onClick={() => setOpen(!open)}
-                                className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 font-bold transition hover:bg-blue-500"
-                            >
-                                {user?.full_name
-                                    ?.charAt(0)
-                                    ?.toUpperCase() || "U"}
-                            </button>
-
-                            {open && (
-                                <ProfileMenu
-                                    user={user}
-                                    profilePath={profilePath}
-                                    analyticsPath={analyticsPath}
-                                    setOpen={setOpen}
-                                    handleLogout={handleLogout}
-                                    handleOpenDelete={handleOpenDelete}
-                                />
-                            )}
-
-                        </div>
-
-                    </div>
+                        </Link>
 
 
-                    {/* MOBILE MENU BUTTON */}
+                        {/* ================================================= */}
+                        {/* DESKTOP NAVIGATION */}
+                        {/* ================================================= */}
 
-                    <button
-                        type="button"
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                        className="flex h-10 w-10 items-center justify-center rounded-lg text-2xl text-white hover:bg-slate-800 md:hidden"
-                        aria-label="Toggle navigation menu"
-                    >
-                        {mobileOpen ? "✕" : "☰"}
-                    </button>
-
-                </div>
-
-
-                {/* MOBILE NAVIGATION */}
-
-                {mobileOpen && (
-                    <div className="border-t border-slate-700 px-4 pb-4 pt-3 md:hidden">
-
-                        <div className="flex flex-col gap-1">
+                        <div className="hidden items-center gap-1 md:flex">
 
                             {isAdmin ? (
                                 <>
-                                    <MobileLink
+                                    <NavItem
                                         to="/admin/dashboard"
-                                        onClick={closeMenus}
+                                        active={isActive(
+                                            "/admin/dashboard"
+                                        )}
+                                        onClick={
+                                            closeMenus
+                                        }
                                     >
                                         Dashboard
-                                    </MobileLink>
+                                    </NavItem>
 
-                                    <MobileLink
+                                    <NavItem
                                         to="/admin/categories"
-                                        onClick={closeMenus}
+                                        active={isActive(
+                                            "/admin/categories"
+                                        )}
+                                        onClick={
+                                            closeMenus
+                                        }
                                     >
                                         Categories
-                                    </MobileLink>
+                                    </NavItem>
 
-                                    <MobileLink
+                                    <NavItem
                                         to="/admin/questions"
-                                        onClick={closeMenus}
+                                        active={isActive(
+                                            "/admin/questions"
+                                        )}
+                                        onClick={
+                                            closeMenus
+                                        }
                                     >
                                         Questions
-                                    </MobileLink>
+                                    </NavItem>
 
-                                    <MobileLink
+                                    <NavItem
                                         to="/admin/quizzes"
-                                        onClick={closeMenus}
+                                        active={isActive(
+                                            "/admin/quizzes"
+                                        )}
+                                        onClick={
+                                            closeMenus
+                                        }
                                     >
                                         Quizzes
-                                    </MobileLink>
+                                    </NavItem>
                                 </>
                             ) : (
                                 <>
-                                    <MobileLink
+                                    <NavItem
                                         to="/student/dashboard"
-                                        onClick={closeMenus}
+                                        active={isActive(
+                                            "/student/dashboard"
+                                        )}
+                                        onClick={
+                                            closeMenus
+                                        }
                                     >
                                         Dashboard
-                                    </MobileLink>
+                                    </NavItem>
 
-                                    <MobileLink
+                                    <NavItem
                                         to="/student/quizzes"
-                                        onClick={closeMenus}
+                                        active={isActive(
+                                            "/student/quizzes"
+                                        )}
+                                        onClick={
+                                            closeMenus
+                                        }
                                     >
                                         Quizzes
-                                    </MobileLink>
+                                    </NavItem>
 
-                                    <MobileLink
+                                    <NavItem
                                         to="/student/leaderboard"
-                                        onClick={closeMenus}
+                                        active={isActive(
+                                            "/student/leaderboard"
+                                        )}
+                                        onClick={
+                                            closeMenus
+                                        }
                                     >
                                         Leaderboard
-                                    </MobileLink>
+                                    </NavItem>
                                 </>
                             )}
 
-                            <div className="my-2 border-t border-slate-700" />
 
-                            <MobileLink
-                                to={profilePath}
-                                onClick={closeMenus}
-                            >
-                                👤 Profile
-                            </MobileLink>
+                            {/* ================================================= */}
+                            {/* PROFILE */}
+                            {/* ================================================= */}
 
-                            <MobileLink
-                                to={analyticsPath}
-                                onClick={closeMenus}
-                            >
-                                📊 Analytics
-                            </MobileLink>
+                            <div className="relative ml-2">
 
-                            <button
-                                type="button"
-                                onClick={handleLogout}
-                                className="w-full rounded-lg px-3 py-3 text-left text-sm font-medium text-red-400 hover:bg-slate-800"
-                            >
-                                🚪 Logout
-                            </button>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setOpen(
+                                            !open
+                                        )
+                                    }
+                                    className="
+                                        flex
+                                        h-10
+                                        w-10
+                                        items-center
+                                        justify-center
+                                        rounded-full
+                                        bg-slate-100
+                                        text-sm
+                                        font-bold
+                                        text-black
+                                        transition
+                                        hover:bg-black
+                                        hover:text-white
+                                    "
+                                >
+                                    {user?.full_name
+                                        ?.charAt(
+                                            0
+                                        )
+                                        ?.toUpperCase() ||
+                                        "U"}
+                                </button>
 
-                            <button
-                                type="button"
-                                onClick={handleOpenDelete}
-                                className="w-full rounded-lg px-3 py-3 text-left text-sm font-medium text-red-400 hover:bg-slate-800"
-                            >
-                                🗑️ Delete Account
-                            </button>
+
+                                {open && (
+                                    <ProfileMenu
+                                        user={user}
+                                        profilePath={
+                                            profilePath
+                                        }
+                                        analyticsPath={
+                                            analyticsPath
+                                        }
+                                        setOpen={
+                                            setOpen
+                                        }
+                                        handleLogout={
+                                            handleLogout
+                                        }
+                                        handleOpenDelete={
+                                            handleOpenDelete
+                                        }
+                                    />
+                                )}
+
+                            </div>
 
                         </div>
 
+
+                        {/* ================================================= */}
+                        {/* MOBILE BUTTON */}
+                        {/* ================================================= */}
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setMobileOpen(
+                                    !mobileOpen
+                                )
+                            }
+                            className="
+                                flex
+                                h-10
+                                w-10
+                                items-center
+                                justify-center
+                                rounded-xl
+                                bg-slate-100
+                                text-lg
+                                text-black
+                                transition
+                                hover:bg-black
+                                hover:text-white
+                                md:hidden
+                            "
+                            aria-label="Toggle navigation menu"
+                        >
+                            {mobileOpen
+                                ? "✕"
+                                : "☰"}
+                        </button>
+
                     </div>
-                )}
-
-            </nav>
 
 
+                    {/* ================================================= */}
+                    {/* MOBILE NAVIGATION */}
+                    {/* ================================================= */}
+
+                    {mobileOpen && (
+                        <div className="border-t border-slate-100 px-3 pb-3 pt-2 md:hidden">
+
+                            <div className="rounded-xl bg-slate-50 p-2">
+
+                                {isAdmin ? (
+                                    <>
+                                        <MobileNavItem
+                                            to="/admin/dashboard"
+                                            active={isActive(
+                                                "/admin/dashboard"
+                                            )}
+                                            onClick={
+                                                closeMenus
+                                            }
+                                        >
+                                            Dashboard
+                                        </MobileNavItem>
+
+                                        <MobileNavItem
+                                            to="/admin/categories"
+                                            active={isActive(
+                                                "/admin/categories"
+                                            )}
+                                            onClick={
+                                                closeMenus
+                                            }
+                                        >
+                                            Categories
+                                        </MobileNavItem>
+
+                                        <MobileNavItem
+                                            to="/admin/questions"
+                                            active={isActive(
+                                                "/admin/questions"
+                                            )}
+                                            onClick={
+                                                closeMenus
+                                            }
+                                        >
+                                            Questions
+                                        </MobileNavItem>
+
+                                        <MobileNavItem
+                                            to="/admin/quizzes"
+                                            active={isActive(
+                                                "/admin/quizzes"
+                                            )}
+                                            onClick={
+                                                closeMenus
+                                            }
+                                        >
+                                            Quizzes
+                                        </MobileNavItem>
+                                    </>
+                                ) : (
+                                    <>
+                                        <MobileNavItem
+                                            to="/student/dashboard"
+                                            active={isActive(
+                                                "/student/dashboard"
+                                            )}
+                                            onClick={
+                                                closeMenus
+                                            }
+                                        >
+                                            Dashboard
+                                        </MobileNavItem>
+
+                                        <MobileNavItem
+                                            to="/student/quizzes"
+                                            active={isActive(
+                                                "/student/quizzes"
+                                            )}
+                                            onClick={
+                                                closeMenus
+                                            }
+                                        >
+                                            Quizzes
+                                        </MobileNavItem>
+
+                                        <MobileNavItem
+                                            to="/student/leaderboard"
+                                            active={isActive(
+                                                "/student/leaderboard"
+                                            )}
+                                            onClick={
+                                                closeMenus
+                                            }
+                                        >
+                                            Leaderboard
+                                        </MobileNavItem>
+                                    </>
+                                )}
+
+
+                                <div className="my-2 border-t border-slate-200" />
+
+
+                                <MobileNavItem
+                                    to={profilePath}
+                                    onClick={
+                                        closeMenus
+                                    }
+                                >
+                                    Profile
+                                </MobileNavItem>
+
+                                <MobileNavItem
+                                    to={analyticsPath}
+                                    onClick={
+                                        closeMenus
+                                    }
+                                >
+                                    Analytics
+                                </MobileNavItem>
+
+
+                                <button
+                                    type="button"
+                                    onClick={
+                                        handleLogout
+                                    }
+                                    className="
+                                        w-full
+                                        rounded-lg
+                                        px-3
+                                        py-3
+                                        text-left
+                                        text-sm
+                                        font-medium
+                                        text-red-600
+                                        transition
+                                        hover:bg-red-50
+                                    "
+                                >
+                                    Logout
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    onClick={
+                                        handleOpenDelete
+                                    }
+                                    className="
+                                        w-full
+                                        rounded-lg
+                                        px-3
+                                        py-3
+                                        text-left
+                                        text-sm
+                                        font-medium
+                                        text-red-600
+                                        transition
+                                        hover:bg-red-50
+                                    "
+                                >
+                                    Delete Account
+                                </button>
+
+                            </div>
+
+                        </div>
+                    )}
+
+                </nav>
+
+            </div>
+
+
+            {/* ================================================= */}
             {/* DELETE ACCOUNT MODAL */}
+            {/* ================================================= */}
 
             {deleteOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
 
                     <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
 
@@ -380,41 +580,110 @@ function Navbar() {
 
                             <input
                                 type="password"
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    setDeleteError("");
+                                value={
+                                    password
+                                }
+                                onChange={(
+                                    e
+                                ) => {
+                                    setPassword(
+                                        e.target
+                                            .value
+                                    );
+                                    setDeleteError(
+                                        ""
+                                    );
                                 }}
                                 placeholder="Enter your password"
                                 autoFocus
-                                disabled={deleting}
-                                className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-red-500 focus:ring-2 focus:ring-red-100 disabled:bg-slate-50"
+                                disabled={
+                                    deleting
+                                }
+                                className="
+                                    w-full
+                                    rounded-lg
+                                    border
+                                    border-slate-300
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    text-slate-900
+                                    outline-none
+                                    transition
+                                    placeholder:text-slate-400
+                                    focus:border-black
+                                    focus:ring-2
+                                    focus:ring-slate-200
+                                    disabled:bg-slate-50
+                                "
                             />
 
                         </div>
 
+
                         {deleteError && (
                             <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
-                                {deleteError}
+                                {
+                                    deleteError
+                                }
                             </div>
                         )}
+
 
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
 
                             <button
                                 type="button"
-                                disabled={deleting}
-                                onClick={handleCloseDelete}
-                                className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={
+                                    deleting
+                                }
+                                onClick={
+                                    handleCloseDelete
+                                }
+                                className="
+                                    flex-1
+                                    rounded-lg
+                                    border
+                                    border-slate-300
+                                    bg-white
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    font-semibold
+                                    text-slate-700
+                                    transition
+                                    hover:bg-slate-50
+                                    disabled:cursor-not-allowed
+                                    disabled:opacity-50
+                                "
                             >
                                 Cancel
                             </button>
 
+
                             <button
                                 type="button"
-                                disabled={deleting || !password}
-                                onClick={handleDeleteAccount}
-                                className="flex-1 rounded-lg bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={
+                                    deleting ||
+                                    !password
+                                }
+                                onClick={
+                                    handleDeleteAccount
+                                }
+                                className="
+                                    flex-1
+                                    rounded-lg
+                                    bg-red-600
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                    transition
+                                    hover:bg-red-700
+                                    disabled:cursor-not-allowed
+                                    disabled:opacity-50
+                                "
                             >
                                 {deleting
                                     ? "Deleting..."
@@ -433,16 +702,35 @@ function Navbar() {
 }
 
 
-/* ========================================= */
-/* MOBILE LINK */
-/* ========================================= */
+/* ========================================================= */
+/* DESKTOP NAV ITEM */
+/* ========================================================= */
 
-function MobileLink({ to, onClick, children }) {
+function NavItem({
+    to,
+    active,
+    onClick,
+    children,
+}) {
     return (
         <Link
             to={to}
             onClick={onClick}
-            className="rounded-lg px-3 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+            className={`
+                relative
+                rounded-full
+                px-4
+                py-2.5
+                text-sm
+                font-semibold
+                transition-all
+                duration-200
+                ${
+                    active
+                        ? "bg-black text-white"
+                        : "text-slate-500 hover:bg-slate-100 hover:text-black"
+                }
+            `}
         >
             {children}
         </Link>
@@ -450,9 +738,44 @@ function MobileLink({ to, onClick, children }) {
 }
 
 
-/* ========================================= */
+/* ========================================================= */
+/* MOBILE NAV ITEM */
+/* ========================================================= */
+
+function MobileNavItem({
+    to,
+    active,
+    onClick,
+    children,
+}) {
+    return (
+        <Link
+            to={to}
+            onClick={onClick}
+            className={`
+                block
+                rounded-lg
+                px-3
+                py-3
+                text-sm
+                font-semibold
+                transition
+                ${
+                    active
+                        ? "bg-black text-white"
+                        : "text-slate-600 hover:bg-white hover:text-black"
+                }
+            `}
+        >
+            {children}
+        </Link>
+    );
+}
+
+
+/* ========================================================= */
 /* PROFILE DROPDOWN */
-/* ========================================= */
+/* ========================================================= */
 
 function ProfileMenu({
     user,
@@ -463,62 +786,144 @@ function ProfileMenu({
     handleOpenDelete,
 }) {
     return (
-        <div className="absolute right-0 top-12 z-50 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl bg-white shadow-xl ring-1 ring-black/5">
+        <div className="absolute right-0 top-12 z-50 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl bg-white shadow-[0_15px_40px_rgba(15,23,42,0.15)] ring-1 ring-slate-200">
 
             <div className="border-b border-slate-100 px-4 py-4">
 
-                <p className="font-semibold text-slate-900">
-                    {user?.full_name || "User"}
-                </p>
+                <div className="flex items-center gap-3">
 
-                <p className="mt-1 truncate text-xs text-slate-500">
-                    {user?.email || ""}
-                </p>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white">
+                        {user?.full_name
+                            ?.charAt(0)
+                            ?.toUpperCase() ||
+                            "U"}
+                    </div>
 
-                <span className="mt-2 inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold capitalize text-blue-600">
-                    {user?.role || "student"}
+                    <div className="min-w-0">
+
+                        <p className="truncate font-semibold text-slate-900">
+                            {user?.full_name ||
+                                "User"}
+                        </p>
+
+                        <p className="truncate text-xs text-slate-500">
+                            {user?.email ||
+                                ""}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <span className="mt-3 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold capitalize text-slate-600">
+                    {user?.role ||
+                        "student"}
                 </span>
 
             </div>
+
 
             <div className="p-2">
 
                 <Link
                     to={profilePath}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                    onClick={() =>
+                        setOpen(false)
+                    }
+                    className="
+                        flex
+                        items-center
+                        gap-3
+                        rounded-lg
+                        px-3
+                        py-2.5
+                        text-sm
+                        font-medium
+                        text-slate-700
+                        transition
+                        hover:bg-slate-100
+                        hover:text-black
+                    "
                 >
-                    👤
-                    <span>Profile</span>
+                    Profile
                 </Link>
+
 
                 <Link
                     to={analyticsPath}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                    onClick={() =>
+                        setOpen(false)
+                    }
+                    className="
+                        flex
+                        items-center
+                        gap-3
+                        rounded-lg
+                        px-3
+                        py-2.5
+                        text-sm
+                        font-medium
+                        text-slate-700
+                        transition
+                        hover:bg-slate-100
+                        hover:text-black
+                    "
                 >
-                    📊
-                    <span>Analytics</span>
+                    Analytics
                 </Link>
+
 
                 <div className="my-2 border-t border-slate-100" />
 
-                <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
-                >
-                    🚪
-                    <span>Logout</span>
-                </button>
 
                 <button
                     type="button"
-                    onClick={handleOpenDelete}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    onClick={
+                        handleLogout
+                    }
+                    className="
+                        flex
+                        w-full
+                        items-center
+                        gap-3
+                        rounded-lg
+                        px-3
+                        py-2.5
+                        text-left
+                        text-sm
+                        font-medium
+                        text-red-600
+                        transition
+                        hover:bg-red-50
+                    "
                 >
-                    🗑️
-                    <span>Delete Account</span>
+                    Logout
+                </button>
+
+
+                <button
+                    type="button"
+                    onClick={
+                        handleOpenDelete
+                    }
+                    className="
+                        flex
+                        w-full
+                        items-center
+                        gap-3
+                        rounded-lg
+                        px-3
+                        py-2.5
+                        text-left
+                        text-sm
+                        font-medium
+                        text-red-600
+                        transition
+                        hover:bg-red-50
+                    "
+                >
+                    Delete Account
                 </button>
 
             </div>

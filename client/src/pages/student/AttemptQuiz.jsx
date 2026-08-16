@@ -1,3 +1,4 @@
+import Navbar from "../../components/common/Navbar.jsx";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -39,9 +40,7 @@ function AttemptQuiz() {
                 ]);
 
                 if (!quizResponse.ok) {
-                    throw new Error(
-                        "Failed to fetch quiz"
-                    );
+                    throw new Error("Failed to fetch quiz");
                 }
 
                 if (!questionsResponse.ok) {
@@ -167,7 +166,6 @@ function AttemptQuiz() {
             navigate(
                 `/student/results/${data.attempt.id}`
             );
-
         } catch (err) {
             setError(err.message);
             setShowSubmitModal(false);
@@ -182,12 +180,18 @@ function AttemptQuiz() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-12">
-                <div className="mx-auto max-w-4xl">
+            <div className="min-h-screen bg-slate-50">
 
-                    <div className="h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
+                <Navbar />
 
-                </div>
+                <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
+                    <div className="mx-auto max-w-5xl">
+
+                        <div className="h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
+
+                    </div>
+                </main>
+
             </div>
         );
     }
@@ -198,11 +202,19 @@ function AttemptQuiz() {
 
     if (error && !quiz) {
         return (
-            <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-12">
+            <div className="min-h-screen bg-slate-50">
 
-                <div className="mx-auto max-w-4xl rounded-xl bg-red-50 p-4 text-sm text-red-600 sm:p-5">
-                    {error}
-                </div>
+                <Navbar />
+
+                <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
+                    <div className="mx-auto max-w-5xl">
+
+                        <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-600 sm:p-5">
+                            {error}
+                        </div>
+
+                    </div>
+                </main>
 
             </div>
         );
@@ -218,34 +230,54 @@ function AttemptQuiz() {
 
     if (questions.length === 0) {
         return (
-            <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 sm:py-12">
+            <div className="min-h-screen bg-slate-50">
 
-                <div className="mx-auto max-w-4xl rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:p-10">
+                <Navbar />
 
-                    <div className="text-4xl">
-                        📝
+                <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
+                    <div className="mx-auto max-w-4xl">
+
+                        <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:p-10">
+
+                            <div className="text-4xl">
+                                📝
+                            </div>
+
+                            <h1 className="mt-4 text-xl font-bold text-slate-900 sm:text-2xl">
+                                No Questions Available
+                            </h1>
+
+                            <p className="mt-2 text-sm text-slate-500">
+                                This quiz does not have any questions yet.
+                            </p>
+
+                            <button
+                                onClick={() =>
+                                    navigate(
+                                        "/student/quizzes"
+                                    )
+                                }
+                                className="
+                                    mt-6
+                                    w-full
+                                    rounded-lg
+                                    bg-black
+                                    px-5 py-3
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                    transition
+                                    hover:bg-slate-800
+                                    sm:w-auto
+                                "
+                            >
+                                Back to Quizzes
+                            </button>
+
+                        </div>
+
                     </div>
-
-                    <h1 className="mt-4 text-xl font-bold text-slate-900 sm:text-2xl">
-                        No Questions Available
-                    </h1>
-
-                    <p className="mt-2 text-sm text-slate-500">
-                        This quiz does not have any questions yet.
-                    </p>
-
-                    <button
-                        onClick={() =>
-                            navigate(
-                                "/student/quizzes"
-                            )
-                        }
-                        className="mt-6 w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
-                    >
-                        Back to Quizzes
-                    </button>
-
-                </div>
+                </main>
 
             </div>
         );
@@ -284,341 +316,387 @@ function AttemptQuiz() {
     // ==========================================
 
     return (
-        <div className="min-h-screen bg-slate-50 px-4 py-5 sm:px-6 sm:py-6">
+        <div className="min-h-screen bg-slate-50">
 
-            <div className="mx-auto max-w-5xl">
+            <Navbar />
 
-                {/* ================================= */}
-                {/* HEADER */}
-                {/* ================================= */}
+            <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
 
-                <div className="mb-5 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:mb-6 sm:p-5">
+                <div className="mx-auto max-w-5xl">
 
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    {/* ================================= */}
+                    {/* HEADER */}
+                    {/* ================================= */}
 
-                        <div className="min-w-0">
+                    <div className="mb-5 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:mb-6 sm:p-5">
 
-                            <p className="text-sm font-semibold text-blue-600">
-                                Quiz Attempt
-                            </p>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-                            <h1 className="mt-1 break-words text-lg font-bold leading-tight text-slate-900 sm:text-xl">
-                                {quiz.title}
-                            </h1>
+                            <div className="min-w-0">
 
-                        </div>
+                                <p className="text-sm font-semibold text-black">
+                                    Quiz Attempt
+                                </p>
 
-                        {/* Timer */}
+                                <h1 className="mt-1 break-words text-lg font-bold leading-tight text-slate-900 sm:text-xl">
+                                    {quiz.title}
+                                </h1>
 
-                        <div
-                            className={`w-full shrink-0 rounded-xl px-4 py-3 text-center sm:w-auto sm:min-w-[150px] sm:px-5 ${
-                                timeLeft <= 60
-                                    ? "bg-red-50 text-red-600"
-                                    : "bg-blue-50 text-blue-600"
-                            }`}
-                        >
+                            </div>
 
-                            <p className="text-xs font-semibold uppercase">
-                                Time Remaining
-                            </p>
-
-                            <p className="mt-1 text-xl font-bold tabular-nums">
-                                {minutes}:{seconds}
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    {/* Progress */}
-
-                    <div className="mt-5">
-
-                        <div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-medium text-slate-500">
-
-                            <span>
-                                Question{" "}
-                                {currentIndex + 1}{" "}
-                                of{" "}
-                                {questions.length}
-                            </span>
-
-                            <span>
-                                {answeredCount} answered
-                            </span>
-
-                        </div>
-
-                        <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                            {/* Timer */}
 
                             <div
-                                className="h-full rounded-full bg-blue-600 transition-all duration-300"
-                                style={{
-                                    width: `${progress}%`,
-                                }}
-                            />
+                                className={`w-full shrink-0 rounded-xl px-4 py-3 text-center sm:w-auto sm:min-w-[150px] sm:px-5 ${
+                                    timeLeft <= 60
+                                        ? "bg-red-50 text-red-600"
+                                        : "bg-slate-100 text-slate-900"
+                                }`}
+                            >
+
+                                <p className="text-xs font-semibold uppercase">
+                                    Time Remaining
+                                </p>
+
+                                <p className="mt-1 text-xl font-bold tabular-nums">
+                                    {minutes}:{seconds}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        {/* Progress */}
+
+                        <div className="mt-5">
+
+                            <div className="mb-2 flex flex-wrap justify-between gap-2 text-xs font-medium text-slate-500">
+
+                                <span>
+                                    Question{" "}
+                                    {currentIndex + 1}{" "}
+                                    of{" "}
+                                    {questions.length}
+                                </span>
+
+                                <span>
+                                    {answeredCount} answered
+                                </span>
+
+                            </div>
+
+                            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+
+                                <div
+                                    className="h-full rounded-full bg-black transition-all duration-300"
+                                    style={{
+                                        width: `${progress}%`,
+                                    }}
+                                />
+
+                            </div>
 
                         </div>
 
                     </div>
 
-                </div>
 
+                    {/* ERROR */}
 
-                {/* ERROR */}
-
-                {error && (
-                    <div className="mb-5 rounded-xl bg-red-50 px-4 py-4 text-sm text-red-600 sm:px-5">
-                        {error}
-                    </div>
-                )}
-
-
-                {/* ================================= */}
-                {/* QUESTION */}
-                {/* ================================= */}
-
-                <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-
-                    <div className="border-b border-slate-100 px-5 py-5 sm:px-8 sm:py-6">
-
-                        <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
-                            Question{" "}
-                            {currentIndex + 1}
-                        </span>
-
-                        <h2 className="mt-4 break-words text-lg font-bold leading-7 text-slate-900 sm:mt-5 sm:text-2xl sm:leading-8">
-                            {
-                                currentQuestion.question_text
-                            }
-                        </h2>
-
-                    </div>
+                    {error && (
+                        <div className="mb-5 rounded-xl border border-red-100 bg-red-50 px-4 py-4 text-sm text-red-600 sm:px-5">
+                            {error}
+                        </div>
+                    )}
 
 
                     {/* ================================= */}
-                    {/* OPTIONS */}
+                    {/* QUESTION */}
                     {/* ================================= */}
 
-                    <div className="space-y-3 px-5 py-5 sm:px-8 sm:py-6">
+                    <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
 
-                        {[
-                            currentQuestion.option_a,
-                            currentQuestion.option_b,
-                            currentQuestion.option_c,
-                            currentQuestion.option_d,
-                        ].map(
-                            (
-                                option,
-                                index
-                            ) => {
+                        <div className="border-b border-slate-100 px-5 py-5 sm:px-8 sm:py-6">
 
-                                const optionLetter =
-                                    String.fromCharCode(
-                                        65 + index
+                            <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                                Question{" "}
+                                {currentIndex + 1}
+                            </span>
+
+                            <h2 className="mt-4 break-words text-lg font-bold leading-7 text-slate-900 sm:mt-5 sm:text-2xl sm:leading-8">
+                                {
+                                    currentQuestion.question_text
+                                }
+                            </h2>
+
+                        </div>
+
+
+                        {/* ================================= */}
+                        {/* OPTIONS */}
+                        {/* ================================= */}
+
+                        <div className="space-y-3 px-5 py-5 sm:px-8 sm:py-6">
+
+                            {[
+                                currentQuestion.option_a,
+                                currentQuestion.option_b,
+                                currentQuestion.option_c,
+                                currentQuestion.option_d,
+                            ].map(
+                                (
+                                    option,
+                                    index
+                                ) => {
+
+                                    const optionLetter =
+                                        String.fromCharCode(
+                                            65 + index
+                                        );
+
+                                    const selected =
+                                        answers[
+                                            currentQuestion.id
+                                        ] === option;
+
+                                    return (
+                                        <label
+                                            key={index}
+                                            className={`flex min-w-0 cursor-pointer items-start gap-3 rounded-xl border p-3 transition sm:items-center sm:gap-4 sm:p-4 ${
+                                                selected
+                                                    ? "border-slate-900 bg-slate-50 ring-2 ring-slate-200"
+                                                    : "border-slate-200 hover:border-slate-400 hover:bg-slate-50"
+                                            }`}
+                                        >
+
+                                            <input
+                                                type="radio"
+                                                name={`question-${currentQuestion.id}`}
+                                                value={option}
+                                                checked={
+                                                    selected
+                                                }
+                                                onChange={() =>
+                                                    handleAnswer(
+                                                        option
+                                                    )
+                                                }
+                                                className="sr-only"
+                                            />
+
+                                            <span
+                                                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold sm:h-10 sm:w-10 ${
+                                                    selected
+                                                        ? "bg-black text-white"
+                                                        : "bg-slate-100 text-slate-600"
+                                                }`}
+                                            >
+                                                {
+                                                    optionLetter
+                                                }
+                                            </span>
+
+                                            <span
+                                                className={`min-w-0 break-words text-sm font-medium leading-6 ${
+                                                    selected
+                                                        ? "text-slate-900"
+                                                        : "text-slate-700"
+                                                }`}
+                                            >
+                                                {option}
+                                            </span>
+
+                                        </label>
                                     );
-
-                                const selected =
-                                    answers[
-                                        currentQuestion.id
-                                    ] === option;
-
-                                return (
-                                    <label
-                                        key={index}
-                                        className={`flex min-w-0 cursor-pointer items-start gap-3 rounded-xl border p-3 transition sm:items-center sm:gap-4 sm:p-4 ${
-                                            selected
-                                                ? "border-blue-500 bg-blue-50 ring-2 ring-blue-100"
-                                                : "border-slate-200 hover:border-blue-300 hover:bg-slate-50"
-                                        }`}
-                                    >
-
-                                        <input
-                                            type="radio"
-                                            name={`question-${currentQuestion.id}`}
-                                            value={option}
-                                            checked={
-                                                selected
-                                            }
-                                            onChange={() =>
-                                                handleAnswer(
-                                                    option
-                                                )
-                                            }
-                                            className="sr-only"
-                                        />
-
-                                        <span
-                                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold sm:h-10 sm:w-10 ${
-                                                selected
-                                                    ? "bg-blue-600 text-white"
-                                                    : "bg-slate-100 text-slate-600"
-                                            }`}
-                                        >
-                                            {
-                                                optionLetter
-                                            }
-                                        </span>
-
-                                        <span
-                                            className={`min-w-0 break-words text-sm font-medium leading-6 ${
-                                                selected
-                                                    ? "text-blue-900"
-                                                    : "text-slate-700"
-                                            }`}
-                                        >
-                                            {option}
-                                        </span>
-
-                                    </label>
-                                );
-                            }
-                        )}
-
-                    </div>
-
-
-                    {/* ================================= */}
-                    {/* NAVIGATION */}
-                    {/* ================================= */}
-
-                    <div className="border-t border-slate-100 px-5 py-4 sm:px-8 sm:py-5">
-
-                        <div className="flex items-center justify-between gap-3">
-
-                            <button
-                                type="button"
-                                disabled={
-                                    currentIndex ===
-                                    0
                                 }
-                                onClick={() =>
-                                    setCurrentIndex(
-                                        currentIndex -
-                                            1
-                                    )
-                                }
-                                className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:px-5"
-                            >
-                                ← Previous
-                            </button>
-
-
-                            {!isLastQuestion ? (
-
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setCurrentIndex(
-                                            currentIndex +
-                                                1
-                                        )
-                                    }
-                                    className="flex-1 rounded-lg bg-blue-600 px-3 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 sm:flex-none sm:px-6"
-                                >
-                                    Next →
-                                </button>
-
-                            ) : (
-
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setShowSubmitModal(
-                                            true
-                                        )
-                                    }
-                                    className="flex-1 rounded-lg bg-green-600 px-3 py-3 text-sm font-semibold text-white transition hover:bg-green-700 sm:flex-none sm:px-6"
-                                >
-                                    Submit Quiz
-                                </button>
-
                             )}
 
                         </div>
 
-                    </div>
 
-                </div>
+                        {/* ================================= */}
+                        {/* NAVIGATION */}
+                        {/* ================================= */}
+
+                        <div className="border-t border-slate-100 px-5 py-4 sm:px-8 sm:py-5">
+
+                            <div className="flex items-center justify-between gap-3">
+
+                                <button
+                                    type="button"
+                                    disabled={
+                                        currentIndex ===
+                                        0
+                                    }
+                                    onClick={() =>
+                                        setCurrentIndex(
+                                            currentIndex -
+                                                1
+                                        )
+                                    }
+                                    className="
+                                        flex-1
+                                        rounded-lg
+                                        border
+                                        border-slate-300
+                                        bg-white
+                                        px-3 py-3
+                                        text-sm
+                                        font-semibold
+                                        text-slate-700
+                                        transition
+                                        hover:bg-slate-50
+                                        disabled:cursor-not-allowed
+                                        disabled:opacity-40
+                                        sm:flex-none
+                                        sm:px-5
+                                    "
+                                >
+                                    ← Previous
+                                </button>
 
 
-                {/* ================================= */}
-                {/* QUESTION NAVIGATION */}
-                {/* ================================= */}
+                                {!isLastQuestion ? (
 
-                <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mt-6 sm:p-6">
-
-                    <h3 className="text-sm font-bold text-slate-900">
-                        Question Navigation
-                    </h3>
-
-                    <div className="mt-4 grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
-
-                        {questions.map(
-                            (
-                                question,
-                                index
-                            ) => {
-
-                                const answered =
-                                    answers[
-                                        question.id
-                                    ];
-
-                                const current =
-                                    index ===
-                                    currentIndex;
-
-                                return (
                                     <button
-                                        key={
-                                            question.id
-                                        }
                                         type="button"
                                         onClick={() =>
                                             setCurrentIndex(
-                                                index
+                                                currentIndex +
+                                                    1
                                             )
                                         }
-                                        className={`h-10 w-full rounded-lg text-sm font-semibold transition sm:w-10 ${
-                                            current
-                                                ? "bg-blue-600 text-white ring-2 ring-blue-200"
-                                                : answered
-                                                ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                        }`}
+                                        className="
+                                            flex-1
+                                            rounded-lg
+                                            bg-black
+                                            px-3 py-3
+                                            text-sm
+                                            font-semibold
+                                            text-white
+                                            transition
+                                            hover:bg-slate-800
+                                            sm:flex-none
+                                            sm:px-6
+                                        "
                                     >
-                                        {index + 1}
+                                        Next →
                                     </button>
-                                );
-                            }
-                        )}
+
+                                ) : (
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowSubmitModal(
+                                                true
+                                            )
+                                        }
+                                        className="
+                                            flex-1
+                                            rounded-lg
+                                            bg-green-600
+                                            px-3 py-3
+                                            text-sm
+                                            font-semibold
+                                            text-white
+                                            transition
+                                            hover:bg-green-700
+                                            sm:flex-none
+                                            sm:px-6
+                                        "
+                                    >
+                                        Submit Quiz
+                                    </button>
+
+                                )}
+
+                            </div>
+
+                        </div>
 
                     </div>
 
 
-                    <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500">
+                    {/* ================================= */}
+                    {/* QUESTION NAVIGATION */}
+                    {/* ================================= */}
 
-                        <span className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded bg-blue-600" />
-                            Current
-                        </span>
+                    <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mt-6 sm:p-6">
 
-                        <span className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded bg-green-100" />
-                            Answered
-                        </span>
+                        <h3 className="text-sm font-bold text-slate-900">
+                            Question Navigation
+                        </h3>
 
-                        <span className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded bg-slate-100" />
-                            Unanswered
-                        </span>
+                        <div className="mt-4 grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
+
+                            {questions.map(
+                                (
+                                    question,
+                                    index
+                                ) => {
+
+                                    const answered =
+                                        answers[
+                                            question.id
+                                        ];
+
+                                    const current =
+                                        index ===
+                                        currentIndex;
+
+                                    return (
+                                        <button
+                                            key={
+                                                question.id
+                                            }
+                                            type="button"
+                                            onClick={() =>
+                                                setCurrentIndex(
+                                                    index
+                                                )
+                                            }
+                                            className={`h-10 w-full rounded-lg text-sm font-semibold transition sm:w-10 ${
+                                                current
+                                                    ? "bg-black text-white ring-2 ring-slate-300"
+                                                    : answered
+                                                    ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            {index + 1}
+                                        </button>
+                                    );
+                                }
+                            )}
+
+                        </div>
+
+
+                        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500">
+
+                            <span className="flex items-center gap-2">
+                                <span className="h-3 w-3 rounded bg-black" />
+                                Current
+                            </span>
+
+                            <span className="flex items-center gap-2">
+                                <span className="h-3 w-3 rounded bg-green-100" />
+                                Answered
+                            </span>
+
+                            <span className="flex items-center gap-2">
+                                <span className="h-3 w-3 rounded bg-slate-100" />
+                                Unanswered
+                            </span>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+            </main>
 
 
             {/* ==========================================
@@ -631,7 +709,7 @@ function AttemptQuiz() {
 
                     <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
 
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-xl">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-xl">
                             📝
                         </div>
 
@@ -670,7 +748,20 @@ function AttemptQuiz() {
                                         false
                                     )
                                 }
-                                className="w-full rounded-lg border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto sm:py-2.5"
+                                className="
+                                    w-full
+                                    rounded-lg
+                                    border
+                                    border-slate-300
+                                    px-5 py-3
+                                    text-sm
+                                    font-semibold
+                                    text-slate-700
+                                    transition
+                                    hover:bg-slate-50
+                                    sm:w-auto
+                                    sm:py-2.5
+                                "
                             >
                                 Continue Quiz
                             </button>
@@ -683,7 +774,20 @@ function AttemptQuiz() {
                                 onClick={
                                     handleSubmit
                                 }
-                                className="w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60 sm:w-auto sm:py-2.5"
+                                className="
+                                    w-full
+                                    rounded-lg
+                                    bg-black
+                                    px-5 py-3
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                    transition
+                                    hover:bg-slate-800
+                                    disabled:opacity-60
+                                    sm:w-auto
+                                    sm:py-2.5
+                                "
                             >
                                 {submitting
                                     ? "Submitting..."

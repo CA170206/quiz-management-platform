@@ -1,3 +1,5 @@
+import Navbar from "../../components/common/Navbar.jsx";
+
 import { useState } from "react";
 
 function Profile() {

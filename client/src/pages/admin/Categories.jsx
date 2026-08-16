@@ -1,3 +1,4 @@
+import Navbar from "../../components/common/Navbar.jsx";
 import { useEffect, useState } from "react";
 
 const API_URL =

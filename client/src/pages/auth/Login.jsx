@@ -53,20 +53,18 @@ function Login() {
 
             const data = await response.json();
 
-            console.log("Login response:", data);
-
             if (!response.ok) {
-                throw new Error(data.message || "Login failed");
+                throw new Error(
+                    data.message || "Login failed"
+                );
             }
 
-            // Make sure backend actually returned a token
             if (!data.token) {
                 throw new Error(
                     "Login succeeded but no token was received."
                 );
             }
 
-            // Store authentication data in localStorage
             localStorage.setItem("token", data.token);
 
             if (data.user) {
@@ -76,7 +74,6 @@ function Login() {
                 );
             }
 
-            // Keep sessionStorage too for compatibility
             sessionStorage.setItem("token", data.token);
 
             if (data.user) {
@@ -86,12 +83,8 @@ function Login() {
                 );
             }
 
-            // Get role from backend
             const role = data.user?.role;
 
-            console.log("Logged in role:", role);
-
-            // Navigate based on backend role
             if (role === "admin") {
                 window.location.href = "/admin/dashboard";
             } else if (role === "student") {
@@ -104,6 +97,7 @@ function Login() {
 
         } catch (err) {
             console.error("Login error:", err);
+
             setError(
                 err.message ||
                 "Something went wrong during login."
@@ -114,72 +108,112 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-12">
-            <div className="mx-auto flex min-h-[80vh] max-w-md items-center justify-center">
+        <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 sm:py-12">
 
-                <div className="w-full rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+            <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center justify-center sm:min-h-[80vh]">
 
-                    {/* Header */}
-                    <div className="mb-7 text-center">
+                <div className="w-full rounded-[24px] bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.08)] ring-1 ring-slate-200 sm:p-8">
 
-                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
-                            T
+                    {/* ============================== */}
+                    {/* HEADER */}
+                    {/* ============================== */}
+
+                    <div className="mb-7 text-center sm:mb-8">
+
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-black sm:h-[68px] sm:w-[68px]">
+                            <img
+                                src="/icon.svg"
+                                alt="TryQuizzers"
+                                className="h-full w-full object-contain"
+                            />
                         </div>
 
-                        <h1 className="mt-5 text-2xl font-bold text-slate-900">
+                        <h1 className="mt-5 text-2xl font-bold tracking-tight text-black sm:text-[28px]">
                             Welcome Back
                         </h1>
 
-                        <p className="mt-2 text-sm text-slate-500">
+                        <p className="mt-2 text-sm leading-6 text-slate-500">
                             Sign in to continue to TryQuizzers.
                         </p>
 
                     </div>
 
-                    {/* Login Type */}
-                    <div className="mb-6 rounded-xl bg-slate-100 p-1">
+
+                    {/* ============================== */}
+                    {/* LOGIN TYPE */}
+                    {/* ============================== */}
+
+                    <div className="mb-6 rounded-2xl bg-slate-100 p-1">
 
                         <div className="grid grid-cols-2 gap-1">
 
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleLoginTypeChange("student")
+                                    handleLoginTypeChange(
+                                        "student"
+                                    )
                                 }
-                                className={`rounded-lg px-4 py-3 text-sm font-semibold transition ${
-                                    loginType === "student"
-                                        ? "bg-white text-blue-600 shadow-sm"
-                                        : "text-slate-500 hover:text-slate-700"
-                                }`}
+                                className={`
+                                    rounded-xl
+                                    px-3
+                                    py-3
+                                    text-sm
+                                    font-semibold
+                                    transition-all
+                                    sm:px-4
+                                    ${
+                                        loginType === "student"
+                                            ? "bg-white text-black shadow-sm"
+                                            : "text-slate-500 hover:text-black"
+                                    }
+                                `}
                             >
                                 🎓 Student Login
                             </button>
 
+
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleLoginTypeChange("admin")
+                                    handleLoginTypeChange(
+                                        "admin"
+                                    )
                                 }
-                                className={`rounded-lg px-4 py-3 text-sm font-semibold transition ${
-                                    loginType === "admin"
-                                        ? "bg-white text-blue-600 shadow-sm"
-                                        : "text-slate-500 hover:text-slate-700"
-                                }`}
+                                className={`
+                                    rounded-xl
+                                    px-3
+                                    py-3
+                                    text-sm
+                                    font-semibold
+                                    transition-all
+                                    sm:px-4
+                                    ${
+                                        loginType === "admin"
+                                            ? "bg-white text-black shadow-sm"
+                                            : "text-slate-500 hover:text-black"
+                                    }
+                                `}
                             >
                                 🛡️ Admin Login
                             </button>
 
                         </div>
+
                     </div>
 
-                    {/* Selected Login Type */}
-                    <div className="mb-6 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3">
 
-                        <p className="text-xs font-semibold uppercase tracking-wide text-blue-500">
+                    {/* ============================== */}
+                    {/* SELECTED LOGIN TYPE */}
+                    {/* ============================== */}
+
+                    <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5">
+
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                             Signing in as
                         </p>
 
-                        <p className="mt-1 text-sm font-bold text-blue-700">
+                        <p className="mt-1 text-sm font-bold text-black">
                             {loginType === "student"
                                 ? "Student"
                                 : "Administrator"}
@@ -187,24 +221,34 @@ function Login() {
 
                     </div>
 
-                    {/* Error */}
+
+                    {/* ============================== */}
+                    {/* ERROR */}
+                    {/* ============================== */}
+
                     {error && (
-                        <div className="mb-5 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                        <div className="mb-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm leading-5 text-red-600">
                             {error}
                         </div>
                     )}
 
-                    {/* Form */}
+
+                    {/* ============================== */}
+                    {/* FORM */}
+                    {/* ============================== */}
+
                     <form
                         onSubmit={handleSubmit}
                         className="space-y-5"
                     >
 
                         {/* Email */}
+
                         <div>
+
                             <label
                                 htmlFor="email"
-                                className="mb-2 block text-sm font-semibold text-slate-700"
+                                className="mb-2 block text-sm font-semibold text-slate-800"
                             >
                                 Email Address
                             </label>
@@ -221,15 +265,36 @@ function Login() {
                                         ? "admin@tryquizzers.com"
                                         : "you@example.com"
                                 }
-                                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-slate-300
+                                    bg-white
+                                    px-4
+                                    py-3.5
+                                    text-sm
+                                    text-slate-900
+                                    outline-none
+                                    transition
+                                    placeholder:text-slate-400
+                                    hover:border-slate-400
+                                    focus:border-black
+                                    focus:ring-2
+                                    focus:ring-slate-100
+                                "
                             />
+
                         </div>
 
+
                         {/* Password */}
+
                         <div>
+
                             <label
                                 htmlFor="password"
-                                className="mb-2 block text-sm font-semibold text-slate-700"
+                                className="mb-2 block text-sm font-semibold text-slate-800"
                             >
                                 Password
                             </label>
@@ -242,15 +307,50 @@ function Login() {
                                 value={formData.password}
                                 onChange={handleChange}
                                 placeholder="Enter your password"
-                                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-slate-300
+                                    bg-white
+                                    px-4
+                                    py-3.5
+                                    text-sm
+                                    text-slate-900
+                                    outline-none
+                                    transition
+                                    placeholder:text-slate-400
+                                    hover:border-slate-400
+                                    focus:border-black
+                                    focus:ring-2
+                                    focus:ring-slate-100
+                                "
                             />
+
                         </div>
 
+
                         {/* Login */}
+
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="
+                                w-full
+                                rounded-xl
+                                bg-black
+                                px-5
+                                py-3.5
+                                text-sm
+                                font-semibold
+                                text-white
+                                shadow-sm
+                                transition
+                                hover:bg-slate-800
+                                active:scale-[0.99]
+                                disabled:cursor-not-allowed
+                                disabled:opacity-60
+                            "
                         >
                             {loading
                                 ? "Signing in..."
@@ -261,10 +361,16 @@ function Login() {
 
                     </form>
 
-                    {/* Signup */}
+
+                    {/* ============================== */}
+                    {/* SIGN UP */}
+                    {/* ============================== */}
+
                     {loginType === "student" && (
                         <div className="mt-6 border-t border-slate-100 pt-6 text-center">
+
                             <p className="text-sm text-slate-500">
+
                                 Don't have an account?{" "}
 
                                 <button
@@ -272,27 +378,42 @@ function Login() {
                                     onClick={() =>
                                         navigate("/register")
                                     }
-                                    className="font-semibold text-blue-600 hover:text-blue-700"
+                                    className="
+                                        font-semibold
+                                        text-black
+                                        transition
+                                        hover:underline
+                                    "
                                 >
                                     Create an account
                                 </button>
+
                             </p>
+
                         </div>
                     )}
 
-                    {/* Admin note */}
+
+                    {/* ============================== */}
+                    {/* ADMIN NOTE */}
+                    {/* ============================== */}
+
                     {loginType === "admin" && (
                         <div className="mt-6 border-t border-slate-100 pt-5 text-center">
+
                             <p className="text-xs leading-5 text-slate-400">
                                 Administrator accounts are created
                                 separately and cannot be created
                                 through student registration.
                             </p>
+
                         </div>
                     )}
 
                 </div>
+
             </div>
+
         </div>
     );
 }

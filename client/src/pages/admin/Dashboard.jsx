@@ -1,3 +1,5 @@
+import Navbar from "../../components/common/Navbar.jsx";
+
 import { Link } from "react-router-dom";
 
 function AdminDashboard() {
