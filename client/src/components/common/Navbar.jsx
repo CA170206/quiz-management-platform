@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 
 function Navbar() {
@@ -15,6 +15,19 @@ function Navbar() {
     const [password, setPassword] = useState("");
     const [deleteError, setDeleteError] = useState("");
     const [deleting, setDeleting] = useState(false);
+
+    // =========================================================
+    // ACTIVE NAV ANIMATION
+    // =========================================================
+
+    const navRef = useRef(null);
+    const itemRefs = useRef({});
+
+    const [indicator, setIndicator] = useState({
+        left: 0,
+        width: 0,
+        visible: false,
+    });
 
     // =========================================================
     // USER
@@ -39,6 +52,117 @@ function Navbar() {
     const homePath = isAdmin
         ? "/admin/dashboard"
         : "/student/dashboard";
+
+    // =========================================================
+    // NAVIGATION ITEMS
+    // =========================================================
+
+    const navItems = isAdmin
+        ? [
+              {
+                  label: "Dashboard",
+                  path: "/admin/dashboard",
+              },
+              {
+                  label: "Categories",
+                  path: "/admin/categories",
+              },
+              {
+                  label: "Questions",
+                  path: "/admin/questions",
+              },
+              {
+                  label: "Quizzes",
+                  path: "/admin/quizzes",
+              },
+          ]
+        : [
+              {
+                  label: "Dashboard",
+                  path: "/student/dashboard",
+              },
+              {
+                  label: "Quizzes",
+                  path: "/student/quizzes",
+              },
+              {
+                  label: "Leaderboard",
+                  path: "/student/leaderboard",
+              },
+          ];
+
+    // =========================================================
+    // ACTIVE ROUTE
+    // =========================================================
+
+    const isActive = (path) => {
+        return location.pathname === path;
+    };
+
+    const activeItem =
+        navItems.findIndex((item) =>
+            isActive(item.path)
+        );
+
+    // =========================================================
+    // UPDATE SPOTLIGHT POSITION
+    // =========================================================
+
+    const updateIndicator = () => {
+        if (!navRef.current || activeItem < 0) {
+            setIndicator((current) => ({
+                ...current,
+                visible: false,
+            }));
+
+            return;
+        }
+
+        const activeElement =
+            itemRefs.current[activeItem];
+
+        if (!activeElement) return;
+
+        const navRect =
+            navRef.current.getBoundingClientRect();
+
+        const itemRect =
+            activeElement.getBoundingClientRect();
+
+        setIndicator({
+            left:
+                itemRect.left -
+                navRect.left,
+            width: itemRect.width,
+            visible: true,
+        });
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            updateIndicator();
+        }, 20);
+
+        return () => clearTimeout(timer);
+    }, [
+        activeItem,
+        isAdmin,
+        location.pathname,
+    ]);
+
+    useEffect(() => {
+        window.addEventListener(
+            "resize",
+            updateIndicator
+        );
+
+        return () => {
+            window.removeEventListener(
+                "resize",
+                updateIndicator
+            );
+        };
+    }, [activeItem]);
 
     // =========================================================
     // CLOSE MENUS
@@ -154,43 +278,33 @@ function Navbar() {
     };
 
     // =========================================================
-    // ACTIVE ROUTE
-    // =========================================================
-
-    const isActive = (path) => {
-        return location.pathname === path;
-    };
-
-    // =========================================================
     // UI
     // =========================================================
 
     return (
         <>
             {/* ================================================= */}
-            {/* FLOATING NAVBAR */}
+            {/* FLOATING ALMOND NAVBAR */}
             {/* ================================================= */}
 
-            <div className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
+            <div className="fixed left-0 right-0 top-0 z-50 px-2 pt-2 sm:px-4 sm:pt-3">
 
                 <nav
-                    className={`
+                    className="
                         mx-auto
                         max-w-7xl
-                        rounded-2xl
-                        shadow-[0_10px_35px_rgba(15,23,42,0.08)]
-                        backdrop-blur-xl
-                        transition-all
-                        duration-300
-                        ${
-                            darkMode
-                                ? "bg-[#151515]/95 shadow-black/40 ring-1 ring-white/10"
-                                : "bg-white/90"
-                        }
-                    `}
+                        overflow-visible
+                        rounded-[2rem]
+                        bg-[#f5f2ec]
+                        shadow-[0_12px_35px_rgba(0,0,0,0.08)]
+                    "
                 >
 
-                    <div className="flex min-h-[64px] items-center justify-between px-4 sm:px-6 lg:px-7">
+                    {/* ================================================= */}
+                    {/* DESKTOP NAV */}
+                    {/* ================================================= */}
+
+                    <div className="hidden min-h-[72px] items-center px-5 sm:px-7 md:flex lg:px-9">
 
                         {/* ================================================= */}
                         {/* LOGO */}
@@ -199,212 +313,157 @@ function Navbar() {
                         <Link
                             to={homePath}
                             onClick={closeMenus}
-                            className="group flex shrink-0 items-center"
+                            className="
+                                shrink-0
+                                text-[22px]
+                                font-extrabold
+                                tracking-[-0.04em]
+                                text-[#080808]
+                                transition-opacity
+                                hover:opacity-70
+                                lg:text-[24px]
+                            "
                         >
-
-                            <div className="leading-none">
-
-                                <div
-                                    className={`
-                                        text-xl
-                                        font-extrabold
-                                        tracking-tight
-                                        transition-colors
-                                        duration-300
-                                        sm:text-[22px]
-                                        ${
-                                            darkMode
-                                                ? "text-white"
-                                                : "text-black"
-                                        }
-                                    `}
-                                >
-                                    TryQuizzers
-                                </div>
-
-                                <div
-                                    className={`
-                                        mt-0.5
-                                        hidden
-                                        text-[10px]
-                                        font-medium
-                                        transition-colors
-                                        duration-300
-                                        sm:block
-                                        ${
-                                            darkMode
-                                                ? "text-slate-500"
-                                                : "text-slate-400"
-                                        }
-                                    `}
-                                >
-                                    Learn. Practice. Improve.
-                                </div>
-
-                            </div>
-
+                            TryQuizzers
                         </Link>
 
                         {/* ================================================= */}
-                        {/* DESKTOP NAVIGATION */}
+                        {/* CENTER NAV */}
                         {/* ================================================= */}
 
-                        <div className="hidden items-center gap-1 md:flex">
+                        <div className="mx-auto flex items-center">
 
-                            {isAdmin ? (
-                                <>
-                                    <NavItem
-                                        to="/admin/dashboard"
-                                        active={isActive(
-                                            "/admin/dashboard"
-                                        )}
-                                        onClick={
-                                            closeMenus
-                                        }
-                                        darkMode={
-                                            darkMode
-                                        }
-                                    >
-                                        Dashboard
-                                    </NavItem>
+                            <div
+                                ref={navRef}
+                                className="
+                                    relative
+                                    flex
+                                    items-center
+                                    gap-1
+                                    rounded-full
+                                "
+                            >
 
-                                    <NavItem
-                                        to="/admin/categories"
-                                        active={isActive(
-                                            "/admin/categories"
-                                        )}
-                                        onClick={
-                                            closeMenus
-                                        }
-                                        darkMode={
-                                            darkMode
-                                        }
-                                    >
-                                        Categories
-                                    </NavItem>
+                                {/* ========================================= */}
+                                {/* SLIDING WHITE SPOTLIGHT */}
+                                {/* ========================================= */}
 
-                                    <NavItem
-                                        to="/admin/questions"
-                                        active={isActive(
-                                            "/admin/questions"
-                                        )}
-                                        onClick={
-                                            closeMenus
-                                        }
-                                        darkMode={
-                                            darkMode
-                                        }
-                                    >
-                                        Questions
-                                    </NavItem>
+                                <div
+                                    className="
+                                        pointer-events-none
+                                        absolute
+                                        top-0
+                                        z-0
+                                        h-full
+                                        rounded-full
+                                        bg-white
+                                        shadow-[0_2px_5px_rgba(0,0,0,0.10)]
+                                        transition-all
+                                        duration-500
+                                        ease-[cubic-bezier(0.22,1,0.36,1)]
+                                    "
+                                    style={{
+                                        left: indicator.left,
+                                        width: indicator.width,
+                                        opacity:
+                                            indicator.visible
+                                                ? 1
+                                                : 0,
+                                    }}
+                                />
 
-                                    <NavItem
-                                        to="/admin/quizzes"
-                                        active={isActive(
-                                            "/admin/quizzes"
-                                        )}
-                                        onClick={
-                                            closeMenus
-                                        }
-                                        darkMode={
-                                            darkMode
-                                        }
-                                    >
-                                        Quizzes
-                                    </NavItem>
-                                </>
-                            ) : (
-                                <>
-                                    <NavItem
-                                        to="/student/dashboard"
-                                        active={isActive(
-                                            "/student/dashboard"
-                                        )}
-                                        onClick={
-                                            closeMenus
-                                        }
-                                        darkMode={
-                                            darkMode
-                                        }
-                                    >
-                                        Dashboard
-                                    </NavItem>
+                                {navItems.map(
+                                    (
+                                        item,
+                                        index
+                                    ) => (
+                                        <Link
+                                            key={
+                                                item.path
+                                            }
+                                            ref={(
+                                                element
+                                            ) => {
+                                                itemRefs.current[
+                                                    index
+                                                ] =
+                                                    element;
+                                            }}
+                                            to={
+                                                item.path
+                                            }
+                                            onClick={
+                                                closeMenus
+                                            }
+                                            className="
+                                                relative
+                                                z-10
+                                                rounded-full
+                                                px-5
+                                                py-3
+                                                text-sm
+                                                font-medium
+                                                text-[#63718a]
+                                                transition-colors
+                                                duration-300
+                                                hover:text-[#111111]
+                                                lg:px-6
+                                            "
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    )
+                                )}
 
-                                    <NavItem
-                                        to="/student/quizzes"
-                                        active={isActive(
-                                            "/student/quizzes"
-                                        )}
-                                        onClick={
-                                            closeMenus
-                                        }
-                                        darkMode={
-                                            darkMode
-                                        }
-                                    >
-                                        Quizzes
-                                    </NavItem>
+                            </div>
 
-                                    <NavItem
-                                        to="/student/leaderboard"
-                                        active={isActive(
-                                            "/student/leaderboard"
-                                        )}
-                                        onClick={
-                                            closeMenus
-                                        }
-                                        darkMode={
-                                            darkMode
-                                        }
-                                    >
-                                        Leaderboard
-                                    </NavItem>
-                                </>
-                            )}
+                        </div>
 
-                            {/* ================================================= */}
-                            {/* THEME TOGGLE */}
-                            {/* ================================================= */}
+                        {/* ================================================= */}
+                        {/* RIGHT SIDE */}
+                        {/* ================================================= */}
+
+                        <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
+
+                            {/* Theme */}
 
                             <button
                                 type="button"
                                 onClick={toggleTheme}
-                                aria-label={
-                                    darkMode
-                                        ? "Switch to light mode"
-                                        : "Switch to dark mode"
-                                }
                                 title={
                                     darkMode
                                         ? "Light mode"
                                         : "Dark mode"
                                 }
-                                className={`
-                                    ml-2
+                                aria-label={
+                                    darkMode
+                                        ? "Switch to light mode"
+                                        : "Switch to dark mode"
+                                }
+                                className="
                                     flex
-                                    h-10
-                                    w-10
+                                    h-11
+                                    w-11
                                     items-center
                                     justify-center
                                     rounded-full
-                                    text-base
+                                    bg-white/70
+                                    text-[17px]
+                                    text-[#344054]
                                     transition-all
                                     duration-300
-                                    ${
-                                        darkMode
-                                            ? "bg-white/10 text-white hover:bg-white hover:text-black"
-                                            : "bg-slate-100 text-slate-700 hover:bg-black hover:text-white"
-                                    }
-                                `}
+                                    hover:scale-105
+                                    hover:bg-white
+                                "
                             >
-                                {darkMode ? "☀" : "☾"}
+                                {darkMode
+                                    ? "☀"
+                                    : "☾"}
                             </button>
 
-                            {/* ================================================= */}
-                            {/* PROFILE */}
-                            {/* ================================================= */}
+                            {/* Sign In / Profile */}
 
-                            <div className="relative ml-2">
+                            <div className="relative">
 
                                 <button
                                     type="button"
@@ -413,29 +472,33 @@ function Navbar() {
                                             !open
                                         )
                                     }
-                                    className={`
+                                    className="
                                         flex
-                                        h-10
-                                        w-10
                                         items-center
-                                        justify-center
+                                        gap-2
                                         rounded-full
+                                        px-4
+                                        py-2.5
                                         text-sm
-                                        font-bold
+                                        font-semibold
+                                        text-[#63718a]
                                         transition
-                                        ${
-                                            darkMode
-                                                ? "bg-white/10 text-white hover:bg-white hover:text-black"
-                                                : "bg-slate-100 text-black hover:bg-black hover:text-white"
-                                        }
-                                    `}
+                                        hover:text-[#111111]
+                                    "
                                 >
-                                    {user?.full_name
-                                        ?.charAt(
-                                            0
-                                        )
-                                        ?.toUpperCase() ||
-                                        "U"}
+                                    <span className="hidden lg:inline">
+                                        {user?.full_name ||
+                                            "Profile"}
+                                    </span>
+
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-black lg:hidden">
+                                        {user?.full_name
+                                            ?.charAt(
+                                                0
+                                            )
+                                            ?.toUpperCase() ||
+                                            "U"}
+                                    </span>
                                 </button>
 
                                 {open && (
@@ -456,48 +519,90 @@ function Navbar() {
                                         handleOpenDelete={
                                             handleOpenDelete
                                         }
-                                        darkMode={
-                                            darkMode
-                                        }
                                     />
                                 )}
 
                             </div>
 
+                            {/* Start Quiz */}
+
+                            <Link
+                                to="/student/quizzes"
+                                onClick={
+                                    closeMenus
+                                }
+                                className="
+                                    flex
+                                    items-center
+                                    gap-2
+                                    rounded-full
+                                    bg-black
+                                    px-5
+                                    py-3
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                    shadow-sm
+                                    transition-all
+                                    duration-300
+                                    hover:-translate-y-0.5
+                                    hover:bg-[#202020]
+                                    hover:shadow-md
+                                "
+                            >
+                                <span className="flex h-2 w-2 rounded-full bg-white" />
+                                Start a Quiz
+                            </Link>
+
                         </div>
 
-                        {/* ================================================= */}
-                        {/* MOBILE BUTTONS */}
-                        {/* ================================================= */}
+                    </div>
 
-                        <div className="flex items-center gap-2 md:hidden">
+                    {/* ================================================= */}
+                    {/* MOBILE NAV */}
+                    {/* ================================================= */}
+
+                    <div className="flex min-h-[62px] items-center justify-between px-4 md:hidden">
+
+                        <Link
+                            to={homePath}
+                            onClick={closeMenus}
+                            className="
+                                text-xl
+                                font-extrabold
+                                tracking-[-0.04em]
+                                text-[#080808]
+                            "
+                        >
+                            TryQuizzers
+                        </Link>
+
+                        <div className="flex items-center gap-2">
+
+                            {/* Theme */}
 
                             <button
                                 type="button"
                                 onClick={toggleTheme}
-                                aria-label={
-                                    darkMode
-                                        ? "Switch to light mode"
-                                        : "Switch to dark mode"
-                                }
-                                className={`
+                                className="
                                     flex
                                     h-10
                                     w-10
                                     items-center
                                     justify-center
-                                    rounded-xl
-                                    text-base
+                                    rounded-full
+                                    bg-white/70
+                                    text-[#344054]
                                     transition
-                                    ${
-                                        darkMode
-                                            ? "bg-white/10 text-white hover:bg-white hover:text-black"
-                                            : "bg-slate-100 text-black hover:bg-black hover:text-white"
-                                    }
-                                `}
+                                    hover:bg-white
+                                "
                             >
-                                {darkMode ? "☀" : "☾"}
+                                {darkMode
+                                    ? "☀"
+                                    : "☾"}
                             </button>
+
+                            {/* Menu */}
 
                             <button
                                 type="button"
@@ -506,22 +611,19 @@ function Navbar() {
                                         !mobileOpen
                                     )
                                 }
-                                className={`
+                                className="
                                     flex
                                     h-10
                                     w-10
                                     items-center
                                     justify-center
-                                    rounded-xl
-                                    text-lg
+                                    rounded-full
+                                    bg-black
+                                    text-white
                                     transition
-                                    ${
-                                        darkMode
-                                            ? "bg-white/10 text-white hover:bg-white hover:text-black"
-                                            : "bg-slate-100 text-black hover:bg-black hover:text-white"
-                                    }
-                                `}
-                                aria-label="Toggle navigation menu"
+                                    hover:bg-[#202020]
+                                "
+                                aria-label="Toggle navigation"
                             >
                                 {mobileOpen
                                     ? "✕"
@@ -533,207 +635,149 @@ function Navbar() {
                     </div>
 
                     {/* ================================================= */}
-                    {/* MOBILE NAVIGATION */}
+                    {/* MOBILE MENU */}
                     {/* ================================================= */}
 
                     {mobileOpen && (
                         <div
-                            className={`
+                            className="
                                 border-t
+                                border-black/5
                                 px-3
                                 pb-3
                                 pt-2
-                                transition-colors
-                                duration-300
                                 md:hidden
-                                ${
-                                    darkMode
-                                        ? "border-white/10"
-                                        : "border-slate-100"
-                                }
-                            `}
+                            "
                         >
 
-                            <div
-                                className={`
-                                    rounded-xl
-                                    p-2
-                                    ${
-                                        darkMode
-                                            ? "bg-[#1c1c1c]"
-                                            : "bg-slate-50"
-                                    }
-                                `}
-                            >
+                            <div className="rounded-2xl bg-white/60 p-2">
 
-                                {isAdmin ? (
-                                    <>
-                                        <MobileNavItem
-                                            to="/admin/dashboard"
-                                            active={isActive(
-                                                "/admin/dashboard"
-                                            )}
+                                {navItems.map(
+                                    (item) => (
+                                        <Link
+                                            key={
+                                                item.path
+                                            }
+                                            to={
+                                                item.path
+                                            }
                                             onClick={
                                                 closeMenus
                                             }
-                                            darkMode={
-                                                darkMode
-                                            }
+                                            className={`
+                                                block
+                                                rounded-xl
+                                                px-4
+                                                py-3
+                                                text-sm
+                                                font-semibold
+                                                transition
+                                                ${
+                                                    isActive(
+                                                        item.path
+                                                    )
+                                                        ? "bg-white text-black shadow-sm"
+                                                        : "text-[#63718a] hover:bg-white/70 hover:text-black"
+                                                }
+                                            `}
                                         >
-                                            Dashboard
-                                        </MobileNavItem>
-
-                                        <MobileNavItem
-                                            to="/admin/categories"
-                                            active={isActive(
-                                                "/admin/categories"
-                                            )}
-                                            onClick={
-                                                closeMenus
+                                            {
+                                                item.label
                                             }
-                                            darkMode={
-                                                darkMode
-                                            }
-                                        >
-                                            Categories
-                                        </MobileNavItem>
-
-                                        <MobileNavItem
-                                            to="/admin/questions"
-                                            active={isActive(
-                                                "/admin/questions"
-                                            )}
-                                            onClick={
-                                                closeMenus
-                                            }
-                                            darkMode={
-                                                darkMode
-                                            }
-                                        >
-                                            Questions
-                                        </MobileNavItem>
-
-                                        <MobileNavItem
-                                            to="/admin/quizzes"
-                                            active={isActive(
-                                                "/admin/quizzes"
-                                            )}
-                                            onClick={
-                                                closeMenus
-                                            }
-                                            darkMode={
-                                                darkMode
-                                            }
-                                        >
-                                            Quizzes
-                                        </MobileNavItem>
-                                    </>
-                                ) : (
-                                    <>
-                                        <MobileNavItem
-                                            to="/student/dashboard"
-                                            active={isActive(
-                                                "/student/dashboard"
-                                            )}
-                                            onClick={
-                                                closeMenus
-                                            }
-                                            darkMode={
-                                                darkMode
-                                            }
-                                        >
-                                            Dashboard
-                                        </MobileNavItem>
-
-                                        <MobileNavItem
-                                            to="/student/quizzes"
-                                            active={isActive(
-                                                "/student/quizzes"
-                                            )}
-                                            onClick={
-                                                closeMenus
-                                            }
-                                            darkMode={
-                                                darkMode
-                                            }
-                                        >
-                                            Quizzes
-                                        </MobileNavItem>
-
-                                        <MobileNavItem
-                                            to="/student/leaderboard"
-                                            active={isActive(
-                                                "/student/leaderboard"
-                                            )}
-                                            onClick={
-                                                closeMenus
-                                            }
-                                            darkMode={
-                                                darkMode
-                                            }
-                                        >
-                                            Leaderboard
-                                        </MobileNavItem>
-                                    </>
+                                        </Link>
+                                    )
                                 )}
 
-                                <div
-                                    className={`
-                                        my-2
-                                        border-t
-                                        ${
-                                            darkMode
-                                                ? "border-white/10"
-                                                : "border-slate-200"
-                                        }
-                                    `}
-                                />
+                                <div className="my-2 border-t border-black/5" />
 
-                                <MobileNavItem
-                                    to={profilePath}
+                                <Link
+                                    to={
+                                        profilePath
+                                    }
                                     onClick={
                                         closeMenus
                                     }
-                                    darkMode={
-                                        darkMode
-                                    }
+                                    className="
+                                        block
+                                        rounded-xl
+                                        px-4
+                                        py-3
+                                        text-sm
+                                        font-semibold
+                                        text-[#63718a]
+                                        transition
+                                        hover:bg-white
+                                        hover:text-black
+                                    "
                                 >
                                     Profile
-                                </MobileNavItem>
+                                </Link>
 
-                                <MobileNavItem
-                                    to={analyticsPath}
+                                <Link
+                                    to={
+                                        analyticsPath
+                                    }
                                     onClick={
                                         closeMenus
                                     }
-                                    darkMode={
-                                        darkMode
-                                    }
+                                    className="
+                                        block
+                                        rounded-xl
+                                        px-4
+                                        py-3
+                                        text-sm
+                                        font-semibold
+                                        text-[#63718a]
+                                        transition
+                                        hover:bg-white
+                                        hover:text-black
+                                    "
                                 >
                                     Analytics
-                                </MobileNavItem>
+                                </Link>
+
+                                <Link
+                                    to="/student/quizzes"
+                                    onClick={
+                                        closeMenus
+                                    }
+                                    className="
+                                        mt-1
+                                        flex
+                                        items-center
+                                        justify-center
+                                        gap-2
+                                        rounded-xl
+                                        bg-black
+                                        px-4
+                                        py-3
+                                        text-sm
+                                        font-semibold
+                                        text-white
+                                    "
+                                >
+                                    <span className="h-2 w-2 rounded-full bg-white" />
+                                    Start a Quiz
+                                </Link>
 
                                 <button
                                     type="button"
                                     onClick={
                                         handleLogout
                                     }
-                                    className={`
+                                    className="
+                                        mt-1
                                         w-full
-                                        rounded-lg
-                                        px-3
+                                        rounded-xl
+                                        px-4
                                         py-3
                                         text-left
                                         text-sm
-                                        font-medium
+                                        font-semibold
                                         text-red-500
                                         transition
-                                        ${
-                                            darkMode
-                                                ? "hover:bg-red-500/10"
-                                                : "hover:bg-red-50"
-                                        }
-                                    `}
+                                        hover:bg-red-50
+                                    "
                                 >
                                     Logout
                                 </button>
@@ -743,22 +787,18 @@ function Navbar() {
                                     onClick={
                                         handleOpenDelete
                                     }
-                                    className={`
+                                    className="
                                         w-full
-                                        rounded-lg
-                                        px-3
+                                        rounded-xl
+                                        px-4
                                         py-3
                                         text-left
                                         text-sm
-                                        font-medium
+                                        font-semibold
                                         text-red-500
                                         transition
-                                        ${
-                                            darkMode
-                                                ? "hover:bg-red-500/10"
-                                                : "hover:bg-red-50"
-                                        }
-                                    `}
+                                        hover:bg-red-50
+                                    "
                                 >
                                     Delete Account
                                 </button>
@@ -780,54 +820,26 @@ function Navbar() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
 
                     <div
-                        className={`
+                        className="
                             w-full
                             max-w-md
-                            rounded-2xl
+                            rounded-3xl
+                            bg-white
                             p-5
                             shadow-2xl
-                            transition-colors
-                            duration-300
                             sm:p-6
-                            ${
-                                darkMode
-                                    ? "bg-[#151515] ring-1 ring-white/10"
-                                    : "bg-white"
-                            }
-                        `}
+                        "
                     >
 
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl">
                             ⚠️
                         </div>
 
-                        <h2
-                            className={`
-                                mt-5
-                                text-xl
-                                font-bold
-                                ${
-                                    darkMode
-                                        ? "text-white"
-                                        : "text-slate-900"
-                                }
-                            `}
-                        >
+                        <h2 className="mt-5 text-xl font-bold text-slate-900">
                             Delete Account?
                         </h2>
 
-                        <p
-                            className={`
-                                mt-2
-                                text-sm
-                                leading-6
-                                ${
-                                    darkMode
-                                        ? "text-slate-400"
-                                        : "text-slate-500"
-                                }
-                            `}
-                        >
+                        <p className="mt-2 text-sm leading-6 text-slate-500">
                             This action is permanent.
                             Your account and associated
                             data will be permanently
@@ -836,72 +848,47 @@ function Navbar() {
 
                         <div className="mt-5">
 
-                            <label
-                                className={`
-                                    mb-2
-                                    block
-                                    text-sm
-                                    font-semibold
-                                    ${
-                                        darkMode
-                                            ? "text-slate-300"
-                                            : "text-slate-700"
-                                    }
-                                `}
-                            >
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
                                 Enter your password
                             </label>
 
                             <input
                                 type="password"
-                                value={
-                                    password
-                                }
-                                onChange={(
-                                    e
-                                ) => {
+                                value={password}
+                                onChange={(e) => {
                                     setPassword(
-                                        e.target
-                                            .value
+                                        e.target.value
                                     );
-                                    setDeleteError(
-                                        ""
-                                    );
+                                    setDeleteError("");
                                 }}
                                 placeholder="Enter your password"
                                 autoFocus
-                                disabled={
-                                    deleting
-                                }
-                                className={`
+                                disabled={deleting}
+                                className="
                                     w-full
-                                    rounded-lg
+                                    rounded-xl
                                     border
+                                    border-slate-300
+                                    bg-white
                                     px-4
                                     py-3
                                     text-sm
+                                    text-slate-900
                                     outline-none
                                     transition
-                                    placeholder:text-slate-500
+                                    placeholder:text-slate-400
                                     focus:border-black
                                     focus:ring-2
-                                    focus:ring-slate-300
+                                    focus:ring-slate-200
                                     disabled:opacity-50
-                                    ${
-                                        darkMode
-                                            ? "border-white/10 bg-[#0f0f0f] text-white"
-                                            : "border-slate-300 bg-white text-slate-900"
-                                    }
-                                `}
+                                "
                             />
 
                         </div>
 
                         {deleteError && (
-                            <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
-                                {
-                                    deleteError
-                                }
+                            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                                {deleteError}
                             </div>
                         )}
 
@@ -909,29 +896,26 @@ function Navbar() {
 
                             <button
                                 type="button"
-                                disabled={
-                                    deleting
-                                }
+                                disabled={deleting}
                                 onClick={
                                     handleCloseDelete
                                 }
-                                className={`
+                                className="
                                     flex-1
-                                    rounded-lg
+                                    rounded-xl
                                     border
+                                    border-slate-300
+                                    bg-white
                                     px-4
                                     py-3
                                     text-sm
                                     font-semibold
+                                    text-slate-700
                                     transition
+                                    hover:bg-slate-50
                                     disabled:cursor-not-allowed
                                     disabled:opacity-50
-                                    ${
-                                        darkMode
-                                            ? "border-white/10 bg-white/5 text-white hover:bg-white/10"
-                                            : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-                                    }
-                                `}
+                                "
                             >
                                 Cancel
                             </button>
@@ -947,7 +931,7 @@ function Navbar() {
                                 }
                                 className="
                                     flex-1
-                                    rounded-lg
+                                    rounded-xl
                                     bg-red-600
                                     px-4
                                     py-3
@@ -971,83 +955,7 @@ function Navbar() {
 
                 </div>
             )}
-
         </>
-    );
-}
-
-/* ========================================================= */
-/* DESKTOP NAV ITEM */
-/* ========================================================= */
-
-function NavItem({
-    to,
-    active,
-    onClick,
-    children,
-    darkMode,
-}) {
-    return (
-        <Link
-            to={to}
-            onClick={onClick}
-            className={`
-                relative
-                rounded-full
-                px-4
-                py-2.5
-                text-sm
-                font-semibold
-                transition-all
-                duration-200
-                ${
-                    active
-                        ? "bg-black text-white"
-                        : darkMode
-                        ? "text-slate-400 hover:bg-white/10 hover:text-white"
-                        : "text-slate-500 hover:bg-slate-100 hover:text-black"
-                }
-            `}
-        >
-            {children}
-        </Link>
-    );
-}
-
-/* ========================================================= */
-/* MOBILE NAV ITEM */
-/* ========================================================= */
-
-function MobileNavItem({
-    to,
-    active,
-    onClick,
-    children,
-    darkMode,
-}) {
-    return (
-        <Link
-            to={to}
-            onClick={onClick}
-            className={`
-                block
-                rounded-lg
-                px-3
-                py-3
-                text-sm
-                font-semibold
-                transition
-                ${
-                    active
-                        ? "bg-black text-white"
-                        : darkMode
-                        ? "text-slate-400 hover:bg-white/10 hover:text-white"
-                        : "text-slate-600 hover:bg-white hover:text-black"
-                }
-            `}
-        >
-            {children}
-        </Link>
     );
 }
 
@@ -1062,42 +970,26 @@ function ProfileMenu({
     setOpen,
     handleLogout,
     handleOpenDelete,
-    darkMode,
 }) {
     return (
         <div
-            className={`
+            className="
                 absolute
                 right-0
-                top-12
+                top-14
                 z-50
                 w-64
                 max-w-[calc(100vw-2rem)]
                 overflow-hidden
                 rounded-2xl
+                bg-white
                 shadow-[0_15px_40px_rgba(15,23,42,0.15)]
-                transition-colors
-                duration-300
-                ${
-                    darkMode
-                        ? "bg-[#151515] shadow-black/50 ring-1 ring-white/10"
-                        : "bg-white ring-1 ring-slate-200"
-                }
-            `}
+                ring-1
+                ring-black/5
+            "
         >
 
-            <div
-                className={`
-                    border-b
-                    px-4
-                    py-4
-                    ${
-                        darkMode
-                            ? "border-white/10"
-                            : "border-slate-100"
-                    }
-                `}
-            >
+            <div className="border-b border-slate-100 px-4 py-4">
 
                 <div className="flex items-center gap-3">
 
@@ -1110,55 +1002,21 @@ function ProfileMenu({
 
                     <div className="min-w-0">
 
-                        <p
-                            className={`
-                                truncate
-                                font-semibold
-                                ${
-                                    darkMode
-                                        ? "text-white"
-                                        : "text-slate-900"
-                                }
-                            `}
-                        >
+                        <p className="truncate font-semibold text-slate-900">
                             {user?.full_name ||
                                 "User"}
                         </p>
 
-                        <p
-                            className={`
-                                truncate
-                                text-xs
-                                text-slate-500
-                            `}
-                        >
-                            {user?.email ||
-                                ""}
+                        <p className="truncate text-xs text-slate-500">
+                            {user?.email || ""}
                         </p>
 
                     </div>
 
                 </div>
 
-                <span
-                    className={`
-                        mt-3
-                        inline-flex
-                        rounded-full
-                        px-2.5
-                        py-1
-                        text-xs
-                        font-semibold
-                        capitalize
-                        ${
-                            darkMode
-                                ? "bg-white/10 text-slate-300"
-                                : "bg-slate-100 text-slate-600"
-                        }
-                    `}
-                >
-                    {user?.role ||
-                        "student"}
+                <span className="mt-3 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold capitalize text-slate-600">
+                    {user?.role || "student"}
                 </span>
 
             </div>
@@ -1170,22 +1028,19 @@ function ProfileMenu({
                     onClick={() =>
                         setOpen(false)
                     }
-                    className={`
+                    className="
                         flex
                         items-center
-                        gap-3
-                        rounded-lg
+                        rounded-xl
                         px-3
                         py-2.5
                         text-sm
                         font-medium
+                        text-slate-700
                         transition
-                        ${
-                            darkMode
-                                ? "text-slate-300 hover:bg-white/10 hover:text-white"
-                                : "text-slate-700 hover:bg-slate-100 hover:text-black"
-                        }
-                    `}
+                        hover:bg-slate-100
+                        hover:text-black
+                    "
                 >
                     Profile
                 </Link>
@@ -1195,49 +1050,32 @@ function ProfileMenu({
                     onClick={() =>
                         setOpen(false)
                     }
-                    className={`
+                    className="
                         flex
                         items-center
-                        gap-3
-                        rounded-lg
+                        rounded-xl
                         px-3
                         py-2.5
                         text-sm
                         font-medium
+                        text-slate-700
                         transition
-                        ${
-                            darkMode
-                                ? "text-slate-300 hover:bg-white/10 hover:text-white"
-                                : "text-slate-700 hover:bg-slate-100 hover:text-black"
-                        }
-                    `}
+                        hover:bg-slate-100
+                        hover:text-black
+                    "
                 >
                     Analytics
                 </Link>
 
-                <div
-                    className={`
-                        my-2
-                        border-t
-                        ${
-                            darkMode
-                                ? "border-white/10"
-                                : "border-slate-100"
-                        }
-                    `}
-                />
+                <div className="my-2 border-t border-slate-100" />
 
                 <button
                     type="button"
-                    onClick={
-                        handleLogout
-                    }
-                    className={`
+                    onClick={handleLogout}
+                    className="
                         flex
                         w-full
-                        items-center
-                        gap-3
-                        rounded-lg
+                        rounded-xl
                         px-3
                         py-2.5
                         text-left
@@ -1245,27 +1083,19 @@ function ProfileMenu({
                         font-medium
                         text-red-500
                         transition
-                        ${
-                            darkMode
-                                ? "hover:bg-red-500/10"
-                                : "hover:bg-red-50"
-                        }
-                    `}
+                        hover:bg-red-50
+                    "
                 >
                     Logout
                 </button>
 
                 <button
                     type="button"
-                    onClick={
-                        handleOpenDelete
-                    }
-                    className={`
+                    onClick={handleOpenDelete}
+                    className="
                         flex
                         w-full
-                        items-center
-                        gap-3
-                        rounded-lg
+                        rounded-xl
                         px-3
                         py-2.5
                         text-left
@@ -1273,12 +1103,8 @@ function ProfileMenu({
                         font-medium
                         text-red-500
                         transition
-                        ${
-                            darkMode
-                                ? "hover:bg-red-500/10"
-                                : "hover:bg-red-50"
-                        }
-                    `}
+                        hover:bg-red-50
+                    "
                 >
                     Delete Account
                 </button>

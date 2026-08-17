@@ -13,7 +13,7 @@ function Dashboard() {
     const [error, setError] = useState("");
 
     // ==========================================
-    // FETCH REAL STUDENT ANALYTICS
+    // FETCH STUDENT ANALYTICS
     // ==========================================
 
     useEffect(() => {
@@ -73,28 +73,62 @@ function Dashboard() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50">
+            <div className="min-h-screen bg-slate-50 transition-colors duration-300 dark:bg-[#0a0a0a]">
 
                 <Navbar />
 
                 <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
                     <div className="mx-auto max-w-7xl">
 
-                        <div className="h-44 animate-pulse rounded-2xl bg-slate-200 sm:h-40" />
+                        <div className="h-44 animate-pulse rounded-2xl bg-slate-200 dark:bg-[#1c1c1c] sm:h-40" />
 
                         <div className="mt-5 grid gap-4 sm:mt-6 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
                             {[1, 2, 3, 4].map((item) => (
                                 <div
                                     key={item}
-                                    className="h-36 animate-pulse rounded-2xl bg-white ring-1 ring-slate-200"
+                                    className="
+                                        h-36
+                                        animate-pulse
+                                        rounded-2xl
+                                        bg-white
+                                        ring-1
+                                        ring-slate-200
+                                        dark:bg-[#151515]
+                                        dark:ring-white/10
+                                    "
                                 />
                             ))}
                         </div>
 
                         <div className="mt-5 grid gap-5 sm:mt-6 lg:grid-cols-3">
-                            <div className="h-80 animate-pulse rounded-2xl bg-white ring-1 ring-slate-200 lg:col-span-2" />
 
-                            <div className="h-80 animate-pulse rounded-2xl bg-white ring-1 ring-slate-200" />
+                            <div
+                                className="
+                                    h-80
+                                    animate-pulse
+                                    rounded-2xl
+                                    bg-white
+                                    ring-1
+                                    ring-slate-200
+                                    dark:bg-[#151515]
+                                    dark:ring-white/10
+                                    lg:col-span-2
+                                "
+                            />
+
+                            <div
+                                className="
+                                    h-80
+                                    animate-pulse
+                                    rounded-2xl
+                                    bg-white
+                                    ring-1
+                                    ring-slate-200
+                                    dark:bg-[#151515]
+                                    dark:ring-white/10
+                                "
+                            />
+
                         </div>
 
                     </div>
@@ -110,14 +144,28 @@ function Dashboard() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-slate-50">
+            <div className="min-h-screen bg-slate-50 transition-colors duration-300 dark:bg-[#0a0a0a]">
 
                 <Navbar />
 
                 <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
                     <div className="mx-auto max-w-7xl">
 
-                        <div className="rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-600">
+                        <div
+                            className="
+                                rounded-xl
+                                border
+                                border-red-100
+                                bg-red-50
+                                px-5
+                                py-4
+                                text-sm
+                                text-red-600
+                                dark:border-red-500/20
+                                dark:bg-red-500/10
+                                dark:text-red-400
+                            "
+                        >
                             {error}
                         </div>
 
@@ -128,12 +176,15 @@ function Dashboard() {
                                 inline-flex
                                 rounded-lg
                                 bg-black
-                                px-5 py-3
+                                px-5
+                                py-3
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition
                                 hover:bg-slate-800
+                                dark:hover:bg-white
+                                dark:hover:text-black
                             "
                         >
                             Browse Quizzes →
@@ -166,14 +217,14 @@ function Dashboard() {
         attempts.slice(0, 3);
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-50 transition-colors duration-300 dark:bg-[#0a0a0a]">
 
             {/* ================================= */}
             {/* SHARED NAVBAR */}
+            {/* Navbar itself stays WHITE */}
             {/* ================================= */}
 
             <Navbar />
-
 
             <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
 
@@ -183,7 +234,27 @@ function Dashboard() {
                     {/* WELCOME */}
                     {/* ================================= */}
 
-                    <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-5 py-6 text-white shadow-sm sm:px-10 sm:py-8">
+                    <div
+                        className="
+                            overflow-hidden
+                            rounded-2xl
+                            bg-gradient-to-br
+                            from-slate-950
+                            via-slate-900
+                            to-slate-800
+                            px-5
+                            py-6
+                            text-white
+                            shadow-sm
+                            transition-all
+                            duration-300
+                            dark:from-[#111111]
+                            dark:via-[#171717]
+                            dark:to-[#202020]
+                            sm:px-10
+                            sm:py-8
+                        "
+                    >
 
                         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-6">
 
@@ -214,7 +285,8 @@ function Dashboard() {
                                     justify-center
                                     rounded-lg
                                     bg-white
-                                    px-5 py-3
+                                    px-5
+                                    py-3
                                     text-sm
                                     font-semibold
                                     text-black
@@ -230,7 +302,6 @@ function Dashboard() {
 
                     </div>
 
-
                     {/* ================================= */}
                     {/* STATS */}
                     {/* ================================= */}
@@ -239,7 +310,24 @@ function Dashboard() {
 
                         {/* Attempts */}
 
-                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
+                        <div
+                            className="
+                                rounded-2xl
+                                bg-white
+                                p-5
+                                shadow-sm
+                                ring-1
+                                ring-slate-200
+                                transition-all
+                                duration-300
+                                hover:-translate-y-0.5
+                                hover:shadow-md
+                                dark:bg-[#151515]
+                                dark:ring-white/10
+                                dark:hover:bg-[#181818]
+                                sm:p-6
+                            "
+                        >
 
                             <div className="flex items-center justify-between">
 
@@ -247,26 +335,42 @@ function Dashboard() {
                                     📝
                                 </span>
 
-                                <span className="text-xs font-semibold text-slate-600">
+                                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                                     Total
                                 </span>
 
                             </div>
 
-                            <p className="mt-4 text-sm text-slate-500 sm:mt-5">
+                            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 sm:mt-5">
                                 Quizzes Attempted
                             </p>
 
-                            <p className="mt-1 text-3xl font-bold text-slate-900">
+                            <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
                                 {quizzesAttempted}
                             </p>
 
                         </div>
 
-
                         {/* Average */}
 
-                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
+                        <div
+                            className="
+                                rounded-2xl
+                                bg-white
+                                p-5
+                                shadow-sm
+                                ring-1
+                                ring-slate-200
+                                transition-all
+                                duration-300
+                                hover:-translate-y-0.5
+                                hover:shadow-md
+                                dark:bg-[#151515]
+                                dark:ring-white/10
+                                dark:hover:bg-[#181818]
+                                sm:p-6
+                            "
+                        >
 
                             <div className="flex items-center justify-between">
 
@@ -274,26 +378,42 @@ function Dashboard() {
                                     🎯
                                 </span>
 
-                                <span className="text-xs font-semibold text-slate-600">
+                                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                                     Average
                                 </span>
 
                             </div>
 
-                            <p className="mt-4 text-sm text-slate-500 sm:mt-5">
+                            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 sm:mt-5">
                                 Average Score
                             </p>
 
-                            <p className="mt-1 text-3xl font-bold text-slate-900">
+                            <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
                                 {averageScore}%
                             </p>
 
                         </div>
 
-
                         {/* Best */}
 
-                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
+                        <div
+                            className="
+                                rounded-2xl
+                                bg-white
+                                p-5
+                                shadow-sm
+                                ring-1
+                                ring-slate-200
+                                transition-all
+                                duration-300
+                                hover:-translate-y-0.5
+                                hover:shadow-md
+                                dark:bg-[#151515]
+                                dark:ring-white/10
+                                dark:hover:bg-[#181818]
+                                sm:p-6
+                            "
+                        >
 
                             <div className="flex items-center justify-between">
 
@@ -301,26 +421,42 @@ function Dashboard() {
                                     🏆
                                 </span>
 
-                                <span className="text-xs font-semibold text-slate-600">
+                                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                                     Best
                                 </span>
 
                             </div>
 
-                            <p className="mt-4 text-sm text-slate-500 sm:mt-5">
+                            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 sm:mt-5">
                                 Highest Score
                             </p>
 
-                            <p className="mt-1 text-3xl font-bold text-slate-900">
+                            <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
                                 {bestScore}%
                             </p>
 
                         </div>
 
-
                         {/* Pass Rate */}
 
-                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
+                        <div
+                            className="
+                                rounded-2xl
+                                bg-white
+                                p-5
+                                shadow-sm
+                                ring-1
+                                ring-slate-200
+                                transition-all
+                                duration-300
+                                hover:-translate-y-0.5
+                                hover:shadow-md
+                                dark:bg-[#151515]
+                                dark:ring-white/10
+                                dark:hover:bg-[#181818]
+                                sm:p-6
+                            "
+                        >
 
                             <div className="flex items-center justify-between">
 
@@ -328,24 +464,23 @@ function Dashboard() {
                                     📈
                                 </span>
 
-                                <span className="text-xs font-semibold text-slate-600">
+                                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                                     Current
                                 </span>
 
                             </div>
 
-                            <p className="mt-4 text-sm text-slate-500 sm:mt-5">
+                            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 sm:mt-5">
                                 Pass Rate
                             </p>
 
-                            <p className="mt-1 text-3xl font-bold text-slate-900">
+                            <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
                                 {passRate}%
                             </p>
 
                         </div>
 
                     </div>
-
 
                     {/* ================================= */}
                     {/* MAIN CONTENT */}
@@ -357,17 +492,45 @@ function Dashboard() {
                         {/* RECENT ACTIVITY */}
                         {/* ================================= */}
 
-                        <div className="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 lg:col-span-2">
+                        <div
+                            className="
+                                min-w-0
+                                overflow-hidden
+                                rounded-2xl
+                                bg-white
+                                shadow-sm
+                                ring-1
+                                ring-slate-200
+                                dark:bg-[#151515]
+                                dark:ring-white/10
+                                lg:col-span-2
+                            "
+                        >
 
-                            <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <div
+                                className="
+                                    flex
+                                    flex-col
+                                    gap-3
+                                    border-b
+                                    border-slate-100
+                                    px-5
+                                    py-5
+                                    dark:border-white/10
+                                    sm:flex-row
+                                    sm:items-center
+                                    sm:justify-between
+                                    sm:px-6
+                                "
+                            >
 
                                 <div className="min-w-0">
 
-                                    <h2 className="text-lg font-bold text-slate-900">
+                                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                                         Recent Activity
                                     </h2>
 
-                                    <p className="mt-1 text-sm text-slate-500">
+                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                         Your latest quiz attempts
                                     </p>
 
@@ -382,6 +545,8 @@ function Dashboard() {
                                         text-slate-700
                                         transition
                                         hover:text-black
+                                        dark:text-slate-300
+                                        dark:hover:text-white
                                     "
                                 >
                                     View Analytics →
@@ -389,14 +554,13 @@ function Dashboard() {
 
                             </div>
 
-
-                            <div className="divide-y divide-slate-100">
+                            <div className="divide-y divide-slate-100 dark:divide-white/10">
 
                                 {recentAttempts.length === 0 ? (
 
                                     <div className="px-5 py-12 text-center sm:px-6">
 
-                                        <p className="text-sm text-slate-500">
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">
                                             You haven't attempted
                                             any quizzes yet.
                                         </p>
@@ -410,6 +574,8 @@ function Dashboard() {
                                                 font-semibold
                                                 text-slate-700
                                                 hover:text-black
+                                                dark:text-slate-300
+                                                dark:hover:text-white
                                             "
                                         >
                                             Browse Quizzes →
@@ -439,40 +605,49 @@ function Dashboard() {
                                                         items-center
                                                         justify-between
                                                         gap-3
-                                                        px-5 py-4
+                                                        px-5
+                                                        py-4
                                                         transition
                                                         hover:bg-slate-50
+                                                        dark:hover:bg-[#1c1c1c]
                                                         sm:gap-4
-                                                        sm:px-6 sm:py-5
+                                                        sm:px-6
+                                                        sm:py-5
                                                     "
                                                 >
 
                                                     <div className="flex min-w-0 items-center gap-3 sm:gap-4">
 
-                                                        <div className="
-                                                            flex
-                                                            h-10 w-10
-                                                            shrink-0
-                                                            items-center
-                                                            justify-center
-                                                            rounded-xl
-                                                            bg-slate-100
-                                                            font-bold
-                                                            text-slate-800
-                                                            sm:h-11 sm:w-11
-                                                        ">
+                                                        <div
+                                                            className="
+                                                                flex
+                                                                h-10
+                                                                w-10
+                                                                shrink-0
+                                                                items-center
+                                                                justify-center
+                                                                rounded-xl
+                                                                bg-slate-100
+                                                                font-bold
+                                                                text-slate-800
+                                                                dark:bg-white/10
+                                                                dark:text-slate-200
+                                                                sm:h-11
+                                                                sm:w-11
+                                                            "
+                                                        >
                                                             Q
                                                         </div>
 
                                                         <div className="min-w-0">
 
-                                                            <p className="truncate font-semibold text-slate-900">
+                                                            <p className="truncate font-semibold text-slate-900 dark:text-white">
                                                                 {
                                                                     attempt.quiz_title
                                                                 }
                                                             </p>
 
-                                                            <p className="mt-1 text-xs text-slate-400">
+                                                            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                                                                 Score:{" "}
                                                                 {
                                                                     attempt.score
@@ -487,18 +662,17 @@ function Dashboard() {
 
                                                     </div>
 
-
                                                     <div className="shrink-0 text-right">
 
-                                                        <p className="font-bold text-slate-900">
+                                                        <p className="font-bold text-slate-900 dark:text-white">
                                                             {percentage}%
                                                         </p>
 
                                                         <span
                                                             className={`text-xs font-semibold ${
                                                                 passed
-                                                                    ? "text-green-600"
-                                                                    : "text-red-600"
+                                                                    ? "text-green-600 dark:text-green-400"
+                                                                    : "text-red-600 dark:text-red-400"
                                                             }`}
                                                         >
                                                             {passed
@@ -519,21 +693,32 @@ function Dashboard() {
 
                         </div>
 
-
                         {/* ================================= */}
                         {/* QUICK ACTIONS */}
                         {/* ================================= */}
 
-                        <div className="min-w-0 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                        <div
+                            className="
+                                min-w-0
+                                rounded-2xl
+                                bg-white
+                                p-5
+                                shadow-sm
+                                ring-1
+                                ring-slate-200
+                                dark:bg-[#151515]
+                                dark:ring-white/10
+                                sm:p-6
+                            "
+                        >
 
-                            <h2 className="text-lg font-bold text-slate-900">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                                 Quick Actions
                             </h2>
 
-                            <p className="mt-1 text-sm text-slate-500">
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                 Jump straight to what you need.
                             </p>
-
 
                             <div className="mt-5 space-y-3 sm:mt-6">
 
@@ -557,63 +742,74 @@ function Dashboard() {
                                         hover:border-slate-400
                                         hover:bg-slate-50
                                         hover:shadow-sm
+                                        dark:border-white/10
+                                        dark:bg-[#111111]
+                                        dark:hover:border-white/20
+                                        dark:hover:bg-[#1c1c1c]
                                         sm:gap-4
                                         sm:p-4
                                     "
                                 >
 
-                                    <span className="
-                                        flex
-                                        h-10 w-10
-                                        shrink-0
-                                        items-center
-                                        justify-center
-                                        rounded-lg
-                                        bg-slate-100
-                                        transition-all
-                                        duration-200
-                                        group-hover:scale-105
-                                        group-hover:bg-slate-200
-                                    ">
+                                    <span
+                                        className="
+                                            flex
+                                            h-10
+                                            w-10
+                                            shrink-0
+                                            items-center
+                                            justify-center
+                                            rounded-lg
+                                            bg-slate-100
+                                            transition-all
+                                            duration-200
+                                            group-hover:scale-105
+                                            group-hover:bg-slate-200
+                                            dark:bg-white/10
+                                            dark:group-hover:bg-white/15
+                                        "
+                                    >
                                         📝
                                     </span>
 
                                     <div className="min-w-0">
 
-                                        <p className="
-                                            text-sm
-                                            font-semibold
-                                            text-slate-900
-                                            transition-colors
-                                            group-hover:text-black
-                                        ">
+                                        <p
+                                            className="
+                                                text-sm
+                                                font-semibold
+                                                text-slate-900
+                                                transition-colors
+                                                group-hover:text-black
+                                                dark:text-white
+                                                dark:group-hover:text-white
+                                            "
+                                        >
                                             Take a Quiz
                                         </p>
 
-                                        <p className="
-                                            mt-1
-                                            text-xs
-                                            text-slate-500
-                                        ">
+                                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                             Test your knowledge
                                         </p>
 
                                     </div>
 
-                                    <span className="
-                                        ml-auto
-                                        text-slate-700
-                                        opacity-0
-                                        transition-all
-                                        duration-200
-                                        group-hover:translate-x-1
-                                        group-hover:opacity-100
-                                    ">
+                                    <span
+                                        className="
+                                            ml-auto
+                                            text-slate-700
+                                            opacity-0
+                                            transition-all
+                                            duration-200
+                                            group-hover:translate-x-1
+                                            group-hover:opacity-100
+                                            dark:text-slate-300
+                                        "
+                                    >
                                         →
                                     </span>
 
                                 </Link>
-
 
                                 {/* LEADERBOARD */}
 
@@ -635,63 +831,74 @@ function Dashboard() {
                                         hover:border-slate-400
                                         hover:bg-slate-50
                                         hover:shadow-sm
+                                        dark:border-white/10
+                                        dark:bg-[#111111]
+                                        dark:hover:border-white/20
+                                        dark:hover:bg-[#1c1c1c]
                                         sm:gap-4
                                         sm:p-4
                                     "
                                 >
 
-                                    <span className="
-                                        flex
-                                        h-10 w-10
-                                        shrink-0
-                                        items-center
-                                        justify-center
-                                        rounded-lg
-                                        bg-slate-100
-                                        transition-all
-                                        duration-200
-                                        group-hover:scale-105
-                                        group-hover:bg-slate-200
-                                    ">
+                                    <span
+                                        className="
+                                            flex
+                                            h-10
+                                            w-10
+                                            shrink-0
+                                            items-center
+                                            justify-center
+                                            rounded-lg
+                                            bg-slate-100
+                                            transition-all
+                                            duration-200
+                                            group-hover:scale-105
+                                            group-hover:bg-slate-200
+                                            dark:bg-white/10
+                                            dark:group-hover:bg-white/15
+                                        "
+                                    >
                                         🏆
                                     </span>
 
                                     <div className="min-w-0">
 
-                                        <p className="
-                                            text-sm
-                                            font-semibold
-                                            text-slate-900
-                                            transition-colors
-                                            group-hover:text-black
-                                        ">
+                                        <p
+                                            className="
+                                                text-sm
+                                                font-semibold
+                                                text-slate-900
+                                                transition-colors
+                                                group-hover:text-black
+                                                dark:text-white
+                                                dark:group-hover:text-white
+                                            "
+                                        >
                                             Leaderboard
                                         </p>
 
-                                        <p className="
-                                            mt-1
-                                            text-xs
-                                            text-slate-500
-                                        ">
+                                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                             Check your ranking
                                         </p>
 
                                     </div>
 
-                                    <span className="
-                                        ml-auto
-                                        text-slate-700
-                                        opacity-0
-                                        transition-all
-                                        duration-200
-                                        group-hover:translate-x-1
-                                        group-hover:opacity-100
-                                    ">
+                                    <span
+                                        className="
+                                            ml-auto
+                                            text-slate-700
+                                            opacity-0
+                                            transition-all
+                                            duration-200
+                                            group-hover:translate-x-1
+                                            group-hover:opacity-100
+                                            dark:text-slate-300
+                                        "
+                                    >
                                         →
                                     </span>
 
                                 </Link>
-
 
                                 {/* ANALYTICS */}
 
@@ -712,64 +919,74 @@ function Dashboard() {
                                         hover:-translate-y-0.5
                                         hover:border-slate-400
                                         hover:bg-slate-50
-                                        hover:shadow-sm
+                                        dark:border-white/10
+                                        dark:bg-[#111111]
+                                        dark:hover:border-white/20
+                                        dark:hover:bg-[#1c1c1c]
                                         sm:gap-4
                                         sm:p-4
                                     "
                                 >
 
-                                    <span className="
-                                        flex
-                                        h-10 w-10
-                                        shrink-0
-                                        items-center
-                                        justify-center
-                                        rounded-lg
-                                        bg-slate-100
-                                        transition-all
-                                        duration-200
-                                        group-hover:scale-105
-                                        group-hover:bg-slate-200
-                                    ">
+                                    <span
+                                        className="
+                                            flex
+                                            h-10
+                                            w-10
+                                            shrink-0
+                                            items-center
+                                            justify-center
+                                            rounded-lg
+                                            bg-slate-100
+                                            transition-all
+                                            duration-200
+                                            group-hover:scale-105
+                                            group-hover:bg-slate-200
+                                            dark:bg-white/10
+                                            dark:group-hover:bg-white/15
+                                        "
+                                    >
                                         📊
                                     </span>
 
                                     <div className="min-w-0">
 
-                                        <p className="
-                                            text-sm
-                                            font-semibold
-                                            text-slate-900
-                                            transition-colors
-                                            group-hover:text-black
-                                        ">
+                                        <p
+                                            className="
+                                                text-sm
+                                                font-semibold
+                                                text-slate-900
+                                                transition-colors
+                                                group-hover:text-black
+                                                dark:text-white
+                                                dark:group-hover:text-white
+                                            "
+                                        >
                                             My Analytics
                                         </p>
 
-                                        <p className="
-                                            mt-1
-                                            text-xs
-                                            text-slate-500
-                                        ">
+                                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                             Track your progress
                                         </p>
 
                                     </div>
 
-                                    <span className="
-                                        ml-auto
-                                        text-slate-700
-                                        opacity-0
-                                        transition-all
-                                        duration-200
-                                        group-hover:translate-x-1
-                                        group-hover:opacity-100
-                                    ">
+                                    <span
+                                        className="
+                                            ml-auto
+                                            text-slate-700
+                                            opacity-0
+                                            transition-all
+                                            duration-200
+                                            group-hover:translate-x-1
+                                            group-hover:opacity-100
+                                            dark:text-slate-300
+                                        "
+                                    >
                                         →
                                     </span>
 
                                 </Link>
-
 
                                 {/* PROFILE */}
 
@@ -791,58 +1008,70 @@ function Dashboard() {
                                         hover:border-slate-400
                                         hover:bg-slate-50
                                         hover:shadow-sm
+                                        dark:border-white/10
+                                        dark:bg-[#111111]
+                                        dark:hover:border-white/20
+                                        dark:hover:bg-[#1c1c1c]
                                         sm:gap-4
                                         sm:p-4
                                     "
                                 >
 
-                                    <span className="
-                                        flex
-                                        h-10 w-10
-                                        shrink-0
-                                        items-center
-                                        justify-center
-                                        rounded-lg
-                                        bg-slate-100
-                                        transition-all
-                                        duration-200
-                                        group-hover:scale-105
-                                        group-hover:bg-slate-200
-                                    ">
+                                    <span
+                                        className="
+                                            flex
+                                            h-10
+                                            w-10
+                                            shrink-0
+                                            items-center
+                                            justify-center
+                                            rounded-lg
+                                            bg-slate-100
+                                            transition-all
+                                            duration-200
+                                            group-hover:scale-105
+                                            group-hover:bg-slate-200
+                                            dark:bg-white/10
+                                            dark:group-hover:bg-white/15
+                                        "
+                                    >
                                         👤
                                     </span>
 
                                     <div className="min-w-0">
 
-                                        <p className="
-                                            text-sm
-                                            font-semibold
-                                            text-slate-900
-                                            transition-colors
-                                            group-hover:text-black
-                                        ">
+                                        <p
+                                            className="
+                                                text-sm
+                                                font-semibold
+                                                text-slate-900
+                                                transition-colors
+                                                group-hover:text-black
+                                                dark:text-white
+                                                dark:group-hover:text-white
+                                            "
+                                        >
                                             My Profile
                                         </p>
 
-                                        <p className="
-                                            mt-1
-                                            text-xs
-                                            text-slate-500
-                                        ">
+                                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                             Manage your account
                                         </p>
 
                                     </div>
 
-                                    <span className="
-                                        ml-auto
-                                        text-slate-700
-                                        opacity-0
-                                        transition-all
-                                        duration-200
-                                        group-hover:translate-x-1
-                                        group-hover:opacity-100
-                                    ">
+                                    <span
+                                        className="
+                                            ml-auto
+                                            text-slate-700
+                                            opacity-0
+                                            transition-all
+                                            duration-200
+                                            group-hover:translate-x-1
+                                            group-hover:opacity-100
+                                            dark:text-slate-300
+                                        "
+                                    >
                                         →
                                     </span>
 
@@ -854,80 +1083,119 @@ function Dashboard() {
 
                     </div>
 
-
                     {/* ================================= */}
-                    {/* PERFORMANCE */}
+                    {/* PERFORMANCE + CTA */}
                     {/* ================================= */}
 
                     <div className="mt-5 grid gap-5 sm:mt-6 sm:gap-6 lg:grid-cols-2">
 
-                        {/* Overall Performance */}
+                        {/* ================================= */}
+                        {/* OVERALL PERFORMANCE */}
+                        {/* ================================= */}
 
-                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                        <div
+                            className="
+                                rounded-2xl
+                                bg-white
+                                p-5
+                                shadow-sm
+                                ring-1
+                                ring-slate-200
+                                dark:bg-[#151515]
+                                dark:ring-white/10
+                                sm:p-6
+                            "
+                        >
 
                             <div className="flex items-start justify-between gap-4">
 
                                 <div className="min-w-0">
 
-                                    <h2 className="text-lg font-bold text-slate-900">
+                                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                                         Overall Performance
                                     </h2>
 
-                                    <p className="mt-1 text-sm text-slate-500">
+                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                         Your current progress
                                     </p>
 
                                 </div>
 
-                                <span className="shrink-0 text-2xl font-bold text-slate-900">
+                                <span className="shrink-0 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
                                     {averageScore}%
                                 </span>
 
                             </div>
 
+                            {/* ================================= */}
+                            {/* PROGRESS BAR */}
+                            {/* ================================= */}
 
-                            <div className="mt-6 h-3 overflow-hidden rounded-full bg-slate-100">
+                            <div className="mt-7">
 
-                                <div
-                                    className="
-                                        h-full
-                                        rounded-full
-                                        bg-black
-                                        transition-all
-                                        duration-500
-                                    "
-                                    style={{
-                                        width: `${Math.min(
-                                            Math.max(
-                                                averageScore,
-                                                0
-                                            ),
-                                            100
-                                        )}%`,
-                                    }}
-                                />
+                                <div className="h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-white/15">
+
+                                    <div
+                                        className="
+                                            h-full
+                                            rounded-full
+                                            bg-black
+                                            transition-all
+                                            duration-700
+                                            ease-out
+                                            dark:bg-white
+                                        "
+                                        style={{
+                                            width: `${Math.min(
+                                                Math.max(
+                                                    averageScore,
+                                                    0
+                                                ),
+                                                100
+                                            )}%`,
+                                        }}
+                                    />
+
+                                </div>
 
                             </div>
 
+                            <div className="mt-4 flex justify-between text-xs text-slate-400 dark:text-slate-500">
 
-                            <div className="mt-4 flex justify-between text-xs text-slate-400">
-
-                                <span>0%</span>
+                                <span>
+                                    0%
+                                </span>
 
                                 <span>
                                     Target: 80%
                                 </span>
 
-                                <span>100%</span>
+                                <span>
+                                    100%
+                                </span>
 
                             </div>
 
                         </div>
 
-
+                        {/* ================================= */}
                         {/* CTA */}
+                        {/* ================================= */}
 
-                        <div className="rounded-2xl bg-slate-900 p-5 text-white sm:p-6">
+                        <div
+                            className="
+                                rounded-2xl
+                                bg-slate-900
+                                p-5
+                                text-white
+                                transition-colors
+                                duration-300
+                                dark:bg-[#151515]
+                                dark:ring-1
+                                dark:ring-white/10
+                                sm:p-6
+                            "
+                        >
 
                             <p className="text-sm font-semibold text-slate-300">
                                 Keep Going
@@ -952,7 +1220,8 @@ function Dashboard() {
                                     justify-center
                                     rounded-lg
                                     bg-white
-                                    px-5 py-3
+                                    px-5
+                                    py-3
                                     text-sm
                                     font-semibold
                                     text-black
