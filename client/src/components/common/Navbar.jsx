@@ -1,9 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 
 function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const { darkMode, toggleTheme } = useTheme();
 
     const [open, setOpen] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -12,104 +15,6 @@ function Navbar() {
     const [password, setPassword] = useState("");
     const [deleteError, setDeleteError] = useState("");
     const [deleting, setDeleting] = useState(false);
-
-    // =========================================================
-    // GLOBAL THEME
-    // =========================================================
-
-    const [darkMode, setDarkMode] = useState(() => {
-        try {
-            return (
-                localStorage.getItem(
-                    "tryquizzers-theme"
-                ) === "dark"
-            );
-        } catch {
-            return false;
-        }
-    });
-
-    useEffect(() => {
-        const handleThemeChange = (event) => {
-            if (
-                event?.detail &&
-                typeof event.detail.darkMode === "boolean"
-            ) {
-                setDarkMode(event.detail.darkMode);
-                return;
-            }
-
-            try {
-                setDarkMode(
-                    localStorage.getItem(
-                        "tryquizzers-theme"
-                    ) === "dark"
-                );
-            } catch {
-                // Ignore storage errors
-            }
-        };
-
-        window.addEventListener(
-            "tryquizzers-theme-change",
-            handleThemeChange
-        );
-
-        return () => {
-            window.removeEventListener(
-                "tryquizzers-theme-change",
-                handleThemeChange
-            );
-        };
-    }, []);
-
-    const handleThemeToggle = () => {
-        const newDarkMode = !darkMode;
-
-        setDarkMode(newDarkMode);
-
-        try {
-            localStorage.setItem(
-                "tryquizzers-theme",
-                newDarkMode ? "dark" : "light"
-            );
-        } catch {
-            // Ignore storage errors
-        }
-
-        document.documentElement.classList.toggle(
-            "dark",
-            newDarkMode
-        );
-
-        document.documentElement.style.colorScheme =
-            newDarkMode ? "dark" : "light";
-
-        document.body.style.backgroundColor =
-            newDarkMode
-                ? "#0a0a0a"
-                : "#ffffff";
-
-        window.dispatchEvent(
-            new CustomEvent(
-                "tryquizzers-theme-change",
-                {
-                    detail: {
-                        darkMode: newDarkMode,
-                    },
-                }
-            )
-        );
-
-        // Also update the global function used by App.jsx
-        if (
-            typeof window.toggleTryQuizzersTheme ===
-            "function"
-        ) {
-            // App.jsx owns the global state.
-            // The event above keeps all components synced.
-        }
-    };
 
     // =========================================================
     // USER
@@ -463,9 +368,7 @@ function Navbar() {
 
                             <button
                                 type="button"
-                                onClick={
-                                    handleThemeToggle
-                                }
+                                onClick={toggleTheme}
                                 aria-label={
                                     darkMode
                                         ? "Switch to light mode"
@@ -569,13 +472,9 @@ function Navbar() {
 
                         <div className="flex items-center gap-2 md:hidden">
 
-                            {/* THEME */}
-
                             <button
                                 type="button"
-                                onClick={
-                                    handleThemeToggle
-                                }
+                                onClick={toggleTheme}
                                 aria-label={
                                     darkMode
                                         ? "Switch to light mode"
@@ -599,8 +498,6 @@ function Navbar() {
                             >
                                 {darkMode ? "☀" : "☾"}
                             </button>
-
-                            {/* MOBILE MENU */}
 
                             <button
                                 type="button"
@@ -1232,11 +1129,7 @@ function ProfileMenu({
                             className={`
                                 truncate
                                 text-xs
-                                ${
-                                    darkMode
-                                        ? "text-slate-500"
-                                        : "text-slate-500"
-                                }
+                                text-slate-500
                             `}
                         >
                             {user?.email ||
