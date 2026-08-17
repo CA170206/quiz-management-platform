@@ -2,21 +2,96 @@ import pool from "../config/db.js";
 
 export const getAdminAnalytics = async (req, res) => {
     try {
-        const result = await pool.query(`
+        if (req.user.role !== "admin") {
+            return res.status(403).json({
+                message: "Admin access required",
+            });
+        }
+
+        const statsResult = await pool.query(`
             SELECT
-                (SELECT COUNT(*) FROM users) AS users,
-                (SELECT COUNT(*) FROM quizzes) AS quizzes,
-                (SELECT COUNT(*) FROM questions) AS questions,
-                (SELECT COUNT(*) FROM attempts) AS attempts
+                (SELECT COUNT(*) FROM users)
+                    AS total_students,
+
+                (SELECT COUNT(*) FROM quizzes)
+                    AS total_quizzes,
+
+                (SELECT COUNT(*)
+                 FROM quizzes
+                 WHERE status = 'published')
+                    AS published_quizzes,
+
+                (SELECT COUNT(*)
+                 FROM quizzes
+                 WHERE status = 'draft')
+                    AS draft_quizzes,
+
+                (SELECT COUNT(*) FROM questions)
+                    AS total_questions,
+
+                (SELECT COUNT(*) FROM attempts)
+                    AS total_attempts,
+
+                COALESCE(
+                    (SELECT ROUND(AVG(percentage), 2)
+                     FROM attempts),
+                    0
+                ) AS average_score,
+
+                (
+                    SELECT COUNT(*)
+                    FROM attempts a
+                    JOIN quizzes q
+                        ON q.id = a.quiz_id
+                    WHERE a.percentage >= q.passing_percentage
+                ) AS passed_attempts,
+
+                (
+                    SELECT COUNT(*)
+                    FROM attempts a
+                    JOIN quizzes q
+                        ON q.id = a.quiz_id
+                    WHERE a.percentage < q.passing_percentage
+                ) AS failed_attempts
         `);
 
-        const stats = result.rows[0];
+        const popularQuizzes = await pool.query(`
+            SELECT
+                q.id,
+                q.title,
+                COUNT(a.id)::integer AS attempts,
+                COALESCE(
+                    ROUND(AVG(a.percentage), 2),
+                    0
+                ) AS average_score
+            FROM quizzes q
+            LEFT JOIN attempts a
+                ON a.quiz_id = q.id
+            GROUP BY q.id, q.title
+            ORDER BY attempts DESC
+            LIMIT 5
+        `);
+
+        const categories = await pool.query(`
+            SELECT
+                c.id,
+                c.name,
+                COUNT(DISTINCT q.id)::integer AS quizzes,
+                COUNT(a.id)::integer AS attempts
+            FROM categories c
+            LEFT JOIN quizzes q
+                ON q.category_id = c.id
+            LEFT JOIN attempts a
+                ON a.quiz_id = q.id
+            GROUP BY c.id, c.name
+            ORDER BY attempts DESC
+            LIMIT 5
+        `);
 
         res.status(200).json({
-            users: Number(stats.users),
-            quizzes: Number(stats.quizzes),
-            questions: Number(stats.questions),
-            attempts: Number(stats.attempts),
+            stats: statsResult.rows[0],
+            popularQuizzes: popularQuizzes.rows,
+            categories: categories.rows,
         });
 
     } catch (error) {
@@ -26,8 +101,7 @@ export const getAdminAnalytics = async (req, res) => {
         );
 
         res.status(500).json({
-            message:
-                "Failed to fetch admin analytics",
+            message: "Failed to fetch admin analytics",
         });
     }
 };

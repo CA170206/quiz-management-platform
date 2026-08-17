@@ -7,18 +7,12 @@ const API_URL =
     "http://localhost:5000";
 
 function AdminDashboard() {
-    const [stats, setStats] = useState({
-        users: 0,
-        quizzes: 0,
-        questions: 0,
-        attempts: 0,
-    });
-
+    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const loadAnalytics = async () => {
             try {
                 const token =
                     localStorage.getItem("token");
@@ -33,351 +27,426 @@ function AdminDashboard() {
                     }
                 );
 
-                const data =
+                const result =
                     await response.json();
 
                 if (!response.ok) {
                     throw new Error(
-                        data.message ||
-                            "Failed to load dashboard statistics"
+                        result.message ||
+                            "Failed to load analytics"
                     );
                 }
 
-                setStats({
-                    users:
-                        Number(
-                            data.users ??
-                            data.total_users ??
-                            data.total_students ??
-                            0
-                        ),
-
-                    quizzes:
-                        Number(
-                            data.quizzes ??
-                            data.total_quizzes ??
-                            0
-                        ),
-
-                    questions:
-                        Number(
-                            data.questions ??
-                            data.total_questions ??
-                            0
-                        ),
-
-                    attempts:
-                        Number(
-                            data.attempts ??
-                            data.total_attempts ??
-                            0
-                        ),
-                });
+                setData({
+    ...result.stats,
+    popular_quizzes: result.popularQuizzes || [],
+    popular_categories: result.categories || [],
+});
 
             } catch (err) {
-                console.error(
-                    "Dashboard stats error:",
-                    err
-                );
-
-                setError(
-                    err.message ||
-                        "Unable to load statistics"
-                );
+                console.error(err);
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchStats();
+        loadAnalytics();
     }, []);
 
-    const cards = [
+    const statCards = [
         {
-            title: "Users",
-            label: "Registered Users",
-            value: stats.users,
+            label: "Total Students",
+            value: data?.total_students ?? 0,
             icon: "👥",
-            color: "blue",
         },
         {
-            title: "Quizzes",
             label: "Total Quizzes",
-            value: stats.quizzes,
+            value: data?.total_quizzes ?? 0,
             icon: "📝",
-            color: "purple",
         },
         {
-            title: "Questions",
+            label: "Published Quizzes",
+            value: data?.published_quizzes ?? 0,
+            icon: "✅",
+        },
+        {
+            label: "Draft Quizzes",
+            value: data?.draft_quizzes ?? 0,
+            icon: "📄",
+        },
+        {
             label: "Total Questions",
-            value: stats.questions,
+            value: data?.total_questions ?? 0,
             icon: "❓",
-            color: "green",
         },
         {
-            title: "Attempts",
-            label: "Quiz Attempts",
-            value: stats.attempts,
+            label: "Total Attempts",
+            value: data?.total_attempts ?? 0,
             icon: "📊",
-            color: "orange",
+        },
+        {
+            label: "Average Score",
+            value: `${data?.average_score ?? 0}%`,
+            icon: "📈",
+        },
+        {
+            label: "Passed Attempts",
+            value: data?.passed_attempts ?? 0,
+            icon: "🏆",
         },
     ];
 
+    const maxQuizAttempts = Math.max(
+        ...(data?.popular_quizzes || []).map(
+            (item) =>
+                Number(item.attempts)
+        ),
+        1
+    );
+
+    const maxCategoryAttempts = Math.max(
+        ...(data?.popular_categories || []).map(
+            (item) =>
+                Number(item.attempts)
+        ),
+        1
+    );
+
     return (
-        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
+        <div className="min-h-screen bg-slate-50">
 
-            <div className="mx-auto max-w-7xl">
+            <Navbar />
 
-                {/* Header */}
+            <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
 
-                <div className="mb-6 sm:mb-8">
+                <div className="mx-auto max-w-7xl">
 
-                    <p className="text-sm font-semibold text-blue-600">
-                        Administration
-                    </p>
+                    {/* HEADER */}
 
-                    <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
-                        Admin Dashboard
-                    </h1>
+                    <div className="mb-6">
 
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
-                        Manage quizzes, questions, categories, and platform activity.
-                    </p>
+                        <p className="text-sm font-semibold text-blue-600">
+                            Administration
+                        </p>
 
-                </div>
+                        <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
+                            Admin Dashboard
+                        </h1>
 
-
-                {/* Error */}
-
-                {error && (
-                    <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                        {error}
-                    </div>
-                )}
-
-
-                {/* Stats */}
-
-                <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
-
-                    {cards.map((card) => (
-
-                        <div
-                            key={card.title}
-                            className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6"
-                        >
-
-                            <div className="flex items-center justify-between gap-3">
-
-                                <span
-                                    className={`
-                                        flex h-11 w-11 shrink-0
-                                        items-center justify-center
-                                        rounded-xl text-xl
-                                        ${
-                                            card.color === "blue"
-                                                ? "bg-blue-50"
-                                                : card.color === "purple"
-                                                ? "bg-purple-50"
-                                                : card.color === "green"
-                                                ? "bg-green-50"
-                                                : "bg-orange-50"
-                                        }
-                                    `}
-                                >
-                                    {card.icon}
-                                </span>
-
-                                <span
-                                    className={`
-                                        text-xs font-semibold
-                                        ${
-                                            card.color === "blue"
-                                                ? "text-blue-600"
-                                                : card.color === "purple"
-                                                ? "text-purple-600"
-                                                : card.color === "green"
-                                                ? "text-green-600"
-                                                : "text-orange-600"
-                                        }
-                                    `}
-                                >
-                                    {card.title}
-                                </span>
-
-                            </div>
-
-                            <p className="mt-5 text-sm text-slate-500">
-                                {card.label}
-                            </p>
-
-                            <p className="mt-1 text-3xl font-bold text-slate-900">
-                                {loading
-                                    ? "—"
-                                    : card.value}
-                            </p>
-
-                        </div>
-
-                    ))}
-
-                </div>
-
-
-                {/* Quick Actions */}
-
-                <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mt-6 sm:p-6">
-
-                    <div>
-
-                        <h2 className="text-lg font-bold text-slate-900">
-                            Quick Actions
-                        </h2>
-
-                        <p className="mt-1 text-sm text-slate-500">
-                            Manage your quiz platform.
+                        <p className="mt-2 text-sm text-slate-500">
+                            Platform statistics and performance analytics.
                         </p>
 
                     </div>
 
 
-                    <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+                    {/* ERROR */}
 
-                        <Link
-                            to="/admin/quizzes"
-                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 sm:p-5"
-                        >
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-xl">
-                                📝
-                            </span>
-
-                            <h3 className="mt-4 font-semibold text-slate-900">
-                                Manage Quizzes
-                            </h3>
-
-                            <p className="mt-1 text-xs leading-5 text-slate-500">
-                                Create, edit, and manage quizzes.
-                            </p>
-
-                            <p className="mt-4 text-sm font-semibold text-blue-600">
-                                Open →
-                            </p>
-                        </Link>
+                    {error && (
+                        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+                            {error}
+                        </div>
+                    )}
 
 
-                        <Link
-                            to="/admin/questions"
-                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50 sm:p-5"
-                        >
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-xl">
-                                ❓
-                            </span>
+                    {/* STATISTICS */}
 
-                            <h3 className="mt-4 font-semibold text-slate-900">
-                                Manage Questions
-                            </h3>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-                            <p className="mt-1 text-xs leading-5 text-slate-500">
-                                Add and organize quiz questions.
-                            </p>
+                        {statCards.map(
+                            (card) => (
+                                <div
+                                    key={card.label}
+                                    className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
+                                >
 
-                            <p className="mt-4 text-sm font-semibold text-green-600">
-                                Open →
-                            </p>
-                        </Link>
+                                    <div className="flex items-center justify-between">
 
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl">
+                                            {card.icon}
+                                        </span>
 
-                        <Link
-                            to="/admin/categories"
-                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-purple-200 hover:bg-purple-50 sm:p-5"
-                        >
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-100 text-xl">
-                                🗂️
-                            </span>
+                                    </div>
 
-                            <h3 className="mt-4 font-semibold text-slate-900">
-                                Categories
-                            </h3>
+                                    <p className="mt-5 text-sm text-slate-500">
+                                        {card.label}
+                                    </p>
 
-                            <p className="mt-1 text-xs leading-5 text-slate-500">
-                                Organize quizzes by category.
-                            </p>
+                                    <p className="mt-1 text-3xl font-bold text-slate-900">
+                                        {loading
+                                            ? "—"
+                                            : card.value}
+                                    </p>
 
-                            <p className="mt-4 text-sm font-semibold text-purple-600">
-                                Open →
-                            </p>
-                        </Link>
-
-
-                        <Link
-                            to="/admin/questions"
-                            className="group rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50 sm:p-5"
-                        >
-                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-100 text-xl">
-                                📊
-                            </span>
-
-                            <h3 className="mt-4 font-semibold text-slate-900">
-                                Question Bank
-                            </h3>
-
-                            <p className="mt-1 text-xs leading-5 text-slate-500">
-                                Review your complete question bank.
-                            </p>
-
-                            <p className="mt-4 text-sm font-semibold text-orange-600">
-                                Open →
-                            </p>
-                        </Link>
+                                </div>
+                            )
+                        )}
 
                     </div>
 
-                </div>
+
+                    {/* PASS / FAIL */}
+
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+
+                        <div className="rounded-2xl bg-green-50 p-5 ring-1 ring-green-100">
+
+                            <p className="text-sm font-semibold text-green-700">
+                                Passed Attempts
+                            </p>
+
+                            <p className="mt-2 text-3xl font-bold text-green-700">
+                                {data?.passed_attempts ?? 0}
+                            </p>
+
+                        </div>
+
+                        <div className="rounded-2xl bg-red-50 p-5 ring-1 ring-red-100">
+
+                            <p className="text-sm font-semibold text-red-700">
+                                Failed Attempts
+                            </p>
+
+                            <p className="mt-2 text-3xl font-bold text-red-700">
+                                {data?.failed_attempts ?? 0}
+                            </p>
+
+                        </div>
+
+                    </div>
 
 
-                {/* System Status */}
+                    {/* POPULAR QUIZZES */}
 
-                <div className="mt-5 rounded-2xl bg-slate-900 p-5 text-white sm:mt-6 sm:p-6">
+                    <div className="mt-6 grid gap-6 lg:grid-cols-2">
 
-                    <p className="text-sm font-semibold text-blue-400">
-                        System
-                    </p>
+                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
-                    <h2 className="mt-2 text-xl font-bold">
-                        Platform Status
-                    </h2>
+                            <h2 className="text-lg font-bold text-slate-900">
+                                Most Popular Quizzes
+                            </h2>
 
-                    <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                            <div className="mt-5 space-y-4">
 
-                        {[
-                            "API Server",
-                            "Database",
-                            "Authentication",
-                        ].map((item) => (
+                                {data?.popular_quizzes?.length ? (
+                                    data.popular_quizzes.map(
+                                        (quiz) => {
 
-                            <div
-                                key={item}
-                                className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4"
-                            >
+                                            const attempts =
+                                                Number(
+                                                    quiz.attempts
+                                                );
 
-                                <span className="text-sm text-slate-300">
-                                    {item}
-                                </span>
+                                            return (
+                                                <div
+                                                    key={
+                                                        quiz.title
+                                                    }
+                                                >
 
-                                <span className="flex shrink-0 items-center gap-2 text-xs font-semibold text-green-400">
-                                    <span className="h-2 w-2 rounded-full bg-green-400" />
-                                    Online
-                                </span>
+                                                    <div className="flex justify-between gap-3 text-sm">
+
+                                                        <span className="min-w-0 truncate font-medium text-slate-700">
+                                                            {
+                                                                quiz.title
+                                                            }
+                                                        </span>
+
+                                                        <span className="shrink-0 font-semibold text-slate-900">
+                                                            {
+                                                                attempts
+                                                            }
+                                                        </span>
+
+                                                    </div>
+
+                                                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+
+                                                        <div
+                                                            className="h-full rounded-full bg-blue-600"
+                                                            style={{
+                                                                width: `${(
+                                                                    attempts /
+                                                                    maxQuizAttempts
+                                                                ) * 100}%`,
+                                                            }}
+                                                        />
+
+                                                    </div>
+
+                                                </div>
+                                            );
+                                        }
+                                    )
+                                ) : (
+                                    <p className="text-sm text-slate-500">
+                                        No quiz attempts yet.
+                                    </p>
+                                )}
 
                             </div>
 
-                        ))}
+                        </div>
+
+
+                        {/* POPULAR CATEGORIES */}
+
+                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
+                            <h2 className="text-lg font-bold text-slate-900">
+                                Most Popular Categories
+                            </h2>
+
+                            <div className="mt-5 space-y-4">
+
+                                {data?.popular_categories?.length ? (
+                                    data.popular_categories.map(
+                                        (category) => {
+
+                                            const attempts =
+                                                Number(
+                                                    category.attempts
+                                                );
+
+                                            return (
+                                                <div
+                                                    key={
+                                                        category.name
+                                                    }
+                                                >
+
+                                                    <div className="flex justify-between gap-3 text-sm">
+
+                                                        <span className="font-medium text-slate-700">
+                                                            {
+                                                                category.name
+                                                            }
+                                                        </span>
+
+                                                        <span className="font-semibold text-slate-900">
+                                                            {
+                                                                attempts
+                                                            }
+                                                        </span>
+
+                                                    </div>
+
+                                                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+
+                                                        <div
+                                                            className="h-full rounded-full bg-purple-600"
+                                                            style={{
+                                                                width: `${(
+                                                                    attempts /
+                                                                    maxCategoryAttempts
+                                                                ) * 100}%`,
+                                                            }}
+                                                        />
+
+                                                    </div>
+
+                                                </div>
+                                            );
+                                        }
+                                    )
+                                ) : (
+                                    <p className="text-sm text-slate-500">
+                                        No category activity yet.
+                                    </p>
+                                )}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* QUICK ACTIONS */}
+
+                    <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
+                        <h2 className="text-lg font-bold text-slate-900">
+                            Quick Actions
+                        </h2>
+
+                        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+                            <Link
+                                to="/admin/quizzes"
+                                className="rounded-xl border border-slate-200 p-4 transition hover:bg-blue-50"
+                            >
+                                <span className="text-xl">
+                                    📝
+                                </span>
+
+                                <h3 className="mt-3 font-semibold text-slate-900">
+                                    Manage Quizzes
+                                </h3>
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Create and manage quizzes.
+                                </p>
+                            </Link>
+
+                            <Link
+                                to="/admin/questions"
+                                className="rounded-xl border border-slate-200 p-4 transition hover:bg-green-50"
+                            >
+                                <span className="text-xl">
+                                    ❓
+                                </span>
+
+                                <h3 className="mt-3 font-semibold text-slate-900">
+                                    Manage Questions
+                                </h3>
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Manage quiz questions.
+                                </p>
+                            </Link>
+
+                            <Link
+                                to="/admin/categories"
+                                className="rounded-xl border border-slate-200 p-4 transition hover:bg-purple-50"
+                            >
+                                <span className="text-xl">
+                                    🗂️
+                                </span>
+
+                                <h3 className="mt-3 font-semibold text-slate-900">
+                                    Categories
+                                </h3>
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Manage quiz categories.
+                                </p>
+                            </Link>
+
+                            <Link
+                                to="/admin/users"
+                                className="rounded-xl border border-slate-200 p-4 transition hover:bg-orange-50"
+                            >
+                                <span className="text-xl">
+                                    👥
+                                </span>
+
+                                <h3 className="mt-3 font-semibold text-slate-900">
+                                    Manage Students
+                                </h3>
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Manage registered students.
+                                </p>
+                            </Link>
+
+                        </div>
 
                     </div>
 
                 </div>
-
-            </div>
+            </main>
         </div>
     );
 }

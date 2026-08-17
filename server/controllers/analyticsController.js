@@ -123,6 +123,11 @@ export const getAdminAnalytics = async (
             });
         }
 
+
+        // ==========================================
+        // PLATFORM STATISTICS
+        // ==========================================
+
         const statsResult = await pool.query(
             `
             SELECT
@@ -142,6 +147,18 @@ export const getAdminAnalytics = async (
                     SELECT COUNT(*)
                     FROM quizzes
                 )::integer AS total_quizzes,
+
+                (
+                    SELECT COUNT(*)
+                    FROM quizzes
+                    WHERE status = 'published'
+                )::integer AS published_quizzes,
+
+                (
+                    SELECT COUNT(*)
+                    FROM quizzes
+                    WHERE status = 'draft'
+                )::integer AS draft_quizzes,
 
                 (
                     SELECT COUNT(*)
@@ -169,24 +186,47 @@ export const getAdminAnalytics = async (
                     0
                 ) AS average_score,
 
+                (
+                    SELECT COUNT(*)
+                    FROM attempts a
+                    INNER JOIN quizzes q
+                        ON q.id = a.quiz_id
+                    WHERE a.percentage >= q.passing_percentage
+                )::integer AS passed_attempts,
+
+                (
+                    SELECT COUNT(*)
+                    FROM attempts a
+                    INNER JOIN quizzes q
+                        ON q.id = a.quiz_id
+                    WHERE a.percentage < q.passing_percentage
+                )::integer AS failed_attempts,
+
                 COALESCE(
                     (
                         SELECT ROUND(
                             (
                                 COUNT(*) FILTER (
-                                    WHERE percentage >= 40
+                                    WHERE a.percentage >= q.passing_percentage
                                 )::numeric
                                 /
                                 NULLIF(COUNT(*), 0)
                             ) * 100,
                             2
                         )
-                        FROM attempts
+                        FROM attempts a
+                        INNER JOIN quizzes q
+                            ON q.id = a.quiz_id
                     ),
                     0
                 ) AS pass_rate
             `
         );
+
+
+        // ==========================================
+        // POPULAR QUIZZES
+        // ==========================================
 
         const popularQuizzesResult =
             await pool.query(
@@ -223,6 +263,11 @@ export const getAdminAnalytics = async (
                 `
             );
 
+
+        // ==========================================
+        // RECENT ATTEMPTS
+        // ==========================================
+
         const recentAttemptsResult =
             await pool.query(
                 `
@@ -249,6 +294,11 @@ export const getAdminAnalytics = async (
                 LIMIT 10
                 `
             );
+
+
+        // ==========================================
+        // CATEGORY ANALYTICS
+        // ==========================================
 
         const categoriesResult =
             await pool.query(
@@ -280,6 +330,11 @@ export const getAdminAnalytics = async (
                     c.name ASC
                 `
             );
+
+
+        // ==========================================
+        // RESPONSE
+        // ==========================================
 
         res.status(200).json({
             stats: statsResult.rows[0],
