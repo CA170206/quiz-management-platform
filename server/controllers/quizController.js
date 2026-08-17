@@ -63,8 +63,15 @@ export const createQuiz = async (req, res) => {
             title,
             description,
             duration,
+            difficulty,
+            passing_percentage,
+            maximum_attempts,
             status,
         } = req.body;
+
+        // ------------------------------------------
+        // REQUIRED FIELDS
+        // ------------------------------------------
 
         if (!category_id || !title || !duration) {
             return res.status(400).json({
@@ -73,19 +80,95 @@ export const createQuiz = async (req, res) => {
             });
         }
 
+        // ------------------------------------------
+        // DIFFICULTY
+        // ------------------------------------------
+
+        const validDifficulties = [
+            "easy",
+            "medium",
+            "hard",
+        ];
+
+        const quizDifficulty =
+            difficulty || "medium";
+
+        if (
+            !validDifficulties.includes(
+                quizDifficulty
+            )
+        ) {
+            return res.status(400).json({
+                message:
+                    "Difficulty must be easy, medium or hard",
+            });
+        }
+
+        // ------------------------------------------
+        // PASSING PERCENTAGE
+        // ------------------------------------------
+
+        const passingPercentage =
+            passing_percentage ?? 50;
+
+        if (
+            !Number.isInteger(
+                Number(passingPercentage)
+            ) ||
+            Number(passingPercentage) < 1 ||
+            Number(passingPercentage) > 100
+        ) {
+            return res.status(400).json({
+                message:
+                    "Passing percentage must be between 1 and 100",
+            });
+        }
+
+        // ------------------------------------------
+        // MAXIMUM ATTEMPTS
+        // ------------------------------------------
+
+        const maximumAttempts =
+            maximum_attempts ?? 1;
+
+        if (
+            !Number.isInteger(
+                Number(maximumAttempts)
+            ) ||
+            Number(maximumAttempts) < 1
+        ) {
+            return res.status(400).json({
+                message:
+                    "Maximum attempts must be at least 1",
+            });
+        }
+
+        // ------------------------------------------
+        // STATUS
+        // ------------------------------------------
+
         const validStatuses = [
             "draft",
             "published",
             "unpublished",
         ];
 
-        const quizStatus = status || "draft";
+        const quizStatus =
+            status || "draft";
 
-        if (!validStatuses.includes(quizStatus)) {
+        if (
+            !validStatuses.includes(
+                quizStatus
+            )
+        ) {
             return res.status(400).json({
                 message: "Invalid quiz status",
             });
         }
+
+        // ------------------------------------------
+        // INSERT QUIZ
+        // ------------------------------------------
 
         const result = await pool.query(
             `INSERT INTO quizzes
@@ -94,16 +177,22 @@ export const createQuiz = async (req, res) => {
                     title,
                     description,
                     duration,
+                    difficulty,
+                    passing_percentage,
+                    maximum_attempts,
                     status
                 )
              VALUES
-                ($1, $2, $3, $4, $5)
+                ($1, $2, $3, $4, $5, $6, $7, $8)
              RETURNING *`,
             [
-                category_id,
-                title,
-                description,
-                duration,
+                Number(category_id),
+                title.trim(),
+                description?.trim() || null,
+                Number(duration),
+                quizDifficulty,
+                Number(passingPercentage),
+                Number(maximumAttempts),
                 quizStatus,
             ]
         );
@@ -138,8 +227,15 @@ export const updateQuiz = async (req, res) => {
             title,
             description,
             duration,
+            difficulty,
+            passing_percentage,
+            maximum_attempts,
             status,
         } = req.body;
+
+        // ------------------------------------------
+        // REQUIRED FIELDS
+        // ------------------------------------------
 
         if (!category_id || !title || !duration) {
             return res.status(400).json({
@@ -147,6 +243,73 @@ export const updateQuiz = async (req, res) => {
                     "Category, title and duration are required",
             });
         }
+
+        // ------------------------------------------
+        // DIFFICULTY
+        // ------------------------------------------
+
+        const validDifficulties = [
+            "easy",
+            "medium",
+            "hard",
+        ];
+
+        const quizDifficulty =
+            difficulty || "medium";
+
+        if (
+            !validDifficulties.includes(
+                quizDifficulty
+            )
+        ) {
+            return res.status(400).json({
+                message:
+                    "Difficulty must be easy, medium or hard",
+            });
+        }
+
+        // ------------------------------------------
+        // PASSING PERCENTAGE
+        // ------------------------------------------
+
+        const passingPercentage =
+            passing_percentage ?? 50;
+
+        if (
+            !Number.isInteger(
+                Number(passingPercentage)
+            ) ||
+            Number(passingPercentage) < 1 ||
+            Number(passingPercentage) > 100
+        ) {
+            return res.status(400).json({
+                message:
+                    "Passing percentage must be between 1 and 100",
+            });
+        }
+
+        // ------------------------------------------
+        // MAXIMUM ATTEMPTS
+        // ------------------------------------------
+
+        const maximumAttempts =
+            maximum_attempts ?? 1;
+
+        if (
+            !Number.isInteger(
+                Number(maximumAttempts)
+            ) ||
+            Number(maximumAttempts) < 1
+        ) {
+            return res.status(400).json({
+                message:
+                    "Maximum attempts must be at least 1",
+            });
+        }
+
+        // ------------------------------------------
+        // STATUS
+        // ------------------------------------------
 
         if (
             status &&
@@ -161,30 +324,48 @@ export const updateQuiz = async (req, res) => {
             });
         }
 
+        // ------------------------------------------
+        // UPDATE QUIZ
+        // ------------------------------------------
+
         const result = await pool.query(
             `UPDATE quizzes
              SET category_id = $1,
                  title = $2,
                  description = $3,
                  duration = $4,
-                 status = COALESCE($5, status)
-             WHERE id = $6
+                 difficulty = $5,
+                 passing_percentage = $6,
+                 maximum_attempts = $7,
+                 status = COALESCE($8, status)
+             WHERE id = $9
              RETURNING *`,
             [
-                category_id,
-                title,
-                description,
-                duration,
+                Number(category_id),
+                title.trim(),
+                description?.trim() || null,
+                Number(duration),
+                quizDifficulty,
+                Number(passingPercentage),
+                Number(maximumAttempts),
                 status || null,
                 id,
             ]
         );
+
+        // ------------------------------------------
+        // NOT FOUND
+        // ------------------------------------------
 
         if (result.rows.length === 0) {
             return res.status(404).json({
                 message: "Quiz not found",
             });
         }
+
+        // ------------------------------------------
+        // SUCCESS
+        // ------------------------------------------
 
         res.status(200).json({
             message: "Quiz updated successfully",
@@ -248,6 +429,7 @@ export const publishQuiz = async (req, res) => {
                 newStatus === "published"
                     ? "Quiz published successfully"
                     : "Quiz unpublished successfully",
+
             quiz: result.rows[0],
         });
     } catch (error) {
@@ -286,7 +468,9 @@ export const deleteQuiz = async (req, res) => {
         }
 
         res.status(200).json({
-            message: "Quiz deleted successfully",
+            message:
+                "Quiz deleted successfully",
+
             quiz: result.rows[0],
         });
     } catch (error) {
@@ -296,7 +480,8 @@ export const deleteQuiz = async (req, res) => {
         );
 
         res.status(500).json({
-            message: "Failed to delete quiz",
+            message:
+                "Failed to delete quiz",
         });
     }
 };
