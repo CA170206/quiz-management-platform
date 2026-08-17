@@ -18,11 +18,11 @@ function AttemptQuiz() {
     const [error, setError] = useState("");
     const [timeLeft, setTimeLeft] = useState(0);
     const [submitting, setSubmitting] = useState(false);
-    const [showSubmitModal, setShowSubmitModal] =
-        useState(false);
+    const [showSubmitModal, setShowSubmitModal] = useState(false);
+    const [attemptStatus, setAttemptStatus] = useState(null);
 
     // ==========================================
-    // FETCH QUIZ + QUESTIONS
+    // CHECK ATTEMPTS FIRST, THEN LOAD QUIZ
     // ==========================================
 
     useEffect(() => {
@@ -31,16 +31,68 @@ function AttemptQuiz() {
                 setLoading(true);
                 setError("");
 
+                const token =
+                    localStorage.getItem("token");
+
+                if (!token) {
+                    throw new Error(
+                        "You are not logged in. Please login again."
+                    );
+                }
+
+                // ------------------------------------------
+                // CHECK ATTEMPT STATUS FIRST
+                // ------------------------------------------
+
+                const statusResponse = await fetch(
+                    `${ATTEMPTS_API}/quiz/${id}/status`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const statusData =
+                    await statusResponse.json();
+
+                if (!statusResponse.ok) {
+                    throw new Error(
+                        statusData.message ||
+                            "Failed to check quiz attempts"
+                    );
+                }
+
+                setAttemptStatus(statusData);
+
+                // ------------------------------------------
+                // BLOCK QUIZ IF MAXIMUM ATTEMPTS REACHED
+                // ------------------------------------------
+
+                if (!statusData.can_attempt) {
+                    setLoading(false);
+                    return;
+                }
+
+                // ------------------------------------------
+                // LOAD QUIZ + QUESTIONS
+                // ------------------------------------------
+
                 const [
                     quizResponse,
                     questionsResponse,
                 ] = await Promise.all([
                     fetch(`${QUIZ_API}/${id}`),
-                    fetch(`${QUESTIONS_API}/quiz/${id}`),
+                    fetch(
+                        `${QUESTIONS_API}/quiz/${id}`
+                    ),
                 ]);
 
                 if (!quizResponse.ok) {
-                    throw new Error("Failed to fetch quiz");
+                    throw new Error(
+                        "Failed to fetch quiz"
+                    );
                 }
 
                 if (!questionsResponse.ok) {
@@ -57,6 +109,7 @@ function AttemptQuiz() {
 
                 setQuiz(quizData);
                 setQuestions(questionsData);
+
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -76,7 +129,9 @@ function AttemptQuiz() {
             return;
         }
 
-        setTimeLeft(quiz.duration * 60);
+        setTimeLeft(
+            Number(quiz.duration) * 60
+        );
     }, [quiz]);
 
     // ==========================================
@@ -89,10 +144,13 @@ function AttemptQuiz() {
         }
 
         const timer = setInterval(() => {
-            setTimeLeft((prev) => prev - 1);
+            setTimeLeft(
+                (prev) => prev - 1
+            );
         }, 1000);
 
-        return () => clearInterval(timer);
+        return () =>
+            clearInterval(timer);
     }, [timeLeft]);
 
     // ==========================================
@@ -102,7 +160,8 @@ function AttemptQuiz() {
     const handleAnswer = (answer) => {
         setAnswers((prev) => ({
             ...prev,
-            [questions[currentIndex].id]: answer,
+            [questions[currentIndex].id]:
+                answer,
         }));
     };
 
@@ -125,7 +184,7 @@ function AttemptQuiz() {
             }
 
             const totalTime =
-                quiz.duration * 60;
+                Number(quiz.duration) * 60;
 
             const timeTaken =
                 totalTime - timeLeft;
@@ -146,7 +205,8 @@ function AttemptQuiz() {
                     body: JSON.stringify({
                         quiz_id: Number(id),
                         answers,
-                        time_taken: timeTaken,
+                        time_taken:
+                            timeTaken,
                     }),
                 }
             );
@@ -166,6 +226,7 @@ function AttemptQuiz() {
             navigate(
                 `/student/results/${data.attempt.id}`
             );
+
         } catch (err) {
             setError(err.message);
             setShowSubmitModal(false);
@@ -181,17 +242,107 @@ function AttemptQuiz() {
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-50">
-
                 <Navbar />
 
                 <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
                     <div className="mx-auto max-w-5xl">
-
                         <div className="h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
-
                     </div>
                 </main>
+            </div>
+        );
+    }
 
+    // ==========================================
+    // MAXIMUM ATTEMPTS REACHED
+    // ==========================================
+
+    if (
+        attemptStatus &&
+        !attemptStatus.can_attempt
+    ) {
+        return (
+            <div className="min-h-screen bg-slate-50">
+                <Navbar />
+
+                <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
+                    <div className="mx-auto max-w-4xl">
+
+                        <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:p-10">
+
+                            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-3xl">
+                                🔒
+                            </div>
+
+                            <h1 className="mt-5 text-xl font-bold text-slate-900 sm:text-2xl">
+                                Maximum Attempts Reached
+                            </h1>
+
+                            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-500 sm:text-base">
+                                You have used all{" "}
+                                <strong>
+                                    {
+                                        attemptStatus.maximum_attempts
+                                    }
+                                </strong>{" "}
+                                attempts for this quiz.
+                            </p>
+
+                            <div className="mx-auto mt-6 max-w-sm rounded-xl bg-slate-50 p-4">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-slate-500">
+                                        Attempts used
+                                    </span>
+
+                                    <strong className="text-slate-900">
+                                        {
+                                            attemptStatus.attempts_used
+                                        }{" "}
+                                        /{" "}
+                                        {
+                                            attemptStatus.maximum_attempts
+                                        }
+                                    </strong>
+                                </div>
+
+                                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+                                    <div
+                                        className="h-full rounded-full bg-red-500"
+                                        style={{
+                                            width: "100%",
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    navigate(
+                                        "/student/quizzes"
+                                    )
+                                }
+                                className="
+                                    mt-6
+                                    w-full
+                                    rounded-lg
+                                    bg-black
+                                    px-5
+                                    py-3
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                    transition
+                                    hover:bg-slate-800
+                                    sm:w-auto
+                                "
+                            >
+                                Back to Quizzes
+                            </button>
+
+                        </div>
+                    </div>
+                </main>
             </div>
         );
     }
@@ -203,7 +354,6 @@ function AttemptQuiz() {
     if (error && !quiz) {
         return (
             <div className="min-h-screen bg-slate-50">
-
                 <Navbar />
 
                 <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
@@ -215,7 +365,6 @@ function AttemptQuiz() {
 
                     </div>
                 </main>
-
             </div>
         );
     }
@@ -231,7 +380,6 @@ function AttemptQuiz() {
     if (questions.length === 0) {
         return (
             <div className="min-h-screen bg-slate-50">
-
                 <Navbar />
 
                 <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
@@ -262,7 +410,8 @@ function AttemptQuiz() {
                                     w-full
                                     rounded-lg
                                     bg-black
-                                    px-5 py-3
+                                    px-5
+                                    py-3
                                     text-sm
                                     font-semibold
                                     text-white
@@ -275,10 +424,8 @@ function AttemptQuiz() {
                             </button>
 
                         </div>
-
                     </div>
                 </main>
-
             </div>
         );
     }
@@ -302,10 +449,9 @@ function AttemptQuiz() {
         Math.floor(timeLeft / 60);
 
     const seconds =
-        String(timeLeft % 60).padStart(
-            2,
-            "0"
-        );
+        String(
+            timeLeft % 60
+        ).padStart(2, "0");
 
     const isLastQuestion =
         currentIndex ===
@@ -324,9 +470,7 @@ function AttemptQuiz() {
 
                 <div className="mx-auto max-w-5xl">
 
-                    {/* ================================= */}
                     {/* HEADER */}
-                    {/* ================================= */}
 
                     <div className="mb-5 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:mb-6 sm:p-5">
 
@@ -342,9 +486,21 @@ function AttemptQuiz() {
                                     {quiz.title}
                                 </h1>
 
-                            </div>
+                                {attemptStatus && (
+                                    <p className="mt-2 text-xs font-medium text-slate-500">
+                                        Attempt{" "}
+                                        {
+                                            attemptStatus.attempts_used +
+                                            1
+                                        }{" "}
+                                        of{" "}
+                                        {
+                                            attemptStatus.maximum_attempts
+                                        }
+                                    </p>
+                                )}
 
-                            {/* Timer */}
+                            </div>
 
                             <div
                                 className={`w-full shrink-0 rounded-xl px-4 py-3 text-center sm:w-auto sm:min-w-[150px] sm:px-5 ${
@@ -353,7 +509,6 @@ function AttemptQuiz() {
                                         : "bg-slate-100 text-slate-900"
                                 }`}
                             >
-
                                 <p className="text-xs font-semibold uppercase">
                                     Time Remaining
                                 </p>
@@ -361,12 +516,9 @@ function AttemptQuiz() {
                                 <p className="mt-1 text-xl font-bold tabular-nums">
                                     {minutes}:{seconds}
                                 </p>
-
                             </div>
 
                         </div>
-
-                        {/* Progress */}
 
                         <div className="mt-5">
 
@@ -395,11 +547,8 @@ function AttemptQuiz() {
                                 />
 
                             </div>
-
                         </div>
-
                     </div>
-
 
                     {/* ERROR */}
 
@@ -409,10 +558,7 @@ function AttemptQuiz() {
                         </div>
                     )}
 
-
-                    {/* ================================= */}
                     {/* QUESTION */}
-                    {/* ================================= */}
 
                     <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
 
@@ -424,17 +570,12 @@ function AttemptQuiz() {
                             </span>
 
                             <h2 className="mt-4 break-words text-lg font-bold leading-7 text-slate-900 sm:mt-5 sm:text-2xl sm:leading-8">
-                                {
-                                    currentQuestion.question_text
-                                }
+                                {currentQuestion.question_text}
                             </h2>
 
                         </div>
 
-
-                        {/* ================================= */}
                         {/* OPTIONS */}
-                        {/* ================================= */}
 
                         <div className="space-y-3 px-5 py-5 sm:px-8 sm:py-6">
 
@@ -473,9 +614,7 @@ function AttemptQuiz() {
                                                 type="radio"
                                                 name={`question-${currentQuestion.id}`}
                                                 value={option}
-                                                checked={
-                                                    selected
-                                                }
+                                                checked={selected}
                                                 onChange={() =>
                                                     handleAnswer(
                                                         option
@@ -491,9 +630,7 @@ function AttemptQuiz() {
                                                         : "bg-slate-100 text-slate-600"
                                                 }`}
                                             >
-                                                {
-                                                    optionLetter
-                                                }
+                                                {optionLetter}
                                             </span>
 
                                             <span
@@ -513,10 +650,7 @@ function AttemptQuiz() {
 
                         </div>
 
-
-                        {/* ================================= */}
                         {/* NAVIGATION */}
-                        {/* ================================= */}
 
                         <div className="border-t border-slate-100 px-5 py-4 sm:px-8 sm:py-5">
 
@@ -525,13 +659,11 @@ function AttemptQuiz() {
                                 <button
                                     type="button"
                                     disabled={
-                                        currentIndex ===
-                                        0
+                                        currentIndex === 0
                                     }
                                     onClick={() =>
                                         setCurrentIndex(
-                                            currentIndex -
-                                                1
+                                            currentIndex - 1
                                         )
                                     }
                                     className="
@@ -555,15 +687,12 @@ function AttemptQuiz() {
                                     ← Previous
                                 </button>
 
-
                                 {!isLastQuestion ? (
-
                                     <button
                                         type="button"
                                         onClick={() =>
                                             setCurrentIndex(
-                                                currentIndex +
-                                                    1
+                                                currentIndex + 1
                                             )
                                         }
                                         className="
@@ -582,9 +711,7 @@ function AttemptQuiz() {
                                     >
                                         Next →
                                     </button>
-
                                 ) : (
-
                                     <button
                                         type="button"
                                         onClick={() =>
@@ -608,7 +735,6 @@ function AttemptQuiz() {
                                     >
                                         Submit Quiz
                                     </button>
-
                                 )}
 
                             </div>
@@ -617,10 +743,7 @@ function AttemptQuiz() {
 
                     </div>
 
-
-                    {/* ================================= */}
                     {/* QUESTION NAVIGATION */}
-                    {/* ================================= */}
 
                     <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mt-6 sm:p-6">
 
@@ -672,7 +795,6 @@ function AttemptQuiz() {
 
                         </div>
 
-
                         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500">
 
                             <span className="flex items-center gap-2">
@@ -691,20 +813,14 @@ function AttemptQuiz() {
                             </span>
 
                         </div>
-
                     </div>
 
                 </div>
-
             </main>
 
-
-            {/* ==========================================
-                SUBMIT MODAL
-            ========================================== */}
+            {/* SUBMIT MODAL */}
 
             {showSubmitModal && (
-
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
 
                     <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
@@ -718,7 +834,6 @@ function AttemptQuiz() {
                         </h2>
 
                         <p className="mt-2 text-sm leading-6 text-slate-500">
-
                             You have answered{" "}
                             <strong>
                                 {answeredCount}
@@ -728,21 +843,15 @@ function AttemptQuiz() {
                                 {questions.length}
                             </strong>{" "}
                             questions.
-
                             <br />
-
                             Are you sure you want to submit?
-
                         </p>
-
 
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-7 sm:flex-row sm:justify-end">
 
                             <button
                                 type="button"
-                                disabled={
-                                    submitting
-                                }
+                                disabled={submitting}
                                 onClick={() =>
                                     setShowSubmitModal(
                                         false
@@ -768,9 +877,7 @@ function AttemptQuiz() {
 
                             <button
                                 type="button"
-                                disabled={
-                                    submitting
-                                }
+                                disabled={submitting}
                                 onClick={
                                     handleSubmit
                                 }
@@ -795,13 +902,9 @@ function AttemptQuiz() {
                             </button>
 
                         </div>
-
                     </div>
-
                 </div>
-
             )}
-
         </div>
     );
 }

@@ -4,10 +4,10 @@ import {
     submitQuiz,
     getAttemptById,
     getLeaderboard,
+    getQuizAttemptStatus,
 } from "../controllers/attemptController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
-
 
 const router = express.Router();
 
@@ -32,6 +32,18 @@ router.get(
     "/leaderboard",
     authMiddleware,
     getLeaderboard
+);
+
+
+// ==========================================
+// QUIZ ATTEMPT STATUS
+// IMPORTANT: before /:id
+// ==========================================
+
+router.get(
+    "/quiz/:quizId/status",
+    authMiddleware,
+    getQuizAttemptStatus
 );
 
 
