@@ -67,19 +67,13 @@ function Results() {
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-50">
-
                 <Navbar />
 
                 <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
-
                     <div className="mx-auto max-w-5xl">
-
                         <div className="h-96 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200" />
-
                     </div>
-
                 </main>
-
             </div>
         );
     }
@@ -91,11 +85,9 @@ function Results() {
     if (error) {
         return (
             <div className="min-h-screen bg-slate-50">
-
                 <Navbar />
 
                 <main className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28">
-
                     <div className="mx-auto max-w-5xl">
 
                         <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-600 sm:p-5">
@@ -127,9 +119,7 @@ function Results() {
                         </button>
 
                     </div>
-
                 </main>
-
             </div>
         );
     }
@@ -145,8 +135,40 @@ function Results() {
     const percentage =
         Number(result.percentage || 0);
 
+    const passingPercentage =
+        Number(
+            result.passing_percentage ?? 50
+        );
+
     const passed =
-        percentage >= 40;
+        typeof result.passed === "boolean"
+            ? result.passed
+            : percentage >= passingPercentage;
+
+    const attemptNumber =
+        Number(
+            result.attempt_number || 1
+        );
+
+    const maximumAttempts =
+        Number(
+            result.maximum_attempts || 1
+        );
+
+    const timeTaken =
+        Number(
+            result.time_taken || 0
+        );
+
+    const minutes =
+        Math.floor(timeTaken / 60);
+
+    const seconds =
+        timeTaken % 60;
+
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -157,9 +179,7 @@ function Results() {
 
                 <div className="mx-auto max-w-5xl">
 
-                    {/* ================================= */}
                     {/* HEADER */}
-                    {/* ================================= */}
 
                     <div className="mb-6 text-center sm:mb-8">
 
@@ -178,9 +198,7 @@ function Results() {
                     </div>
 
 
-                    {/* ================================= */}
                     {/* SCORE CARD */}
-                    {/* ================================= */}
 
                     <div
                         className={`overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ${
@@ -205,7 +223,6 @@ function Results() {
                                         : "border-red-200"
                                 }`}
                             >
-
                                 <p
                                     className={`text-2xl font-bold sm:text-3xl ${
                                         passed
@@ -215,7 +232,6 @@ function Results() {
                                 >
                                     {percentage}%
                                 </p>
-
                             </div>
 
                             <h2
@@ -237,10 +253,58 @@ function Results() {
                                 </strong>{" "}
                                 out of{" "}
                                 <strong>
-                                    {
-                                        result.total_questions
-                                    }
+                                    {result.total_questions}
                                 </strong>
+                            </p>
+
+                            {/* PASSING SCORE */}
+
+                            <div className="mx-auto mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm">
+                                <span>
+                                    Passing Score:
+                                </span>
+
+                                <span
+                                    className={
+                                        passed
+                                            ? "text-green-600"
+                                            : "text-red-600"
+                                    }
+                                >
+                                    {passingPercentage}%
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* ATTEMPT INFO */}
+
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+
+                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+
+                            <p className="text-sm text-slate-500">
+                                Attempt
+                            </p>
+
+                            <p className="mt-2 text-2xl font-bold text-slate-900">
+                                {attemptNumber} /{" "}
+                                {maximumAttempts}
+                            </p>
+
+                        </div>
+
+                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+
+                            <p className="text-sm text-slate-500">
+                                Passing Percentage
+                            </p>
+
+                            <p className="mt-2 text-2xl font-bold text-slate-900">
+                                {passingPercentage}%
                             </p>
 
                         </div>
@@ -248,13 +312,9 @@ function Results() {
                     </div>
 
 
-                    {/* ================================= */}
                     {/* STATISTICS */}
-                    {/* ================================= */}
 
-                    <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-
-                        {/* Score */}
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
 
                         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
@@ -269,9 +329,6 @@ function Results() {
 
                         </div>
 
-
-                        {/* Correct */}
-
                         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
                             <p className="text-sm text-slate-500">
@@ -279,15 +336,10 @@ function Results() {
                             </p>
 
                             <p className="mt-2 text-2xl font-bold text-green-600">
-                                {
-                                    result.correct_answers
-                                }
+                                {result.correct_answers}
                             </p>
 
                         </div>
-
-
-                        {/* Incorrect */}
 
                         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
@@ -296,15 +348,10 @@ function Results() {
                             </p>
 
                             <p className="mt-2 text-2xl font-bold text-red-600">
-                                {
-                                    result.incorrect_answers
-                                }
+                                {result.incorrect_answers}
                             </p>
 
                         </div>
-
-
-                        {/* Time */}
 
                         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
@@ -313,10 +360,9 @@ function Results() {
                             </p>
 
                             <p className="mt-2 text-2xl font-bold text-slate-900">
-                                {
-                                    result.time_taken
-                                }
-                                s
+                                {minutes > 0
+                                    ? `${minutes}m ${seconds}s`
+                                    : `${seconds}s`}
                             </p>
 
                         </div>
@@ -324,9 +370,7 @@ function Results() {
                     </div>
 
 
-                    {/* ================================= */}
                     {/* ANSWER REVIEW */}
-                    {/* ================================= */}
 
                     <div className="mt-7 sm:mt-8">
 
@@ -341,7 +385,6 @@ function Results() {
                             </p>
 
                         </div>
-
 
                         <div className="space-y-4">
 
@@ -362,8 +405,6 @@ function Results() {
                                         }`}
                                     >
 
-                                        {/* Question Header */}
-
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 
                                             <div className="flex min-w-0 gap-3 sm:gap-4">
@@ -378,10 +419,7 @@ function Results() {
                                                     {index + 1}
                                                 </div>
 
-
                                                 <div className="min-w-0 flex-1">
-
-                                                    {/* Difficulty */}
 
                                                     {answer.difficulty && (
                                                         <div className="mb-2">
@@ -403,7 +441,7 @@ function Results() {
                                                                     : answer.difficulty ===
                                                                       "medium"
                                                                     ? "Medium"
-                                                                    : "Intermediate"}
+                                                                    : "Advanced"}
                                                             </span>
 
                                                         </div>
@@ -418,7 +456,6 @@ function Results() {
                                                 </div>
 
                                             </div>
-
 
                                             <span
                                                 className={`self-start rounded-full px-3 py-1 text-xs font-semibold sm:shrink-0 ${
@@ -435,11 +472,7 @@ function Results() {
                                         </div>
 
 
-                                        {/* Answers */}
-
                                         <div className="mt-4 grid gap-3 sm:mt-5 sm:grid-cols-2">
-
-                                            {/* Your Answer */}
 
                                             <div
                                                 className={`min-w-0 rounded-xl p-4 ${
@@ -461,8 +494,6 @@ function Results() {
                                             </div>
 
 
-                                            {/* Correct Answer */}
-
                                             <div className="min-w-0 rounded-xl bg-green-50 p-4">
 
                                                 <p className="text-xs font-semibold uppercase text-slate-500">
@@ -479,8 +510,6 @@ function Results() {
 
                                         </div>
 
-
-                                        {/* Explanation */}
 
                                         {answer.explanation && (
                                             <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -508,9 +537,7 @@ function Results() {
                     </div>
 
 
-                    {/* ================================= */}
                     {/* ACTIONS */}
-                    {/* ================================= */}
 
                     <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:justify-center">
 
@@ -536,7 +563,6 @@ function Results() {
                         >
                             Take Another Quiz
                         </button>
-
 
                         <button
                             type="button"
@@ -567,9 +593,7 @@ function Results() {
                     </div>
 
                 </div>
-
             </main>
-
         </div>
     );
 }
