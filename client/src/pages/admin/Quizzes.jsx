@@ -1,5 +1,3 @@
-import Navbar from "../../components/common/Navbar.jsx";
-
 import { useEffect, useState } from "react";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api/quizzes`;
@@ -15,6 +13,9 @@ function Quizzes() {
         description: "",
         category_id: "",
         duration: "",
+        difficulty: "medium",
+        passing_percentage: "50",
+        maximum_attempts: "1",
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -42,7 +43,6 @@ function Quizzes() {
 
     // =========================
     // FETCH ALL QUIZZES
-    // ADMIN ONLY
     // =========================
 
     const fetchQuizzes = async () => {
@@ -166,6 +166,27 @@ function Quizzes() {
                 return;
             }
 
+            if (
+                !formData.passing_percentage ||
+                Number(formData.passing_percentage) < 1 ||
+                Number(formData.passing_percentage) > 100
+            ) {
+                setError(
+                    "Passing percentage must be between 1 and 100."
+                );
+                return;
+            }
+
+            if (
+                !formData.maximum_attempts ||
+                Number(formData.maximum_attempts) < 1
+            ) {
+                setError(
+                    "Maximum attempts must be at least 1."
+                );
+                return;
+            }
+
             const token = getToken();
 
             if (!token) {
@@ -210,6 +231,19 @@ function Quizzes() {
                         Number(
                             formData.duration
                         ),
+
+                    difficulty:
+                        formData.difficulty,
+
+                    passing_percentage:
+                        Number(
+                            formData.passing_percentage
+                        ),
+
+                    maximum_attempts:
+                        Number(
+                            formData.maximum_attempts
+                        ),
                 }),
             });
 
@@ -248,6 +282,14 @@ function Quizzes() {
             duration:
                 quiz.duration?.toString() ||
                 "",
+            difficulty:
+                quiz.difficulty || "medium",
+            passing_percentage:
+                quiz.passing_percentage?.toString() ||
+                "50",
+            maximum_attempts:
+                quiz.maximum_attempts?.toString() ||
+                "1",
         });
 
         setError("");
@@ -391,6 +433,9 @@ function Quizzes() {
             description: "",
             category_id: "",
             duration: "",
+            difficulty: "medium",
+            passing_percentage: "50",
+            maximum_attempts: "1",
         });
 
         setError("");
@@ -446,9 +491,7 @@ function Quizzes() {
 
             <div className="mx-auto max-w-7xl">
 
-                {/* ========================= */}
                 {/* HEADER */}
-                {/* ========================= */}
 
                 <div className="mb-6 sm:mb-8">
 
@@ -466,10 +509,7 @@ function Quizzes() {
 
                 </div>
 
-
-                {/* ========================= */}
                 {/* FORM CARD */}
-                {/* ========================= */}
 
                 <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mb-8 sm:p-8">
 
@@ -498,7 +538,6 @@ function Quizzes() {
                         </div>
 
                     </div>
-
 
                     <form
                         onSubmit={handleSubmit}
@@ -529,7 +568,6 @@ function Quizzes() {
 
                         </div>
 
-
                         {/* DESCRIPTION */}
 
                         <div>
@@ -552,7 +590,6 @@ function Quizzes() {
                             />
 
                         </div>
-
 
                         {/* CATEGORY + DURATION */}
 
@@ -605,7 +642,6 @@ function Quizzes() {
 
                             </div>
 
-
                             {/* DURATION */}
 
                             <div className="min-w-0">
@@ -641,6 +677,104 @@ function Quizzes() {
 
                         </div>
 
+                        {/* DIFFICULTY + PASSING SCORE + ATTEMPTS */}
+
+                        <div className="grid gap-5 sm:grid-cols-3">
+
+                            {/* DIFFICULTY */}
+
+                            <div className="min-w-0">
+
+                                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                    Difficulty
+                                </label>
+
+                                <select
+                                    name="difficulty"
+                                    value={
+                                        formData.difficulty
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
+                                    required
+                                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm capitalize outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                >
+
+                                    <option value="easy">
+                                        Easy
+                                    </option>
+
+                                    <option value="medium">
+                                        Medium
+                                    </option>
+
+                                    <option value="hard">
+                                        Hard
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            {/* PASSING PERCENTAGE */}
+
+                            <div className="min-w-0">
+
+                                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                    Passing Score
+                                </label>
+
+                                <div className="relative">
+
+                                    <input
+                                        type="number"
+                                        name="passing_percentage"
+                                        value={
+                                            formData.passing_percentage
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                        min="1"
+                                        max="100"
+                                        required
+                                        className="w-full rounded-lg border border-slate-300 px-4 py-3 pr-10 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                    />
+
+                                    <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">
+                                        %
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            {/* MAXIMUM ATTEMPTS */}
+
+                            <div className="min-w-0">
+
+                                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                    Maximum Attempts
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="maximum_attempts"
+                                    value={
+                                        formData.maximum_attempts
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
+                                    min="1"
+                                    required
+                                    className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                />
+
+                            </div>
+
+                        </div>
 
                         {/* ERROR */}
 
@@ -649,7 +783,6 @@ function Quizzes() {
                                 {error}
                             </div>
                         )}
-
 
                         {/* BUTTONS */}
 
@@ -682,10 +815,7 @@ function Quizzes() {
 
                 </div>
 
-
-                {/* ========================= */}
                 {/* QUIZZES HEADER */}
-                {/* ========================= */}
 
                 <div className="mb-4">
 
@@ -703,10 +833,7 @@ function Quizzes() {
 
                 </div>
 
-
-                {/* ========================= */}
                 {/* LOADING */}
-                {/* ========================= */}
 
                 {loading ? (
 
@@ -716,7 +843,7 @@ function Quizzes() {
                             (item) => (
                                 <div
                                     key={item}
-                                    className="h-64 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
+                                    className="h-72 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
                                 />
                             )
                         )}
@@ -790,13 +917,11 @@ function Quizzes() {
 
                                     </div>
 
-
                                     {/* TITLE */}
 
                                     <h3 className="mt-5 break-words text-lg font-bold leading-6 text-slate-900">
                                         {quiz.title}
                                     </h3>
-
 
                                     {/* DESCRIPTION */}
 
@@ -804,7 +929,6 @@ function Quizzes() {
                                         {quiz.description ||
                                             "No description provided."}
                                     </p>
-
 
                                     {/* INFO */}
 
@@ -825,17 +949,47 @@ function Quizzes() {
 
                                         </div>
 
+                                        <div className="min-w-0 rounded-xl bg-slate-50 p-3">
+
+                                            <p className="text-xs text-slate-400">
+                                                Difficulty
+                                            </p>
+
+                                            <p className="mt-1 text-sm font-bold capitalize text-slate-800">
+                                                {
+                                                    quiz.difficulty ||
+                                                    "Medium"
+                                                }
+                                            </p>
+
+                                        </div>
 
                                         <div className="min-w-0 rounded-xl bg-slate-50 p-3">
 
                                             <p className="text-xs text-slate-400">
-                                                Quiz ID
+                                                Passing Score
                                             </p>
 
                                             <p className="mt-1 text-sm font-bold text-slate-800">
-                                                #
                                                 {
-                                                    quiz.id
+                                                    quiz.passing_percentage ??
+                                                    50
+                                                }
+                                                %
+                                            </p>
+
+                                        </div>
+
+                                        <div className="min-w-0 rounded-xl bg-slate-50 p-3">
+
+                                            <p className="text-xs text-slate-400">
+                                                Max Attempts
+                                            </p>
+
+                                            <p className="mt-1 text-sm font-bold text-slate-800">
+                                                {
+                                                    quiz.maximum_attempts ??
+                                                    1
                                                 }
                                             </p>
 
@@ -843,6 +997,19 @@ function Quizzes() {
 
                                     </div>
 
+                                    {/* QUIZ ID */}
+
+                                    <div className="mt-3 rounded-xl bg-slate-50 p-3">
+
+                                        <p className="text-xs text-slate-400">
+                                            Quiz ID
+                                        </p>
+
+                                        <p className="mt-1 text-sm font-bold text-slate-800">
+                                            #{quiz.id}
+                                        </p>
+
+                                    </div>
 
                                     {/* ACTIONS */}
 
@@ -906,20 +1073,15 @@ function Quizzes() {
                                     </div>
 
                                 </div>
-
                             )
                         )}
 
                     </div>
-
                 )}
 
             </div>
 
-
-            {/* ========================= */}
             {/* DELETE MODAL */}
-            {/* ========================= */}
 
             {showDeleteModal && (
 
@@ -941,7 +1103,6 @@ function Quizzes() {
                             undone.
                         </p>
 
-
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:mt-7 sm:flex-row sm:justify-end">
 
                             <button
@@ -954,7 +1115,6 @@ function Quizzes() {
                             >
                                 Cancel
                             </button>
-
 
                             <button
                                 type="button"
