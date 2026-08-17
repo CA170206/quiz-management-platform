@@ -1,3 +1,351 @@
+// import pool from "../config/db.js";
+
+// // ==========================================
+// // SUBMIT QUIZ
+// // ==========================================
+
+// export const submitQuiz = async (req, res) => {
+//     try {
+//         // Get user ID from JWT
+//         const userId = req.user.id;
+
+//         const {
+//             quiz_id,
+//             answers,
+//             time_taken,
+//         } = req.body;
+
+//         // ------------------------------------------
+//         // Validate input
+//         // ------------------------------------------
+
+//         if (!quiz_id || !answers) {
+//             return res.status(400).json({
+//                 message: "Quiz and answers are required",
+//             });
+//         }
+
+//         // ------------------------------------------
+//         // Get questions for THIS QUIZ
+//         // ------------------------------------------
+
+//         const questionsResult = await pool.query(
+//             `
+//             SELECT *
+//             FROM questions
+//             WHERE quiz_id = $1
+//             ORDER BY id
+//             `,
+//             [quiz_id]
+//         );
+
+//         const questions = questionsResult.rows;
+
+//         if (questions.length === 0) {
+//             return res.status(404).json({
+//                 message:
+//                     "No questions found for this quiz",
+//             });
+//         }
+
+//         // ------------------------------------------
+//         // Calculate result
+//         // ------------------------------------------
+
+//         let correctAnswers = 0;
+//         let incorrectAnswers = 0;
+//         let unanswered = 0;
+
+//         questions.forEach((question) => {
+//             const selectedAnswer =
+//                 answers[question.id];
+
+//             if (!selectedAnswer) {
+//                 unanswered++;
+//             } else if (
+//                 selectedAnswer ===
+//                 question.correct_answer
+//             ) {
+//                 correctAnswers++;
+//             } else {
+//                 incorrectAnswers++;
+//             }
+//         });
+
+//         const totalQuestions =
+//             questions.length;
+
+//         const score = correctAnswers;
+
+//         const percentage =
+//             totalQuestions > 0
+//                 ? (
+//                       (correctAnswers /
+//                           totalQuestions) *
+//                       100
+//                   ).toFixed(2)
+//                 : 0;
+
+//         // ------------------------------------------
+//         // Create attempt
+//         // ------------------------------------------
+
+//         const attemptResult = await pool.query(
+//             `
+//             INSERT INTO attempts
+//             (
+//                 user_id,
+//                 quiz_id,
+//                 score,
+//                 percentage,
+//                 total_questions,
+//                 correct_answers,
+//                 incorrect_answers,
+//                 unanswered,
+//                 time_taken
+//             )
+//             VALUES
+//             (
+//                 $1,
+//                 $2,
+//                 $3,
+//                 $4,
+//                 $5,
+//                 $6,
+//                 $7,
+//                 $8,
+//                 $9
+//             )
+//             RETURNING *
+//             `,
+//             [
+//                 userId,
+//                 quiz_id,
+//                 score,
+//                 percentage,
+//                 totalQuestions,
+//                 correctAnswers,
+//                 incorrectAnswers,
+//                 unanswered,
+//                 time_taken || 0,
+//             ]
+//         );
+
+//         const attempt =
+//             attemptResult.rows[0];
+
+//         // ------------------------------------------
+//         // Save individual answers
+//         // ------------------------------------------
+
+//         for (const question of questions) {
+//             const selectedAnswer =
+//                 answers[question.id] || null;
+
+//             const isCorrect =
+//                 selectedAnswer !== null &&
+//                 selectedAnswer ===
+//                     question.correct_answer;
+
+//             await pool.query(
+//                 `
+//                 INSERT INTO answers
+//                 (
+//                     attempt_id,
+//                     question_id,
+//                     selected_answer,
+//                     is_correct
+//                 )
+//                 VALUES ($1, $2, $3, $4)
+//                 `,
+//                 [
+//                     attempt.id,
+//                     question.id,
+//                     selectedAnswer,
+//                     isCorrect,
+//                 ]
+//             );
+//         }
+
+//         // ------------------------------------------
+//         // Response
+//         // ------------------------------------------
+
+//         res.status(201).json({
+//             message:
+//                 "Quiz submitted successfully",
+//             attempt,
+//         });
+
+//     } catch (error) {
+//         console.error(
+//             "Submit quiz error:",
+//             error
+//         );
+
+//         res.status(500).json({
+//             message:
+//                 "Failed to submit quiz",
+//         });
+//     }
+// };
+
+
+// // ==========================================
+// // GET ATTEMPT BY ID
+// // ==========================================
+
+// export const getAttemptById = async (
+//     req,
+//     res
+// ) => {
+//     try {
+//         const { id } = req.params;
+
+//         const userId = req.user.id;
+
+//         // ------------------------------------------
+//         // Get attempt
+//         // ------------------------------------------
+
+//         const result = await pool.query(
+//             `
+//             SELECT
+//                 attempts.*,
+//                 quizzes.title AS quiz_title
+
+//             FROM attempts
+
+//             JOIN quizzes
+//                 ON attempts.quiz_id =
+//                    quizzes.id
+
+//             WHERE attempts.id = $1
+//             AND attempts.user_id = $2
+//             `,
+//             [
+//                 id,
+//                 userId,
+//             ]
+//         );
+
+//         if (result.rows.length === 0) {
+//             return res.status(404).json({
+//                 message:
+//                     "Attempt not found",
+//             });
+//         }
+
+//         const attempt =
+//             result.rows[0];
+
+//         // ------------------------------------------
+//         // Get answers
+//         // ------------------------------------------
+
+//         const answersResult = await pool.query(
+//             `
+//             SELECT
+//                 answers.question_id,
+//                 answers.selected_answer,
+//                 answers.is_correct,
+//                 questions.question_text,
+//                 questions.correct_answer,
+//                 questions.explanation,
+//                 questions.difficulty
+
+//             FROM answers
+
+//             JOIN questions
+//                 ON answers.question_id =
+//                    questions.id
+
+//             WHERE answers.attempt_id = $1
+
+//             ORDER BY answers.question_id
+//             `,
+//             [id]
+//         );
+
+//         // ------------------------------------------
+//         // Response
+//         // ------------------------------------------
+
+//         res.status(200).json({
+//             ...attempt,
+//             answers: answersResult.rows,
+//         });
+
+//     } catch (error) {
+//         console.error(
+//             "Get attempt error:",
+//             error
+//         );
+
+//         res.status(500).json({
+//             message:
+//                 "Failed to fetch result",
+//         });
+//     }
+// };
+
+
+// // ==========================================
+// // LEADERBOARD
+// // ==========================================
+
+// export const getLeaderboard = async (
+//     req,
+//     res
+// ) => {
+//     try {
+//         const result = await pool.query(
+//             `
+//             SELECT
+//                 users.id AS user_id,
+//                 users.full_name,
+
+//                 MAX(attempts.score)
+//                     AS best_score,
+
+//                 MAX(attempts.percentage)
+//                     AS best_percentage,
+
+//                 COUNT(attempts.id)
+//                     AS attempts
+
+//             FROM attempts
+
+//             JOIN users
+//                 ON attempts.user_id =
+//                    users.id
+
+//             GROUP BY
+//                 users.id,
+//                 users.full_name
+
+//             ORDER BY
+//                 best_percentage DESC,
+//                 best_score DESC
+//             `
+//         );
+
+//         res.status(200).json(result.rows);
+
+//     } catch (error) {
+//         console.error(
+//             "Leaderboard error:",
+//             error
+//         );
+
+//         res.status(500).json({
+//             message:
+//                 "Failed to fetch leaderboard",
+//         });
+//     }
+// };
+
+
 import pool from "../config/db.js";
 
 // ==========================================
@@ -6,7 +354,10 @@ import pool from "../config/db.js";
 
 export const submitQuiz = async (req, res) => {
     try {
-        // Get user ID from JWT
+        // ==========================================
+        // GET USER ID FROM JWT
+        // ==========================================
+
         const userId = req.user.id;
 
         const {
@@ -15,31 +366,111 @@ export const submitQuiz = async (req, res) => {
             time_taken,
         } = req.body;
 
-        // ------------------------------------------
-        // Validate input
-        // ------------------------------------------
+        // ==========================================
+        // VALIDATE INPUT
+        // ==========================================
 
         if (!quiz_id || !answers) {
             return res.status(400).json({
-                message: "Quiz and answers are required",
+                message:
+                    "Quiz and answers are required",
             });
         }
 
-        // ------------------------------------------
-        // Get questions for THIS QUIZ
-        // ------------------------------------------
+        // ==========================================
+        // GET QUIZ SETTINGS
+        // ==========================================
 
-        const questionsResult = await pool.query(
+        const quizResult = await pool.query(
             `
-            SELECT *
-            FROM questions
-            WHERE quiz_id = $1
-            ORDER BY id
+            SELECT
+                id,
+                title,
+                duration,
+                passing_percentage,
+                maximum_attempts
+            FROM quizzes
+            WHERE id = $1
             `,
             [quiz_id]
         );
 
-        const questions = questionsResult.rows;
+        if (quizResult.rows.length === 0) {
+            return res.status(404).json({
+                message: "Quiz not found",
+            });
+        }
+
+        const quiz = quizResult.rows[0];
+
+        const passingPercentage =
+            Number(
+                quiz.passing_percentage ?? 50
+            );
+
+        const maximumAttempts =
+            Number(
+                quiz.maximum_attempts ?? 1
+            );
+
+        // ==========================================
+        // CHECK PREVIOUS ATTEMPTS
+        // ==========================================
+
+        const attemptsCountResult =
+            await pool.query(
+                `
+                SELECT COUNT(*) AS count
+                FROM attempts
+                WHERE user_id = $1
+                AND quiz_id = $2
+                `,
+                [
+                    userId,
+                    quiz_id,
+                ]
+            );
+
+        const attemptsUsed =
+            Number(
+                attemptsCountResult.rows[0].count
+            );
+
+        // ==========================================
+        // MAXIMUM ATTEMPTS CHECK
+        // ==========================================
+
+        if (
+            attemptsUsed >=
+            maximumAttempts
+        ) {
+            return res.status(403).json({
+                message:
+                    `Maximum attempts reached. You have used all ${maximumAttempts} attempt${maximumAttempts === 1 ? "" : "s"} for this quiz.`,
+                attempts_used:
+                    attemptsUsed,
+                maximum_attempts:
+                    maximumAttempts,
+            });
+        }
+
+        // ==========================================
+        // GET QUESTIONS FOR THIS QUIZ
+        // ==========================================
+
+        const questionsResult =
+            await pool.query(
+                `
+                SELECT *
+                FROM questions
+                WHERE quiz_id = $1
+                ORDER BY id
+                `,
+                [quiz_id]
+            );
+
+        const questions =
+            questionsResult.rows;
 
         if (questions.length === 0) {
             return res.status(404).json({
@@ -48,9 +479,9 @@ export const submitQuiz = async (req, res) => {
             });
         }
 
-        // ------------------------------------------
-        // Calculate result
-        // ------------------------------------------
+        // ==========================================
+        // CALCULATE RESULT
+        // ==========================================
 
         let correctAnswers = 0;
         let incorrectAnswers = 0;
@@ -72,71 +503,94 @@ export const submitQuiz = async (req, res) => {
             }
         });
 
+        // ==========================================
+        // SCORE
+        // ==========================================
+
         const totalQuestions =
             questions.length;
 
-        const score = correctAnswers;
+        const score =
+            correctAnswers;
 
         const percentage =
             totalQuestions > 0
-                ? (
-                      (correctAnswers /
-                          totalQuestions) *
-                      100
-                  ).toFixed(2)
+                ? Number(
+                      (
+                          (correctAnswers /
+                              totalQuestions) *
+                          100
+                      ).toFixed(2)
+                  )
                 : 0;
 
-        // ------------------------------------------
-        // Create attempt
-        // ------------------------------------------
+        // ==========================================
+        // PASS / FAIL
+        // ==========================================
 
-        const attemptResult = await pool.query(
-            `
-            INSERT INTO attempts
-            (
-                user_id,
-                quiz_id,
-                score,
-                percentage,
-                total_questions,
-                correct_answers,
-                incorrect_answers,
-                unanswered,
-                time_taken
-            )
-            VALUES
-            (
-                $1,
-                $2,
-                $3,
-                $4,
-                $5,
-                $6,
-                $7,
-                $8,
-                $9
-            )
-            RETURNING *
-            `,
-            [
-                userId,
-                quiz_id,
-                score,
-                percentage,
-                totalQuestions,
-                correctAnswers,
-                incorrectAnswers,
-                unanswered,
-                time_taken || 0,
-            ]
-        );
+        const passed =
+            percentage >=
+            passingPercentage;
+
+        // ==========================================
+        // CURRENT ATTEMPT NUMBER
+        // ==========================================
+
+        const attemptNumber =
+            attemptsUsed + 1;
+
+        // ==========================================
+        // CREATE ATTEMPT
+        // ==========================================
+
+        const attemptResult =
+            await pool.query(
+                `
+                INSERT INTO attempts
+                (
+                    user_id,
+                    quiz_id,
+                    score,
+                    percentage,
+                    total_questions,
+                    correct_answers,
+                    incorrect_answers,
+                    unanswered,
+                    time_taken
+                )
+                VALUES
+                (
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    $6,
+                    $7,
+                    $8,
+                    $9
+                )
+                RETURNING *
+                `,
+                [
+                    userId,
+                    quiz_id,
+                    score,
+                    percentage,
+                    totalQuestions,
+                    correctAnswers,
+                    incorrectAnswers,
+                    unanswered,
+                    time_taken || 0,
+                ]
+            );
 
         const attempt =
             attemptResult.rows[0];
 
-        // ------------------------------------------
-        // Save individual answers
-        // ------------------------------------------
+        // ==========================================
+        // SAVE INDIVIDUAL ANSWERS
+        // ==========================================
 
         for (const question of questions) {
             const selectedAnswer =
@@ -167,14 +621,31 @@ export const submitQuiz = async (req, res) => {
             );
         }
 
-        // ------------------------------------------
-        // Response
-        // ------------------------------------------
+        // ==========================================
+        // RESPONSE
+        // ==========================================
 
         res.status(201).json({
             message:
                 "Quiz submitted successfully",
-            attempt,
+
+            attempt: {
+                ...attempt,
+
+                attempt_number:
+                    attemptNumber,
+
+                attempts_used:
+                    attemptNumber,
+
+                maximum_attempts:
+                    maximumAttempts,
+
+                passing_percentage:
+                    passingPercentage,
+
+                passed,
+            },
         });
 
     } catch (error) {
@@ -204,15 +675,22 @@ export const getAttemptById = async (
 
         const userId = req.user.id;
 
-        // ------------------------------------------
-        // Get attempt
-        // ------------------------------------------
+        // ==========================================
+        // GET ATTEMPT + QUIZ SETTINGS
+        // ==========================================
 
         const result = await pool.query(
             `
             SELECT
                 attempts.*,
-                quizzes.title AS quiz_title
+
+                quizzes.title AS quiz_title,
+
+                quizzes.passing_percentage,
+
+                quizzes.maximum_attempts,
+
+                quizzes.duration AS quiz_duration
 
             FROM attempts
 
@@ -239,41 +717,106 @@ export const getAttemptById = async (
         const attempt =
             result.rows[0];
 
-        // ------------------------------------------
-        // Get answers
-        // ------------------------------------------
+        // ==========================================
+        // CALCULATE PASS / FAIL
+        // ==========================================
 
-        const answersResult = await pool.query(
-            `
-            SELECT
-                answers.question_id,
-                answers.selected_answer,
-                answers.is_correct,
-                questions.question_text,
-                questions.correct_answer,
-                questions.explanation,
-                questions.difficulty
+        const passingPercentage =
+            Number(
+                attempt.passing_percentage ??
+                    50
+            );
 
-            FROM answers
+        const maximumAttempts =
+            Number(
+                attempt.maximum_attempts ??
+                    1
+            );
 
-            JOIN questions
-                ON answers.question_id =
-                   questions.id
+        const percentage =
+            Number(
+                attempt.percentage || 0
+            );
 
-            WHERE answers.attempt_id = $1
+        const passed =
+            percentage >=
+            passingPercentage;
 
-            ORDER BY answers.question_id
-            `,
-            [id]
-        );
+        // ==========================================
+        // GET ATTEMPT NUMBER
+        // ==========================================
 
-        // ------------------------------------------
-        // Response
-        // ------------------------------------------
+        const attemptNumberResult =
+            await pool.query(
+                `
+                SELECT COUNT(*) AS attempt_number
+                FROM attempts
+                WHERE user_id = $1
+                AND quiz_id = $2
+                AND id <= $3
+                `,
+                [
+                    userId,
+                    attempt.quiz_id,
+                    id,
+                ]
+            );
+
+        const attemptNumber =
+            Number(
+                attemptNumberResult.rows[0]
+                    .attempt_number
+            );
+
+        // ==========================================
+        // GET ANSWERS
+        // ==========================================
+
+        const answersResult =
+            await pool.query(
+                `
+                SELECT
+                    answers.question_id,
+                    answers.selected_answer,
+                    answers.is_correct,
+                    questions.question_text,
+                    questions.correct_answer,
+                    questions.explanation,
+                    questions.difficulty
+
+                FROM answers
+
+                JOIN questions
+                    ON answers.question_id =
+                       questions.id
+
+                WHERE answers.attempt_id = $1
+
+                ORDER BY answers.question_id
+                `,
+                [id]
+            );
+
+        // ==========================================
+        // RESPONSE
+        // ==========================================
 
         res.status(200).json({
             ...attempt,
-            answers: answersResult.rows,
+
+            attempt_number:
+                attemptNumber,
+
+            passing_percentage:
+                passingPercentage,
+
+            maximum_attempts:
+                maximumAttempts,
+
+            passed,
+
+            answers:
+                answersResult.rows,
         });
 
     } catch (error) {
@@ -330,7 +873,9 @@ export const getLeaderboard = async (
             `
         );
 
-        res.status(200).json(result.rows);
+        res.status(200).json(
+            result.rows
+        );
 
     } catch (error) {
         console.error(
