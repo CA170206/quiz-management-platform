@@ -88,10 +88,37 @@ export const getAdminAnalytics = async (req, res) => {
             LIMIT 5
         `);
 
+        const recentAttempts = await pool.query(`
+    SELECT
+        a.id,
+        u.full_name,
+        q.title AS quiz_title,
+        a.score,
+        a.percentage,
+        a.submitted_at
+    FROM attempts a
+    JOIN users u ON u.id = a.user_id
+    JOIN quizzes q ON q.id = a.quiz_id
+    ORDER BY a.submitted_at DESC
+    LIMIT 10
+`);
+
+const attemptsOverTime = await pool.query(`
+    SELECT
+        DATE(submitted_at) AS date,
+        COUNT(*)::integer AS attempts
+    FROM attempts
+    GROUP BY DATE(submitted_at)
+    ORDER BY date DESC
+    LIMIT 7
+`);
+
         res.status(200).json({
             stats: statsResult.rows[0],
             popularQuizzes: popularQuizzes.rows,
             categories: categories.rows,
+            recentAttempts: recentAttempts.rows,
+            attemptsOverTime: attemptsOverTime.rows,
         });
 
     } catch (error) {

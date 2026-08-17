@@ -41,6 +41,8 @@ function AdminDashboard() {
     ...result.stats,
     popular_quizzes: result.popularQuizzes || [],
     popular_categories: result.categories || [],
+    recent_attempts: result.recentAttempts || [],
+    attempts_over_time: result.attemptsOverTime || [],
 });
 
             } catch (err) {
@@ -112,6 +114,13 @@ function AdminDashboard() {
         ),
         1
     );
+
+    const maxDailyAttempts = Math.max(
+    ...(data?.attempts_over_time || []).map(
+        (item) => Number(item.attempts)
+    ),
+    1
+);
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -362,6 +371,122 @@ function AdminDashboard() {
 
                     </div>
 
+
+                    {/* RECENT ACTIVITY */}
+
+<div className="mt-6 grid gap-6 lg:grid-cols-2">
+
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
+        <h2 className="text-lg font-bold text-slate-900">
+            Recent Quiz Activity
+        </h2>
+
+        <div className="mt-5 space-y-3">
+
+            {data?.recent_attempts?.length ? (
+                data.recent_attempts.map((attempt) => (
+                    <div
+                        key={attempt.id}
+                        className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 p-3"
+                    >
+                        <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-slate-800">
+                                {attempt.full_name}
+                            </p>
+
+                            <p className="truncate text-xs text-slate-500">
+                                {attempt.quiz_title}
+                            </p>
+                        </div>
+
+                        <div className="shrink-0 text-right">
+                            <p className="text-sm font-bold text-slate-900">
+                                {Number(attempt.percentage)}%
+                            </p>
+
+                            <p className="text-xs text-slate-400">
+                                {attempt.submitted_at
+                                    ? new Date(
+                                          attempt.submitted_at
+                                      ).toLocaleDateString()
+                                    : ""}
+                            </p>
+                        </div>
+                    </div>
+                ))
+            ) : (
+                <p className="text-sm text-slate-500">
+                    No recent attempts.
+                </p>
+            )}
+
+        </div>
+    </div>
+
+
+    {/* ATTEMPTS CHART */}
+
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+
+        <h2 className="text-lg font-bold text-slate-900">
+            Attempts Over Time
+        </h2>
+
+        <div className="mt-6 flex h-56 items-end gap-3">
+
+            {(data?.attempts_over_time || [])
+                .slice()
+                .reverse()
+                .map((item) => {
+
+                    const attempts =
+                        Number(item.attempts);
+
+                    const height =
+                        Math.max(
+                            (attempts /
+                                maxDailyAttempts) *
+                                100,
+                            5
+                        );
+
+                    return (
+                        <div
+                            key={item.date}
+                            className="flex h-full flex-1 flex-col items-center justify-end"
+                        >
+                            <span className="mb-2 text-xs font-semibold text-slate-700">
+                                {attempts}
+                            </span>
+
+                            <div
+                                className="w-full max-w-10 rounded-t-lg bg-blue-600"
+                                style={{
+                                    height: `${height}%`,
+                                }}
+                            />
+
+                            <span className="mt-2 text-[10px] text-slate-400">
+                                {new Date(
+                                    item.date
+                                ).toLocaleDateString(
+                                    undefined,
+                                    {
+                                        month: "short",
+                                        day: "numeric",
+                                    }
+                                )}
+                            </span>
+                        </div>
+                    );
+                })}
+
+        </div>
+
+    </div>
+
+</div>
 
                     {/* QUICK ACTIONS */}
 
