@@ -10,7 +10,7 @@ import userRoutes from "./routes/userRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import developerRoutes from "./routes/developerRoutes.js";
 import authMiddleware from "./middleware/authMiddleware.js";
-
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -75,5 +75,13 @@ app.use(
     "/api/developer",
     developerRoutes
 );
+
+
+// admin routes
+app.use(
+    "/api/admin",
+    adminRoutes
+);
+
 
 export default app;

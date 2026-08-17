@@ -1,14 +1,137 @@
 import Navbar from "../../components/common/Navbar.jsx";
-
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000";
 
 function AdminDashboard() {
+    const [stats, setStats] = useState({
+        users: 0,
+        quizzes: 0,
+        questions: 0,
+        attempts: 0,
+    });
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const token =
+                    localStorage.getItem("token");
+
+                const response = await fetch(
+                    `${API_URL}/api/admin/analytics`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message ||
+                            "Failed to load dashboard statistics"
+                    );
+                }
+
+                setStats({
+                    users:
+                        Number(
+                            data.users ??
+                            data.total_users ??
+                            data.total_students ??
+                            0
+                        ),
+
+                    quizzes:
+                        Number(
+                            data.quizzes ??
+                            data.total_quizzes ??
+                            0
+                        ),
+
+                    questions:
+                        Number(
+                            data.questions ??
+                            data.total_questions ??
+                            0
+                        ),
+
+                    attempts:
+                        Number(
+                            data.attempts ??
+                            data.total_attempts ??
+                            0
+                        ),
+                });
+
+            } catch (err) {
+                console.error(
+                    "Dashboard stats error:",
+                    err
+                );
+
+                setError(
+                    err.message ||
+                        "Unable to load statistics"
+                );
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
+    const cards = [
+        {
+            title: "Users",
+            label: "Registered Users",
+            value: stats.users,
+            icon: "👥",
+            color: "blue",
+        },
+        {
+            title: "Quizzes",
+            label: "Total Quizzes",
+            value: stats.quizzes,
+            icon: "📝",
+            color: "purple",
+        },
+        {
+            title: "Questions",
+            label: "Total Questions",
+            value: stats.questions,
+            icon: "❓",
+            color: "green",
+        },
+        {
+            title: "Attempts",
+            label: "Quiz Attempts",
+            value: stats.attempts,
+            icon: "📊",
+            color: "orange",
+        },
+    ];
+
     return (
         <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
+
             <div className="mx-auto max-w-7xl">
 
                 {/* Header */}
+
                 <div className="mb-6 sm:mb-8">
+
                     <p className="text-sm font-semibold text-blue-600">
                         Administration
                     </p>
@@ -20,102 +143,93 @@ function AdminDashboard() {
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
                         Manage quizzes, questions, categories, and platform activity.
                     </p>
+
                 </div>
 
 
+                {/* Error */}
+
+                {error && (
+                    <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                        {error}
+                    </div>
+                )}
+
+
                 {/* Stats */}
+
                 <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
 
-                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
-                        <div className="flex items-center justify-between gap-3">
-                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-xl">
-                                👥
-                            </span>
+                    {cards.map((card) => (
 
-                            <span className="text-xs font-semibold text-blue-600">
-                                Users
-                            </span>
+                        <div
+                            key={card.title}
+                            className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6"
+                        >
+
+                            <div className="flex items-center justify-between gap-3">
+
+                                <span
+                                    className={`
+                                        flex h-11 w-11 shrink-0
+                                        items-center justify-center
+                                        rounded-xl text-xl
+                                        ${
+                                            card.color === "blue"
+                                                ? "bg-blue-50"
+                                                : card.color === "purple"
+                                                ? "bg-purple-50"
+                                                : card.color === "green"
+                                                ? "bg-green-50"
+                                                : "bg-orange-50"
+                                        }
+                                    `}
+                                >
+                                    {card.icon}
+                                </span>
+
+                                <span
+                                    className={`
+                                        text-xs font-semibold
+                                        ${
+                                            card.color === "blue"
+                                                ? "text-blue-600"
+                                                : card.color === "purple"
+                                                ? "text-purple-600"
+                                                : card.color === "green"
+                                                ? "text-green-600"
+                                                : "text-orange-600"
+                                        }
+                                    `}
+                                >
+                                    {card.title}
+                                </span>
+
+                            </div>
+
+                            <p className="mt-5 text-sm text-slate-500">
+                                {card.label}
+                            </p>
+
+                            <p className="mt-1 text-3xl font-bold text-slate-900">
+                                {loading
+                                    ? "—"
+                                    : card.value}
+                            </p>
+
                         </div>
 
-                        <p className="mt-5 text-sm text-slate-500">
-                            Registered Users
-                        </p>
-
-                        <p className="mt-1 text-3xl font-bold text-slate-900">
-                            128
-                        </p>
-                    </div>
-
-
-                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
-                        <div className="flex items-center justify-between gap-3">
-                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-xl">
-                                📝
-                            </span>
-
-                            <span className="text-xs font-semibold text-purple-600">
-                                Quizzes
-                            </span>
-                        </div>
-
-                        <p className="mt-5 text-sm text-slate-500">
-                            Total Quizzes
-                        </p>
-
-                        <p className="mt-1 text-3xl font-bold text-slate-900">
-                            24
-                        </p>
-                    </div>
-
-
-                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
-                        <div className="flex items-center justify-between gap-3">
-                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 text-xl">
-                                ❓
-                            </span>
-
-                            <span className="text-xs font-semibold text-green-600">
-                                Questions
-                            </span>
-                        </div>
-
-                        <p className="mt-5 text-sm text-slate-500">
-                            Total Questions
-                        </p>
-
-                        <p className="mt-1 text-3xl font-bold text-slate-900">
-                            186
-                        </p>
-                    </div>
-
-
-                    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
-                        <div className="flex items-center justify-between gap-3">
-                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-xl">
-                                📊
-                            </span>
-
-                            <span className="text-xs font-semibold text-orange-600">
-                                Attempts
-                            </span>
-                        </div>
-
-                        <p className="mt-5 text-sm text-slate-500">
-                            Quiz Attempts
-                        </p>
-
-                        <p className="mt-1 text-3xl font-bold text-slate-900">
-                            542
-                        </p>
-                    </div>
+                    ))}
 
                 </div>
 
 
                 {/* Quick Actions */}
+
                 <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mt-6 sm:p-6">
 
                     <div>
+
                         <h2 className="text-lg font-bold text-slate-900">
                             Quick Actions
                         </h2>
@@ -123,6 +237,7 @@ function AdminDashboard() {
                         <p className="mt-1 text-sm text-slate-500">
                             Manage your quiz platform.
                         </p>
+
                     </div>
 
 
@@ -216,145 +331,47 @@ function AdminDashboard() {
                         </Link>
 
                     </div>
+
                 </div>
 
 
-                {/* Activity + System Status */}
-                <div className="mt-5 grid gap-5 sm:mt-6 sm:gap-6 lg:grid-cols-3">
+                {/* System Status */}
 
-                    {/* Activity */}
-                    <div className="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 lg:col-span-2">
+                <div className="mt-5 rounded-2xl bg-slate-900 p-5 text-white sm:mt-6 sm:p-6">
 
-                        <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
-                            <h2 className="text-lg font-bold text-slate-900">
-                                Recent Activity
-                            </h2>
+                    <p className="text-sm font-semibold text-blue-400">
+                        System
+                    </p>
 
-                            <p className="mt-1 text-sm text-slate-500">
-                                Latest platform activity.
-                            </p>
-                        </div>
+                    <h2 className="mt-2 text-xl font-bold">
+                        Platform Status
+                    </h2>
 
+                    <div className="mt-5 grid gap-3 sm:grid-cols-3">
 
-                        <div className="divide-y divide-slate-100">
+                        {[
+                            "API Server",
+                            "Database",
+                            "Authentication",
+                        ].map((item) => (
 
-                            {[
-                                {
-                                    icon: "📝",
-                                    title: "New quiz created",
-                                    description: "Java Fundamentals",
-                                    time: "10 minutes ago",
-                                },
-                                {
-                                    icon: "❓",
-                                    title: "Questions added",
-                                    description: "5 questions added to Java",
-                                    time: "32 minutes ago",
-                                },
-                                {
-                                    icon: "👤",
-                                    title: "New user registered",
-                                    description: "New student account created",
-                                    time: "1 hour ago",
-                                },
-                                {
-                                    icon: "📊",
-                                    title: "Quiz completed",
-                                    description: "Python Fundamentals",
-                                    time: "2 hours ago",
-                                },
-                            ].map((activity, index) => (
+                            <div
+                                key={item}
+                                className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4"
+                            >
 
-                                <div
-                                    key={index}
-                                    className="flex items-start gap-3 px-5 py-4 sm:items-center sm:gap-4 sm:px-6 sm:py-5"
-                                >
-
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
-                                        {activity.icon}
-                                    </div>
-
-                                    <div className="min-w-0 flex-1">
-                                        <p className="break-words font-semibold text-slate-900">
-                                            {activity.title}
-                                        </p>
-
-                                        <p className="mt-1 break-words text-xs text-slate-500">
-                                            {activity.description}
-                                        </p>
-                                    </div>
-
-                                    <span className="shrink-0 text-right text-[11px] leading-4 text-slate-400 sm:text-xs">
-                                        {activity.time}
-                                    </span>
-
-                                </div>
-
-                            ))}
-
-                        </div>
-                    </div>
-
-
-                    {/* Status */}
-                    <div className="rounded-2xl bg-slate-900 p-5 text-white sm:p-6">
-
-                        <p className="text-sm font-semibold text-blue-400">
-                            System
-                        </p>
-
-                        <h2 className="mt-2 text-xl font-bold">
-                            Platform Status
-                        </h2>
-
-
-                        <div className="mt-5 space-y-3 sm:mt-6 sm:space-y-4">
-
-                            <div className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4">
                                 <span className="text-sm text-slate-300">
-                                    API Server
+                                    {item}
                                 </span>
 
                                 <span className="flex shrink-0 items-center gap-2 text-xs font-semibold text-green-400">
                                     <span className="h-2 w-2 rounded-full bg-green-400" />
                                     Online
                                 </span>
+
                             </div>
 
-
-                            <div className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4">
-                                <span className="text-sm text-slate-300">
-                                    Database
-                                </span>
-
-                                <span className="flex shrink-0 items-center gap-2 text-xs font-semibold text-green-400">
-                                    <span className="h-2 w-2 rounded-full bg-green-400" />
-                                    Connected
-                                </span>
-                            </div>
-
-
-                            <div className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-3 sm:p-4">
-                                <span className="text-sm text-slate-300">
-                                    Authentication
-                                </span>
-
-                                <span className="flex shrink-0 items-center gap-2 text-xs font-semibold text-green-400">
-                                    <span className="h-2 w-2 rounded-full bg-green-400" />
-                                    Active
-                                </span>
-                            </div>
-
-                        </div>
-
-
-                        <div className="mt-5 border-t border-white/10 pt-5 sm:mt-6">
-                            <p className="text-xs leading-5 text-slate-400">
-                                These statistics are currently UI placeholders.
-                                We will connect them to your backend after the
-                                design pass.
-                            </p>
-                        </div>
+                        ))}
 
                     </div>
 
