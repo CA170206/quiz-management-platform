@@ -363,12 +363,13 @@ function AuthPage() {
 
             {/* =====================================================
                 NAVBAR
+                ALWAYS LIGHT - NOT AFFECTED BY DARK MODE
             ===================================================== */}
 
             <header className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 lg:px-8">
 
                 <div
-                    className={`
+                    className="
                         relative
                         mx-auto
                         flex
@@ -377,19 +378,13 @@ function AuthPage() {
                         justify-between
                         overflow-hidden
                         rounded-full
+                        bg-[#f5f3ee]/95
                         px-4
                         py-2.5
                         backdrop-blur-xl
                         shadow-[0_12px_35px_rgba(15,23,42,0.10)]
-                        transition-colors
-                        duration-500
                         sm:px-6
-                        ${
-                            darkMode
-                                ? "bg-[#151515]/95 shadow-black/40"
-                                : "bg-[#f5f3ee]/95"
-                        }
-                    `}
+                    "
                 >
 
                     {/* Navbar animation */}
@@ -407,17 +402,13 @@ function AuthPage() {
                         className="relative z-10"
                     >
                         <span
-                            className={`
+                            className="
                                 text-[18px]
                                 font-black
                                 tracking-[-0.055em]
+                                text-black
                                 sm:text-[20px]
-                                ${
-                                    darkMode
-                                        ? "text-white"
-                                        : "text-black"
-                                }
-                            `}
+                            "
                         >
                             TryQuizzers
                         </span>
@@ -451,8 +442,6 @@ function AuthPage() {
                                         ${
                                             active
                                                 ? "bg-white text-black shadow-sm"
-                                                : darkMode
-                                                ? "text-slate-400 hover:bg-white/10 hover:text-white"
                                                 : "text-slate-500 hover:bg-white/80 hover:text-black"
                                         }
                                     `}
@@ -470,21 +459,20 @@ function AuthPage() {
 
                         <button
                             onClick={toggleTheme}
-                            className={`
+                            className="
                                 flex
                                 h-9
                                 w-9
                                 items-center
                                 justify-center
                                 rounded-full
+                                bg-white/70
                                 text-sm
+                                text-slate-700
                                 transition
-                                ${
-                                    darkMode
-                                        ? "bg-white/10 text-white hover:bg-white hover:text-black"
-                                        : "bg-white/70 text-slate-700 hover:bg-white hover:text-black"
-                                }
-                            `}
+                                hover:bg-white
+                                hover:text-black
+                            "
                         >
                             {darkMode
                                 ? "☀"
@@ -495,19 +483,16 @@ function AuthPage() {
                             onClick={() =>
                                 navigate("/login")
                             }
-                            className={`
+                            className="
                                 rounded-full
                                 px-4
                                 py-2
                                 text-[12px]
                                 font-semibold
+                                text-slate-500
                                 transition
-                                ${
-                                    darkMode
-                                        ? "text-slate-400 hover:text-white"
-                                        : "text-slate-500 hover:text-black"
-                                }
-                            `}
+                                hover:text-black
+                            "
                         >
                             Sign In
                         </button>
@@ -543,19 +528,16 @@ function AuthPage() {
 
                         <button
                             onClick={toggleTheme}
-                            className={`
+                            className="
                                 flex
                                 h-10
                                 w-10
                                 items-center
                                 justify-center
                                 rounded-full
-                                ${
-                                    darkMode
-                                        ? "bg-white/10 text-white"
-                                        : "bg-white/70 text-slate-800"
-                                }
-                            `}
+                                bg-white/70
+                                text-slate-800
+                            "
                         >
                             {darkMode
                                 ? "☀"
@@ -569,19 +551,16 @@ function AuthPage() {
                                         !current
                                 )
                             }
-                            className={`
+                            className="
                                 flex
                                 h-10
                                 w-10
                                 items-center
                                 justify-center
                                 rounded-full
-                                ${
-                                    darkMode
-                                        ? "bg-white/10 text-white"
-                                        : "bg-white/70 text-slate-800"
-                                }
-                            `}
+                                bg-white/70
+                                text-slate-800
+                            "
                         >
                             {menuOpen ? (
                                 <span className="text-2xl">
@@ -600,25 +579,20 @@ function AuthPage() {
 
                 </div>
 
-                {/* Mobile menu */}
+                {/* Mobile menu - ALWAYS LIGHT */}
 
                 {menuOpen && (
                     <div
-                        className={`
+                        className="
                             mx-auto
                             mt-2
                             max-w-6xl
                             rounded-[1.75rem]
+                            bg-[#f5f3ee]
                             p-2
-                            backdrop-blur-xl
                             shadow-xl
                             lg:hidden
-                            ${
-                                darkMode
-                                    ? "bg-[#151515]"
-                                    : "bg-[#f5f3ee]"
-                            }
-                        `}
+                        "
                     >
 
                         {navItems.map((item) => (
@@ -641,8 +615,6 @@ function AuthPage() {
                                         activeSection ===
                                         item.id
                                             ? "bg-black text-white"
-                                            : darkMode
-                                            ? "text-slate-400 hover:bg-white/10"
                                             : "text-slate-600 hover:bg-white"
                                     }
                                 `}
@@ -658,18 +630,15 @@ function AuthPage() {
                                     setMenuOpen(false);
                                     navigate("/login");
                                 }}
-                                className={`
+                                className="
                                     rounded-2xl
+                                    bg-white
                                     px-4
                                     py-3
                                     text-sm
                                     font-semibold
-                                    ${
-                                        darkMode
-                                            ? "bg-white/10 text-white"
-                                            : "bg-white text-slate-700"
-                                    }
-                                `}
+                                    text-slate-700
+                                "
                             >
                                 Sign In
                             </button>
@@ -679,7 +648,15 @@ function AuthPage() {
                                     setMenuOpen(false);
                                     navigate("/register");
                                 }}
-                                className="rounded-2xl bg-black px-4 py-3 text-sm font-semibold text-white"
+                                className="
+                                    rounded-2xl
+                                    bg-black
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                "
                             >
                                 Get Started
                             </button>
@@ -970,9 +947,7 @@ function AuthPage() {
                         "
                     >
 
-                        {/* =================================================
-                            LEFT / TEXT
-                        ================================================= */}
+                        {/* LEFT / TEXT */}
 
                         <div
                             className="
@@ -1235,9 +1210,7 @@ function AuthPage() {
 
                         </div>
 
-                        {/* =================================================
-                            ANIMATION / PRODUCT PREVIEW
-                        ================================================= */}
+                        {/* ANIMATION / PRODUCT PREVIEW */}
 
                         <div className="hero-preview relative w-full">
 
@@ -1348,9 +1321,7 @@ function AuthPage() {
 
                                 </div>
 
-                                {/* =================================================
-                                    QUIZ
-                                ================================================= */}
+                                {/* QUIZ */}
 
                                 {demoStep === 0 && (
                                     <div
@@ -1519,9 +1490,7 @@ function AuthPage() {
                                     </div>
                                 )}
 
-                                {/* =================================================
-                                    RESULT
-                                ================================================= */}
+                                {/* RESULT */}
 
                                 {demoStep === 1 && (
                                     <div className="demo-enter mt-5">
@@ -1657,9 +1626,7 @@ function AuthPage() {
                                     </div>
                                 )}
 
-                                {/* =================================================
-                                    LEADERBOARD
-                                ================================================= */}
+                                {/* LEADERBOARD */}
 
                                 {demoStep === 2 && (
                                     <div className="demo-enter mt-5">
@@ -1993,9 +1960,7 @@ function AuthPage() {
 
                         </div>
 
-                        {/* =================================================
-                            MOBILE CTA
-                        ================================================= */}
+                        {/* MOBILE CTA */}
 
                         <div className="hero-mobile-actions hidden">
 
@@ -2049,9 +2014,7 @@ function AuthPage() {
 
                         </div>
 
-                        {/* =================================================
-                            MOBILE FEATURES
-                        ================================================= */}
+                        {/* MOBILE FEATURES */}
 
                         <div
                             className={`
@@ -2107,13 +2070,13 @@ function AuthPage() {
                             </p>
 
                             <h2
-                                className={`
+                                className="
                                     mt-2
                                     text-3xl
                                     font-black
                                     tracking-tight
                                     sm:text-4xl
-                                `}
+                                "
                             >
                                 Built for better learning
                             </h2>
@@ -2419,15 +2382,11 @@ function AuthPage() {
                 >
 
                     <span
-                        className={`
+                        className="
                             font-black
                             tracking-[-0.045em]
-                            ${
-                                darkMode
-                                    ? "text-white"
-                                    : "text-black"
-                            }
-                        `}
+                            text-black
+                        "
                     >
                         TryQuizzers
                     </span>
