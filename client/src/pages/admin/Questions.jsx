@@ -151,7 +151,6 @@ function Questions() {
         setSelectedQuizId(quizId);
         setError("");
         setEditingId(null);
-
         setQuestions([]);
 
         if (!quizId) {
@@ -536,26 +535,27 @@ function Questions() {
     // FORMAT CREATED DATE
     // =====================================================
 
-   const formatCreatedAt = (createdAt) => {
-    if (!createdAt) {
-        return "Not available";
-    }
+    const formatCreatedAt = (createdAt) => {
+        if (!createdAt) {
+            return "Not available";
+        }
 
-    const date = new Date(createdAt);
+        const date = new Date(createdAt);
 
-    if (Number.isNaN(date.getTime())) {
-        return "Not available";
-    }
+        if (Number.isNaN(date.getTime())) {
+            return "Not available";
+        }
 
-    return date.toLocaleString(undefined, {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-    });
-};
+        return date.toLocaleString(undefined, {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+    };
+
     // =====================================================
     // DIFFICULTY DISPLAY
     // =====================================================
@@ -1122,13 +1122,13 @@ function Questions() {
 
                 {selectedQuizId &&
                     loading && (
-                        <div className="grid gap-4 lg:grid-cols-2">
+                        <div className="grid gap-4">
 
                             {[1, 2, 3, 4].map(
                                 (item) => (
                                     <div
                                         key={item}
-                                        className="h-80 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
+                                        className="h-20 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
                                     />
                                 )
                             )}
@@ -1163,14 +1163,14 @@ function Questions() {
 
 
                 {/* ================================================= */}
-                {/* QUESTIONS */}
+                {/* QUESTIONS — ACCORDION */}
                 {/* ================================================= */}
 
                 {selectedQuizId &&
                     !loading &&
                     questions.length > 0 && (
 
-                        <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
+                        <div className="space-y-3">
 
                             {questions.map(
                                 (
@@ -1178,25 +1178,56 @@ function Questions() {
                                     index
                                 ) => (
 
-                                    <div
+                                    <details
                                         key={
                                             question.id
                                         }
-                                        className="min-w-0 overflow-hidden rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6"
+                                        className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
                                     >
 
-                                        {/* Card Header */}
+                                        {/* ================================================= */}
+                                        {/* CLOSED HEADER */}
+                                        {/* ================================================= */}
 
-                                        <div className="flex items-start justify-between gap-3">
+                                        <summary className="flex cursor-pointer list-none items-center gap-3 p-5 sm:p-6 [&::-webkit-details-marker]:hidden">
 
-                                            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+                                            {/* Number */}
 
-                                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600 sm:h-10 sm:w-10">
-                                                    {index +
-                                                        1}
-                                                </span>
+                                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600">
+                                                {index +
+                                                    1}
+                                            </span>
 
-                                                <span className="max-w-[180px] truncate rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
+
+                                            {/* ONLY QUESTION IS VISIBLE */}
+
+                                            <p className="min-w-0 flex-1 break-words text-sm font-semibold leading-6 text-slate-900 sm:text-base">
+                                                {
+                                                    question.question_text
+                                                }
+                                            </p>
+
+
+                                            {/* Arrow */}
+
+                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-500 transition-transform duration-200 group-open:rotate-180">
+                                                ↓
+                                            </span>
+
+                                        </summary>
+
+
+                                        {/* ================================================= */}
+                                        {/* OPEN CONTENT */}
+                                        {/* ================================================= */}
+
+                                        <div className="border-t border-slate-100 px-5 pb-5 pt-5 sm:px-6 sm:pb-6">
+
+                                            {/* Category + Difficulty + ID */}
+
+                                            <div className="flex flex-wrap items-center gap-2">
+
+                                                <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
                                                     {question.category_name ||
                                                         "Category"}
                                                 </span>
@@ -1211,186 +1242,190 @@ function Questions() {
                                                     )}
                                                 </span>
 
+                                                <span className="text-xs font-medium text-slate-400">
+                                                    #
+                                                    {
+                                                        question.id
+                                                    }
+                                                </span>
+
                                             </div>
 
-                                            <span className="shrink-0 text-xs font-medium text-slate-400">
-                                                #
-                                                {
-                                                    question.id
-                                                }
-                                            </span>
 
-                                        </div>
+                                            {/* Quiz */}
 
+                                            <div className="mt-4 rounded-lg bg-blue-50 px-3 py-3">
 
-                                        {/* Quiz Name */}
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-blue-500">
+                                                    Quiz
+                                                </p>
 
-                                        <div className="mt-4 min-w-0 rounded-lg bg-blue-50 px-3 py-2">
-
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-blue-500">
-                                                Quiz
-                                            </p>
-
-                                            <p className="mt-1 break-words text-sm font-semibold leading-5 text-blue-700">
-                                                {question.quiz_title ||
-                                                    getQuizName(
-                                                        question.quiz_id
-                                                    )}
-                                            </p>
-
-                                        </div>
-
-
-                                        {/* Question */}
-
-                                        <h3 className="mt-5 break-words text-base font-bold leading-6 text-slate-900">
-                                            {
-                                                question.question_text
-                                            }
-                                        </h3>
-
-
-                                        {/* Options */}
-
-                                        <div className="mt-5 grid gap-2">
-
-                                            {[
-                                                [
-                                                    "A",
-                                                    question.option_a,
-                                                ],
-                                                [
-                                                    "B",
-                                                    question.option_b,
-                                                ],
-                                                [
-                                                    "C",
-                                                    question.option_c,
-                                                ],
-                                                [
-                                                    "D",
-                                                    question.option_d,
-                                                ],
-                                            ].map(
-                                                ([
-                                                    letter,
-                                                    option,
-                                                ]) => (
-
-                                                    <div
-                                                        key={
-                                                            letter
-                                                        }
-                                                        className={`flex min-w-0 items-start gap-3 rounded-lg px-3 py-2.5 text-sm ${
-                                                            option ===
-                                                            question.correct_answer
-                                                                ? "bg-green-50 text-green-700 ring-1 ring-green-100"
-                                                                : "bg-slate-50 text-slate-600"
-                                                        }`}
-                                                    >
-
-                                                        <span className="shrink-0 font-bold">
-                                                            {
-                                                                letter
-                                                            }.
-                                                        </span>
-
-                                                        <span className="min-w-0 flex-1 break-words leading-5">
-                                                            {
-                                                                option
-                                                            }
-                                                        </span>
-
-                                                        {option ===
-                                                            question.correct_answer && (
-                                                            <span className="shrink-0 text-xs font-bold">
-                                                                ✓
-                                                            </span>
+                                                <p className="mt-1 break-words text-sm font-semibold leading-5 text-blue-700">
+                                                    {question.quiz_title ||
+                                                        getQuizName(
+                                                            question.quiz_id
                                                         )}
+                                                </p>
 
-                                                    </div>
+                                            </div>
 
-                                                )
+
+                                            {/* Options */}
+
+                                            <div className="mt-5">
+
+                                                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                    Answer Options
+                                                </p>
+
+                                                <div className="grid gap-2">
+
+                                                    {[
+                                                        [
+                                                            "A",
+                                                            question.option_a,
+                                                        ],
+                                                        [
+                                                            "B",
+                                                            question.option_b,
+                                                        ],
+                                                        [
+                                                            "C",
+                                                            question.option_c,
+                                                        ],
+                                                        [
+                                                            "D",
+                                                            question.option_d,
+                                                        ],
+                                                    ].map(
+                                                        ([
+                                                            letter,
+                                                            option,
+                                                        ]) => {
+
+                                                            const isCorrect =
+                                                                option ===
+                                                                question.correct_answer;
+
+                                                            return (
+                                                                <div
+                                                                    key={
+                                                                        letter
+                                                                    }
+                                                                    className={`flex min-w-0 items-start gap-3 rounded-lg px-3 py-3 text-sm ${
+                                                                        isCorrect
+                                                                            ? "bg-green-50 text-green-700 ring-1 ring-green-100"
+                                                                            : "bg-slate-50 text-slate-600"
+                                                                    }`}
+                                                                >
+
+                                                                    <span className="shrink-0 font-bold">
+                                                                        {
+                                                                            letter
+                                                                        }.
+                                                                    </span>
+
+                                                                    <span className="min-w-0 flex-1 break-words leading-5">
+                                                                        {
+                                                                            option
+                                                                        }
+                                                                    </span>
+
+                                                                    {isCorrect && (
+                                                                        <span className="shrink-0 text-xs font-bold text-green-600">
+                                                                            ✓
+                                                                            {" "}
+                                                                            Correct
+                                                                        </span>
+                                                                    )}
+
+                                                                </div>
+                                                            );
+                                                        }
+                                                    )}
+
+                                                </div>
+
+                                            </div>
+
+
+                                            {/* Explanation */}
+
+                                            {question.explanation && (
+                                                <div className="mt-5 rounded-lg bg-slate-50 px-4 py-3">
+
+                                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                        Explanation
+                                                    </p>
+
+                                                    <p className="mt-1 break-words text-sm leading-6 text-slate-600">
+                                                        {
+                                                            question.explanation
+                                                        }
+                                                    </p>
+
+                                                </div>
                                             )}
 
-                                        </div>
+
+                                            {/* Created */}
+
+                                            <div className="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
+
+                                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                                                    🕒
+                                                </span>
+
+                                                <div>
+
+                                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                        Created
+                                                    </p>
+
+                                                    <p className="mt-0.5 text-sm font-medium text-slate-600">
+                                                        {formatCreatedAt(
+                                                            question.created_at
+                                                        )}
+                                                    </p>
+
+                                                </div>
+
+                                            </div>
 
 
-                                        {/* Explanation */}
+                                            {/* Actions */}
 
-                                        {question.explanation && (
-                                            <div className="mt-4 rounded-lg bg-slate-50 px-3 py-3">
+                                            <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 min-[400px]:flex-row">
 
-                                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                                    Explanation
-                                                </p>
-
-                                                <p className="mt-1 break-words text-sm leading-5 text-slate-600">
-                                                    {
-                                                        question.explanation
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleEdit(
+                                                            question
+                                                        )
                                                     }
-                                                </p>
+                                                    className="flex-1 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
+                                                >
+                                                    Edit
+                                                </button>
 
-                                            </div>
-                                        )}
-
-
-                                        {/* Created At */}
-
-                                        <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4">
-
-                                            <span className="text-sm">
-                                                🕒
-                                            </span>
-
-                                            <div>
-
-                                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                                    Created
-                                                </p>
-
-                                                <p className="mt-0.5 text-sm font-medium text-slate-600">
-                                                    {formatCreatedAt(
-                                                        question.created_at
-                                                    )}
-                                                </p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openDeleteModal(
+                                                            question.id
+                                                        )
+                                                    }
+                                                    className="flex-1 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                                                >
+                                                    Delete
+                                                </button>
 
                                             </div>
 
                                         </div>
 
-
-                                        {/* Actions */}
-
-                                        <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 min-[400px]:flex-row">
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleEdit(
-                                                        question
-                                                    )
-                                                }
-                                                className="flex-1 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
-                                            >
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    openDeleteModal(
-                                                        question.id
-                                                    )
-                                                }
-                                                className="flex-1 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
-                                            >
-                                                Delete
-                                            </button>
-
-                                        </div>
-
-                                    </div>
+                                    </details>
 
                                 )
                             )}
