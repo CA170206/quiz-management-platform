@@ -1,13 +1,17 @@
-import Navbar from "../../components/common/Navbar.jsx";
-
 import { useEffect, useState } from "react";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/questions`;
-const QUIZ_API_URL = `${import.meta.env.VITE_API_URL}/api/quizzes`;
+const API_URL =
+    `${import.meta.env.VITE_API_URL}/api/questions`;
+
+const QUIZ_API_URL =
+    `${import.meta.env.VITE_API_URL}/api/quizzes`;
 
 function Questions() {
     const [questions, setQuestions] = useState([]);
     const [quizzes, setQuizzes] = useState([]);
+
+    const [selectedQuizId, setSelectedQuizId] =
+        useState("");
 
     const [formData, setFormData] = useState({
         quiz_id: "",
@@ -21,9 +25,17 @@ function Questions() {
         difficulty: "",
     });
 
-    const [editingId, setEditingId] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [editingId, setEditingId] =
+        useState(null);
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [quizLoading, setQuizLoading] =
+        useState(true);
+
+    const [error, setError] =
+        useState("");
 
     const [showDeleteModal, setShowDeleteModal] =
         useState(false);
@@ -34,43 +46,15 @@ function Questions() {
     const [deleting, setDeleting] =
         useState(false);
 
-    // =========================
-    // FETCH QUESTIONS
-    // =========================
-
-    const fetchQuestions = async () => {
-        try {
-            setLoading(true);
-            setError("");
-
-            const response = await fetch(API_URL);
-
-            if (!response.ok) {
-                throw new Error(
-                    "Failed to fetch questions"
-                );
-            }
-
-            const data = await response.json();
-
-            const sortedQuestions = [...data].sort(
-                (a, b) => a.id - b.id
-            );
-
-            setQuestions(sortedQuestions);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // =========================
+    // =====================================================
     // FETCH QUIZZES
-    // =========================
+    // =====================================================
 
     const fetchQuizzes = async () => {
         try {
+            setQuizLoading(true);
+            setError("");
+
             const response =
                 await fetch(QUIZ_API_URL);
 
@@ -80,43 +64,120 @@ function Questions() {
                 );
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
-            const sortedQuizzes = [...data].sort(
-                (a, b) => a.id - b.id
-            );
+            const sortedQuizzes =
+                [...data].sort(
+                    (a, b) => a.id - b.id
+                );
 
             setQuizzes(sortedQuizzes);
+
         } catch (err) {
-            setError(err.message);
+            setError(
+                err.message ||
+                "Failed to load quizzes"
+            );
+        } finally {
+            setQuizLoading(false);
         }
     };
 
-    // =========================
+    // =====================================================
+    // FETCH QUESTIONS FOR SELECTED QUIZ
+    // =====================================================
+
+    const fetchQuestions = async (
+        quizId = selectedQuizId
+    ) => {
+        if (!quizId) {
+            setQuestions([]);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError("");
+
+            const response =
+                await fetch(
+                    `${API_URL}/quiz/${quizId}`
+                );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to fetch questions"
+                );
+            }
+
+            const data =
+                await response.json();
+
+            const sortedQuestions =
+                [...data].sort(
+                    (a, b) => a.id - b.id
+                );
+
+            setQuestions(
+                sortedQuestions
+            );
+
+        } catch (err) {
+            setError(
+                err.message ||
+                "Failed to load questions"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // =====================================================
     // INITIAL LOAD
-    // =========================
+    // =====================================================
 
     useEffect(() => {
-        fetchQuestions();
         fetchQuizzes();
     }, []);
 
-    // =========================
+    // =====================================================
+    // SELECT QUIZ
+    // =====================================================
+
+    const handleQuizSelection = async (e) => {
+        const quizId = e.target.value;
+
+        setSelectedQuizId(quizId);
+        setError("");
+        setEditingId(null);
+
+        setQuestions([]);
+
+        if (!quizId) {
+            return;
+        }
+
+        await fetchQuestions(quizId);
+    };
+
+    // =====================================================
     // HANDLE INPUT
-    // =========================
+    // =====================================================
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [e.target.name]:
+                e.target.value,
         });
 
         setError("");
     };
 
-    // =========================
+    // =====================================================
     // CREATE / UPDATE
-    // =========================
+    // =====================================================
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -131,7 +192,9 @@ function Questions() {
                 return;
             }
 
-            if (!formData.question_text.trim()) {
+            if (
+                !formData.question_text.trim()
+            ) {
                 setError(
                     "Question is required."
                 );
@@ -150,7 +213,9 @@ function Questions() {
                 return;
             }
 
-            if (!formData.correct_answer.trim()) {
+            if (
+                !formData.correct_answer.trim()
+            ) {
                 setError(
                     "Correct answer is required."
                 );
@@ -174,7 +239,11 @@ function Questions() {
             const correctAnswer =
                 formData.correct_answer.trim();
 
-            if (!options.includes(correctAnswer)) {
+            if (
+                !options.includes(
+                    correctAnswer
+                )
+            ) {
                 setError(
                     "Correct answer must exactly match one of the four options."
                 );
@@ -200,48 +269,49 @@ function Questions() {
                 return;
             }
 
-            const response = await fetch(url, {
-                method,
+            const response =
+                await fetch(url, {
+                    method,
 
-                headers: {
-                    "Content-Type":
-                        "application/json",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
 
-                    Authorization:
-                        `Bearer ${token}`,
-                },
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
 
-                body: JSON.stringify({
-                    quiz_id:
-                        Number(
-                            formData.quiz_id
-                        ),
+                    body: JSON.stringify({
+                        quiz_id:
+                            Number(
+                                formData.quiz_id
+                            ),
 
-                    question_text:
-                        formData.question_text.trim(),
+                        question_text:
+                            formData.question_text.trim(),
 
-                    option_a:
-                        formData.option_a.trim(),
+                        option_a:
+                            formData.option_a.trim(),
 
-                    option_b:
-                        formData.option_b.trim(),
+                        option_b:
+                            formData.option_b.trim(),
 
-                    option_c:
-                        formData.option_c.trim(),
+                        option_c:
+                            formData.option_c.trim(),
 
-                    option_d:
-                        formData.option_d.trim(),
+                        option_d:
+                            formData.option_d.trim(),
 
-                    correct_answer:
-                        correctAnswer,
+                        correct_answer:
+                            correctAnswer,
 
-                    explanation:
-                        formData.explanation.trim(),
+                        explanation:
+                            formData.explanation.trim(),
 
-                    difficulty:
-                        formData.difficulty,
-                }),
-            });
+                        difficulty:
+                            formData.difficulty,
+                    }),
+                });
 
             const data =
                 await response.json();
@@ -249,53 +319,85 @@ function Questions() {
             if (!response.ok) {
                 throw new Error(
                     data.message ||
-                        "Something went wrong"
+                    "Something went wrong"
                 );
             }
 
+            const quizId =
+                Number(
+                    formData.quiz_id
+                );
+
             resetForm();
 
-            await fetchQuestions();
+            setSelectedQuizId(
+                quizId.toString()
+            );
+
+            await fetchQuestions(
+                quizId.toString()
+            );
 
         } catch (err) {
-            setError(err.message);
+            setError(
+                err.message ||
+                "Something went wrong"
+            );
         }
     };
 
-    // =========================
+    // =====================================================
     // EDIT
-    // =========================
+    // =====================================================
 
     const handleEdit = (question) => {
-        setEditingId(question.id);
+        setEditingId(
+            question.id
+        );
+
+        const quizId =
+            question.quiz_id?.toString() ||
+            "";
+
+        setSelectedQuizId(
+            quizId
+        );
 
         setFormData({
             quiz_id:
-                question.quiz_id?.toString() || "",
+                quizId,
 
             question_text:
-                question.question_text || "",
+                question.question_text ||
+                "",
 
             option_a:
-                question.option_a || "",
+                question.option_a ||
+                "",
 
             option_b:
-                question.option_b || "",
+                question.option_b ||
+                "",
 
             option_c:
-                question.option_c || "",
+                question.option_c ||
+                "",
 
             option_d:
-                question.option_d || "",
+                question.option_d ||
+                "",
 
             correct_answer:
-                question.correct_answer || "",
+                question.correct_answer ||
+                "",
 
             explanation:
-                question.explanation || "",
+                question.explanation ||
+                "",
 
             difficulty:
-                question.difficulty || "",
+                question.difficulty ||
+                "",
         });
 
         setError("");
@@ -306,9 +408,9 @@ function Questions() {
         });
     };
 
-    // =========================
+    // =====================================================
     // DELETE MODAL
-    // =========================
+    // =====================================================
 
     const openDeleteModal = (id) => {
         setDeleteId(id);
@@ -324,9 +426,9 @@ function Questions() {
         setShowDeleteModal(false);
     };
 
-    // =========================
+    // =====================================================
     // DELETE
-    // =========================
+    // =====================================================
 
     const handleDelete = async () => {
         if (!deleteId) {
@@ -348,17 +450,18 @@ function Questions() {
                 return;
             }
 
-            const response = await fetch(
-                `${API_URL}/${deleteId}`,
-                {
-                    method: "DELETE",
+            const response =
+                await fetch(
+                    `${API_URL}/${deleteId}`,
+                    {
+                        method: "DELETE",
 
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`,
-                    },
-                }
-            );
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+                        },
+                    }
+                );
 
             const data =
                 await response.json();
@@ -366,25 +469,32 @@ function Questions() {
             if (!response.ok) {
                 throw new Error(
                     data.message ||
-                        "Failed to delete question"
+                    "Failed to delete question"
                 );
             }
 
             setDeleteId(null);
             setShowDeleteModal(false);
 
-            await fetchQuestions();
+            if (selectedQuizId) {
+                await fetchQuestions(
+                    selectedQuizId
+                );
+            }
 
         } catch (err) {
-            setError(err.message);
+            setError(
+                err.message ||
+                "Failed to delete question"
+            );
         } finally {
             setDeleting(false);
         }
     };
 
-    // =========================
+    // =====================================================
     // RESET FORM
-    // =========================
+    // =====================================================
 
     const resetForm = () => {
         setEditingId(null);
@@ -404,15 +514,17 @@ function Questions() {
         setError("");
     };
 
-    // =========================
+    // =====================================================
     // GET QUIZ NAME
-    // =========================
+    // =====================================================
 
     const getQuizName = (quizId) => {
-        const quiz = quizzes.find(
-            (item) =>
-                item.id === Number(quizId)
-        );
+        const quiz =
+            quizzes.find(
+                (item) =>
+                    item.id ===
+                    Number(quizId)
+            );
 
         return (
             quiz?.title ||
@@ -420,22 +532,55 @@ function Questions() {
         );
     };
 
-    // =========================
+    // =====================================================
+    // FORMAT CREATED DATE
+    // =====================================================
+
+   const formatCreatedAt = (createdAt) => {
+    if (!createdAt) {
+        return "Not available";
+    }
+
+    const date = new Date(createdAt);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Not available";
+    }
+
+    return date.toLocaleString(undefined, {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    });
+};
+    // =====================================================
     // DIFFICULTY DISPLAY
-    // =========================
+    // =====================================================
 
     const getDifficultyClasses = (
         difficulty
     ) => {
-        if (difficulty === "beginner") {
+        if (
+            difficulty ===
+            "beginner"
+        ) {
             return "bg-green-50 text-green-700";
         }
 
-        if (difficulty === "medium") {
+        if (
+            difficulty ===
+            "medium"
+        ) {
             return "bg-yellow-50 text-yellow-700";
         }
 
-        if (difficulty === "intermediate") {
+        if (
+            difficulty ===
+            "intermediate"
+        ) {
             return "bg-red-50 text-red-700";
         }
 
@@ -445,33 +590,55 @@ function Questions() {
     const getDifficultyLabel = (
         difficulty
     ) => {
-        if (difficulty === "beginner") {
+        if (
+            difficulty ===
+            "beginner"
+        ) {
             return "Beginner";
         }
 
-        if (difficulty === "medium") {
+        if (
+            difficulty ===
+            "medium"
+        ) {
             return "Medium";
         }
 
-        if (difficulty === "intermediate") {
+        if (
+            difficulty ===
+            "intermediate"
+        ) {
             return "Intermediate";
         }
 
         return "Not set";
     };
 
-    // =========================
+    // =====================================================
+    // SELECTED QUIZ
+    // =====================================================
+
+    const selectedQuiz =
+        quizzes.find(
+            (quiz) =>
+                quiz.id ===
+                Number(
+                    selectedQuizId
+                )
+        );
+
+    // =====================================================
     // RENDER
-    // =========================
+    // =====================================================
 
     return (
         <div className="min-h-screen bg-slate-50 px-4 pb-10 pt-24 sm:px-6 sm:pb-10 sm:pt-28">
 
             <div className="mx-auto max-w-7xl">
 
-                {/* ========================= */}
+                {/* ================================================= */}
                 {/* HEADER */}
-                {/* ========================= */}
+                {/* ================================================= */}
 
                 <div className="mb-6 sm:mb-8">
 
@@ -491,9 +658,9 @@ function Questions() {
                 </div>
 
 
-                {/* ========================= */}
+                {/* ================================================= */}
                 {/* FORM CARD */}
-                {/* ========================= */}
+                {/* ================================================= */}
 
                 <div className="mb-6 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:mb-8 sm:p-8">
 
@@ -525,7 +692,9 @@ function Questions() {
 
 
                     <form
-                        onSubmit={handleSubmit}
+                        onSubmit={
+                            handleSubmit
+                        }
                         className="space-y-5 sm:space-y-6"
                     >
 
@@ -814,277 +983,427 @@ function Questions() {
                 </div>
 
 
-                {/* ========================= */}
-                {/* QUESTIONS HEADER */}
-                {/* ========================= */}
+                {/* ================================================= */}
+                {/* QUESTION BANK */}
+                {/* ================================================= */}
 
-                <div className="mb-4">
+                <div className="mb-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
-                    <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
-                        All Questions
-                    </h2>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
-                    <p className="mt-1 text-sm text-slate-500">
-                        {questions.length}{" "}
-                        {questions.length === 1
-                            ? "question"
-                            : "questions"}{" "}
-                        available
-                    </p>
+                        <div>
+
+                            <p className="text-sm font-semibold text-blue-600">
+                                Question Bank
+                            </p>
+
+                            <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl">
+                                Browse Questions
+                            </h2>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                Select a quiz to view its questions.
+                            </p>
+
+                        </div>
+
+
+                        <div className="w-full sm:max-w-md">
+
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Select Quiz
+                            </label>
+
+                            <select
+                                value={
+                                    selectedQuizId
+                                }
+                                onChange={
+                                    handleQuizSelection
+                                }
+                                disabled={
+                                    quizLoading
+                                }
+                                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50"
+                            >
+
+                                <option value="">
+                                    {quizLoading
+                                        ? "Loading quizzes..."
+                                        : "Select a quiz"}
+                                </option>
+
+                                {quizzes.map(
+                                    (quiz) => (
+                                        <option
+                                            key={
+                                                quiz.id
+                                            }
+                                            value={
+                                                quiz.id
+                                            }
+                                        >
+                                            {
+                                                quiz.title
+                                            }
+                                        </option>
+                                    )
+                                )}
+
+                            </select>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
 
-                {/* ========================= */}
-                {/* LOADING */}
-                {/* ========================= */}
+                {/* ================================================= */}
+                {/* NO QUIZ SELECTED */}
+                {/* ================================================= */}
 
-                {loading ? (
+                {!selectedQuizId && (
+                    <div className="rounded-2xl bg-white px-5 py-14 text-center shadow-sm ring-1 ring-slate-200 sm:px-6 sm:py-16">
 
-                    <div className="grid gap-4 lg:grid-cols-2">
-
-                        {[1, 2, 3, 4].map(
-                            (item) => (
-                                <div
-                                    key={item}
-                                    className="h-52 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
-                                />
-                            )
-                        )}
-
-                    </div>
-
-                ) : questions.length === 0 ? (
-
-                    <div className="rounded-2xl bg-white px-5 py-12 text-center shadow-sm ring-1 ring-slate-200 sm:px-6 sm:py-14">
-
-                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl">
-                            ❓
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-3xl">
+                            📚
                         </div>
 
-                        <h3 className="mt-4 text-lg font-bold text-slate-900">
-                            No questions yet
+                        <h3 className="mt-5 text-lg font-bold text-slate-900 sm:text-xl">
+                            Select a quiz
                         </h3>
 
-                        <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Add your first question using
-                            the form above.
+                        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                            Choose a quiz from the dropdown above
+                            to view and manage its questions.
                         </p>
 
                     </div>
-
-                ) : (
-
-                    <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
-
-                        {questions.map(
-                            (
-                                question,
-                                index
-                            ) => (
-
-                                <div
-                                    key={
-                                        question.id
-                                    }
-                                    className="min-w-0 overflow-hidden rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6"
-                                >
-
-                                    {/* Card Header */}
-
-                                    <div className="flex items-start justify-between gap-3">
-
-                                        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-
-                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600 sm:h-10 sm:w-10">
-                                                {index +
-                                                    1}
-                                            </span>
-
-                                            <span className="max-w-[180px] truncate rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
-                                                {question.category_name ||
-                                                    "Category"}
-                                            </span>
-
-                                            <span
-                                                className={`rounded-full px-3 py-1 text-xs font-semibold ${getDifficultyClasses(
-                                                    question.difficulty
-                                                )}`}
-                                            >
-                                                {getDifficultyLabel(
-                                                    question.difficulty
-                                                )}
-                                            </span>
-
-                                        </div>
-
-                                        <span className="shrink-0 text-xs font-medium text-slate-400">
-                                            #
-                                            {
-                                                question.id
-                                            }
-                                        </span>
-
-                                    </div>
+                )}
 
 
-                                    {/* Quiz Name */}
+                {/* ================================================= */}
+                {/* SELECTED QUIZ HEADER */}
+                {/* ================================================= */}
 
-                                    <div className="mt-4 min-w-0 rounded-lg bg-blue-50 px-3 py-2">
+                {selectedQuizId && (
+                    <div className="mb-5 flex flex-col gap-3 rounded-2xl bg-slate-950 px-5 py-5 text-white shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
 
-                                        <p className="text-xs font-semibold uppercase tracking-wide text-blue-500">
-                                            Quiz
-                                        </p>
+                        <div>
 
-                                        <p className="mt-1 break-words text-sm font-semibold leading-5 text-blue-700">
-                                            {question.quiz_title ||
-                                                getQuizName(
-                                                    question.quiz_id
-                                                )}
-                                        </p>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-blue-400">
+                                Selected Quiz
+                            </p>
 
-                                    </div>
-
-
-                                    {/* Question */}
-
-                                    <h3 className="mt-5 break-words text-base font-bold leading-6 text-slate-900">
-                                        {
-                                            question.question_text
-                                        }
-                                    </h3>
-
-
-                                    {/* Options */}
-
-                                    <div className="mt-5 grid gap-2">
-
-                                        {[
-                                            [
-                                                "A",
-                                                question.option_a,
-                                            ],
-                                            [
-                                                "B",
-                                                question.option_b,
-                                            ],
-                                            [
-                                                "C",
-                                                question.option_c,
-                                            ],
-                                            [
-                                                "D",
-                                                question.option_d,
-                                            ],
-                                        ].map(
-                                            ([
-                                                letter,
-                                                option,
-                                            ]) => (
-
-                                                <div
-                                                    key={
-                                                        letter
-                                                    }
-                                                    className={`flex min-w-0 items-start gap-3 rounded-lg px-3 py-2.5 text-sm ${
-                                                        option ===
-                                                        question.correct_answer
-                                                            ? "bg-green-50 text-green-700 ring-1 ring-green-100"
-                                                            : "bg-slate-50 text-slate-600"
-                                                    }`}
-                                                >
-
-                                                    <span className="shrink-0 font-bold">
-                                                        {
-                                                            letter
-                                                        }.
-                                                    </span>
-
-                                                    <span className="min-w-0 flex-1 break-words leading-5">
-                                                        {
-                                                            option
-                                                        }
-                                                    </span>
-
-                                                    {option ===
-                                                        question.correct_answer && (
-                                                        <span className="shrink-0 text-xs font-bold">
-                                                            ✓
-                                                        </span>
-                                                    )}
-
-                                                </div>
-
-                                            )
-                                        )}
-
-                                    </div>
-
-
-                                    {/* Explanation */}
-
-                                    {question.explanation && (
-                                        <div className="mt-4 rounded-lg bg-slate-50 px-3 py-3">
-
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                                                Explanation
-                                            </p>
-
-                                            <p className="mt-1 break-words text-sm leading-5 text-slate-600">
-                                                {
-                                                    question.explanation
-                                                }
-                                            </p>
-
-                                        </div>
+                            <h2 className="mt-1 text-xl font-bold">
+                                {selectedQuiz?.title ||
+                                    getQuizName(
+                                        selectedQuizId
                                     )}
+                            </h2>
 
+                        </div>
 
-                                    {/* Actions */}
-
-                                    <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 min-[400px]:flex-row">
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleEdit(
-                                                    question
-                                                )
-                                            }
-                                            className="flex-1 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
-                                        >
-                                            Edit
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                openDeleteModal(
-                                                    question.id
-                                                )
-                                            }
-                                            className="flex-1 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
-                                        >
-                                            Delete
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            )
-                        )}
+                        <div className="w-fit rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-slate-200">
+                            {questions.length}{" "}
+                            {questions.length === 1
+                                ? "Question"
+                                : "Questions"}
+                        </div>
 
                     </div>
-
                 )}
+
+
+                {/* ================================================= */}
+                {/* LOADING */}
+                {/* ================================================= */}
+
+                {selectedQuizId &&
+                    loading && (
+                        <div className="grid gap-4 lg:grid-cols-2">
+
+                            {[1, 2, 3, 4].map(
+                                (item) => (
+                                    <div
+                                        key={item}
+                                        className="h-80 animate-pulse rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
+                                    />
+                                )
+                            )}
+
+                        </div>
+                    )}
+
+
+                {/* ================================================= */}
+                {/* NO QUESTIONS */}
+                {/* ================================================= */}
+
+                {selectedQuizId &&
+                    !loading &&
+                    questions.length === 0 && (
+                        <div className="rounded-2xl bg-white px-5 py-12 text-center shadow-sm ring-1 ring-slate-200 sm:px-6 sm:py-14">
+
+                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl">
+                                ❓
+                            </div>
+
+                            <h3 className="mt-4 text-lg font-bold text-slate-900">
+                                No questions in this quiz
+                            </h3>
+
+                            <p className="mt-2 text-sm leading-6 text-slate-500">
+                                Add a question using the form above.
+                            </p>
+
+                        </div>
+                    )}
+
+
+                {/* ================================================= */}
+                {/* QUESTIONS */}
+                {/* ================================================= */}
+
+                {selectedQuizId &&
+                    !loading &&
+                    questions.length > 0 && (
+
+                        <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
+
+                            {questions.map(
+                                (
+                                    question,
+                                    index
+                                ) => (
+
+                                    <div
+                                        key={
+                                            question.id
+                                        }
+                                        className="min-w-0 overflow-hidden rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6"
+                                    >
+
+                                        {/* Card Header */}
+
+                                        <div className="flex items-start justify-between gap-3">
+
+                                            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+
+                                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600 sm:h-10 sm:w-10">
+                                                    {index +
+                                                        1}
+                                                </span>
+
+                                                <span className="max-w-[180px] truncate rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600">
+                                                    {question.category_name ||
+                                                        "Category"}
+                                                </span>
+
+                                                <span
+                                                    className={`rounded-full px-3 py-1 text-xs font-semibold ${getDifficultyClasses(
+                                                        question.difficulty
+                                                    )}`}
+                                                >
+                                                    {getDifficultyLabel(
+                                                        question.difficulty
+                                                    )}
+                                                </span>
+
+                                            </div>
+
+                                            <span className="shrink-0 text-xs font-medium text-slate-400">
+                                                #
+                                                {
+                                                    question.id
+                                                }
+                                            </span>
+
+                                        </div>
+
+
+                                        {/* Quiz Name */}
+
+                                        <div className="mt-4 min-w-0 rounded-lg bg-blue-50 px-3 py-2">
+
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-blue-500">
+                                                Quiz
+                                            </p>
+
+                                            <p className="mt-1 break-words text-sm font-semibold leading-5 text-blue-700">
+                                                {question.quiz_title ||
+                                                    getQuizName(
+                                                        question.quiz_id
+                                                    )}
+                                            </p>
+
+                                        </div>
+
+
+                                        {/* Question */}
+
+                                        <h3 className="mt-5 break-words text-base font-bold leading-6 text-slate-900">
+                                            {
+                                                question.question_text
+                                            }
+                                        </h3>
+
+
+                                        {/* Options */}
+
+                                        <div className="mt-5 grid gap-2">
+
+                                            {[
+                                                [
+                                                    "A",
+                                                    question.option_a,
+                                                ],
+                                                [
+                                                    "B",
+                                                    question.option_b,
+                                                ],
+                                                [
+                                                    "C",
+                                                    question.option_c,
+                                                ],
+                                                [
+                                                    "D",
+                                                    question.option_d,
+                                                ],
+                                            ].map(
+                                                ([
+                                                    letter,
+                                                    option,
+                                                ]) => (
+
+                                                    <div
+                                                        key={
+                                                            letter
+                                                        }
+                                                        className={`flex min-w-0 items-start gap-3 rounded-lg px-3 py-2.5 text-sm ${
+                                                            option ===
+                                                            question.correct_answer
+                                                                ? "bg-green-50 text-green-700 ring-1 ring-green-100"
+                                                                : "bg-slate-50 text-slate-600"
+                                                        }`}
+                                                    >
+
+                                                        <span className="shrink-0 font-bold">
+                                                            {
+                                                                letter
+                                                            }.
+                                                        </span>
+
+                                                        <span className="min-w-0 flex-1 break-words leading-5">
+                                                            {
+                                                                option
+                                                            }
+                                                        </span>
+
+                                                        {option ===
+                                                            question.correct_answer && (
+                                                            <span className="shrink-0 text-xs font-bold">
+                                                                ✓
+                                                            </span>
+                                                        )}
+
+                                                    </div>
+
+                                                )
+                                            )}
+
+                                        </div>
+
+
+                                        {/* Explanation */}
+
+                                        {question.explanation && (
+                                            <div className="mt-4 rounded-lg bg-slate-50 px-3 py-3">
+
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                    Explanation
+                                                </p>
+
+                                                <p className="mt-1 break-words text-sm leading-5 text-slate-600">
+                                                    {
+                                                        question.explanation
+                                                    }
+                                                </p>
+
+                                            </div>
+                                        )}
+
+
+                                        {/* Created At */}
+
+                                        <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4">
+
+                                            <span className="text-sm">
+                                                🕒
+                                            </span>
+
+                                            <div>
+
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                                    Created
+                                                </p>
+
+                                                <p className="mt-0.5 text-sm font-medium text-slate-600">
+                                                    {formatCreatedAt(
+                                                        question.created_at
+                                                    )}
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        {/* Actions */}
+
+                                        <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 min-[400px]:flex-row">
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleEdit(
+                                                        question
+                                                    )
+                                                }
+                                                className="flex-1 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
+                                            >
+                                                Edit
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    openDeleteModal(
+                                                        question.id
+                                                    )
+                                                }
+                                                className="flex-1 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                )
+                            )}
+
+                        </div>
+                    )}
 
             </div>
 
 
-            {/* ========================= */}
+            {/* ===================================================== */}
             {/* DELETE MODAL */}
-            {/* ========================= */}
+            {/* ===================================================== */}
 
             {showDeleteModal && (
 
@@ -1113,7 +1432,9 @@ function Questions() {
                                 onClick={
                                     closeDeleteModal
                                 }
-                                disabled={deleting}
+                                disabled={
+                                    deleting
+                                }
                                 className="w-full rounded-lg border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50 sm:w-auto sm:py-2.5"
                             >
                                 Cancel
@@ -1124,7 +1445,9 @@ function Questions() {
                                 onClick={
                                     handleDelete
                                 }
-                                disabled={deleting}
+                                disabled={
+                                    deleting
+                                }
                                 className="w-full rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2.5"
                             >
                                 {deleting
