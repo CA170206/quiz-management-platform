@@ -187,7 +187,7 @@ function Users() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-10">
+        <div className="min-h-screen bg-slate-50 px-6 pb-10 pt-24 sm:pt-28">
 
             <div className="mx-auto max-w-7xl">
 
