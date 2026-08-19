@@ -487,7 +487,7 @@ function Quizzes() {
     // =========================
 
     return (
-        <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10">
+        <div className="min-h-screen bg-slate-50 px-4 pb-10 pt-24 sm:px-6 sm:pb-10 sm:pt-28">
 
             <div className="mx-auto max-w-7xl">
 

@@ -6,6 +6,7 @@ import {
     getAdminUserById,
     updateAdminUserStatus,
     deleteAdminUser,
+    getAdminAttempts,
 } from "../controllers/adminController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -37,7 +38,6 @@ router.get(
 // USER MANAGEMENT
 // ==========================================
 
-// Get all students
 router.get(
     "/users",
     authMiddleware,
@@ -45,7 +45,6 @@ router.get(
     getAdminUsers
 );
 
-// Get single student + attempt history
 router.get(
     "/users/:id",
     authMiddleware,
@@ -53,7 +52,6 @@ router.get(
     getAdminUserById
 );
 
-// Activate / deactivate student
 router.patch(
     "/users/:id/status",
     authMiddleware,
@@ -61,12 +59,22 @@ router.patch(
     updateAdminUserStatus
 );
 
-// Delete student
 router.delete(
     "/users/:id",
     authMiddleware,
     adminOnly,
     deleteAdminUser
+);
+
+// ==========================================
+// ADMIN ATTEMPTS / RESULTS
+// ==========================================
+
+router.get(
+    "/attempts",
+    authMiddleware,
+    adminOnly,
+    getAdminAttempts
 );
 
 export default router;

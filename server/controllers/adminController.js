@@ -403,3 +403,57 @@ export const deleteAdminUser = async (req, res) => {
         client.release();
     }
 };
+
+// ==========================================
+// GET ALL QUIZ ATTEMPTS
+// ADMIN RESULTS
+// ==========================================
+
+export const getAdminAttempts = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                a.id,
+                u.full_name,
+                u.email,
+                q.title AS quiz_title,
+                a.score,
+                a.percentage,
+                a.total_questions,
+                a.correct_answers,
+                a.incorrect_answers,
+                a.unanswered,
+                a.time_taken,
+                a.submitted_at,
+                q.passing_percentage,
+
+                CASE
+                    WHEN a.percentage >= q.passing_percentage
+                    THEN true
+                    ELSE false
+                END AS passed
+
+            FROM attempts a
+
+            JOIN users u
+                ON u.id = a.user_id
+
+            JOIN quizzes q
+                ON q.id = a.quiz_id
+
+            ORDER BY a.submitted_at DESC
+        `);
+
+        res.status(200).json(result.rows);
+
+    } catch (error) {
+        console.error(
+            "Get admin attempts error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Failed to fetch attempts",
+        });
+    }
+};

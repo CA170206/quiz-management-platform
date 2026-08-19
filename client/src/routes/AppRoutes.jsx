@@ -22,6 +22,7 @@ import Quizzes from "../pages/admin/Quizzes";
 import AdminProfile from "../pages/admin/Profile";
 import AdminAnalytics from "../pages/admin/Analytics";
 import Users from "../pages/admin/Users";
+import AdminAttempts from "../pages/admin/Attempts";
 
 // Student
 import Dashboard from "../pages/student/Dashboard";
@@ -174,6 +175,11 @@ function AppContent() {
                         <Route
                             path="/admin/analytics"
                             element={<AdminAnalytics />}
+                        />
+
+                        <Route
+                            path="/admin/attempts"
+                            element={<AdminAttempts />}
                         />
                     </Route>
 

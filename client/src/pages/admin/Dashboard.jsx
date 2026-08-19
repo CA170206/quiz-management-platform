@@ -38,13 +38,16 @@ function AdminDashboard() {
                 }
 
                 setData({
-    ...result.stats,
-    popular_quizzes: result.popularQuizzes || [],
-    popular_categories: result.categories || [],
-    recent_attempts: result.recentAttempts || [],
-    attempts_over_time: result.attemptsOverTime || [],
-});
-
+                    ...result.stats,
+                    popular_quizzes:
+                        result.popularQuizzes || [],
+                    popular_categories:
+                        result.categories || [],
+                    recent_attempts:
+                        result.recentAttempts || [],
+                    attempts_over_time:
+                        result.attemptsOverTime || [],
+                });
             } catch (err) {
                 console.error(err);
                 setError(err.message);
@@ -101,26 +104,24 @@ function AdminDashboard() {
 
     const maxQuizAttempts = Math.max(
         ...(data?.popular_quizzes || []).map(
-            (item) =>
-                Number(item.attempts)
+            (item) => Number(item.attempts)
         ),
         1
     );
 
     const maxCategoryAttempts = Math.max(
         ...(data?.popular_categories || []).map(
-            (item) =>
-                Number(item.attempts)
+            (item) => Number(item.attempts)
         ),
         1
     );
 
     const maxDailyAttempts = Math.max(
-    ...(data?.attempts_over_time || []).map(
-        (item) => Number(item.attempts)
-    ),
-    1
-);
+        ...(data?.attempts_over_time || []).map(
+            (item) => Number(item.attempts)
+        ),
+        1
+    );
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -149,7 +150,6 @@ function AdminDashboard() {
 
                     </div>
 
-
                     {/* ERROR */}
 
                     {error && (
@@ -158,42 +158,38 @@ function AdminDashboard() {
                         </div>
                     )}
 
-
                     {/* STATISTICS */}
 
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-                        {statCards.map(
-                            (card) => (
-                                <div
-                                    key={card.label}
-                                    className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
-                                >
+                        {statCards.map((card) => (
+                            <div
+                                key={card.label}
+                                className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
+                            >
 
-                                    <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between">
 
-                                        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl">
-                                            {card.icon}
-                                        </span>
-
-                                    </div>
-
-                                    <p className="mt-5 text-sm text-slate-500">
-                                        {card.label}
-                                    </p>
-
-                                    <p className="mt-1 text-3xl font-bold text-slate-900">
-                                        {loading
-                                            ? "—"
-                                            : card.value}
-                                    </p>
+                                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl">
+                                        {card.icon}
+                                    </span>
 
                                 </div>
-                            )
-                        )}
+
+                                <p className="mt-5 text-sm text-slate-500">
+                                    {card.label}
+                                </p>
+
+                                <p className="mt-1 text-3xl font-bold text-slate-900">
+                                    {loading
+                                        ? "—"
+                                        : card.value}
+                                </p>
+
+                            </div>
+                        ))}
 
                     </div>
-
 
                     {/* PASS / FAIL */}
 
@@ -224,7 +220,6 @@ function AdminDashboard() {
                         </div>
 
                     </div>
-
 
                     {/* POPULAR QUIZZES */}
 
@@ -257,15 +252,11 @@ function AdminDashboard() {
                                                     <div className="flex justify-between gap-3 text-sm">
 
                                                         <span className="min-w-0 truncate font-medium text-slate-700">
-                                                            {
-                                                                quiz.title
-                                                            }
+                                                            {quiz.title}
                                                         </span>
 
                                                         <span className="shrink-0 font-semibold text-slate-900">
-                                                            {
-                                                                attempts
-                                                            }
+                                                            {attempts}
                                                         </span>
 
                                                     </div>
@@ -298,7 +289,6 @@ function AdminDashboard() {
 
                         </div>
 
-
                         {/* POPULAR CATEGORIES */}
 
                         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
@@ -328,15 +318,11 @@ function AdminDashboard() {
                                                     <div className="flex justify-between gap-3 text-sm">
 
                                                         <span className="font-medium text-slate-700">
-                                                            {
-                                                                category.name
-                                                            }
+                                                            {category.name}
                                                         </span>
 
                                                         <span className="font-semibold text-slate-900">
-                                                            {
-                                                                attempts
-                                                            }
+                                                            {attempts}
                                                         </span>
 
                                                     </div>
@@ -371,122 +357,136 @@ function AdminDashboard() {
 
                     </div>
 
-
                     {/* RECENT ACTIVITY */}
 
-<div className="mt-6 grid gap-6 lg:grid-cols-2">
+                    <div className="mt-6 grid gap-6 lg:grid-cols-2">
 
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
-        <h2 className="text-lg font-bold text-slate-900">
-            Recent Quiz Activity
-        </h2>
+                            <h2 className="text-lg font-bold text-slate-900">
+                                Recent Quiz Activity
+                            </h2>
 
-        <div className="mt-5 space-y-3">
+                            <div className="mt-5 space-y-3">
 
-            {data?.recent_attempts?.length ? (
-                data.recent_attempts.map((attempt) => (
-                    <div
-                        key={attempt.id}
-                        className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 p-3"
-                    >
-                        <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-slate-800">
-                                {attempt.full_name}
-                            </p>
+                                {data?.recent_attempts?.length ? (
+                                    data.recent_attempts.map(
+                                        (attempt) => (
+                                            <div
+                                                key={attempt.id}
+                                                className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 p-3"
+                                            >
 
-                            <p className="truncate text-xs text-slate-500">
-                                {attempt.quiz_title}
-                            </p>
-                        </div>
+                                                <div className="min-w-0">
 
-                        <div className="shrink-0 text-right">
-                            <p className="text-sm font-bold text-slate-900">
-                                {Number(attempt.percentage)}%
-                            </p>
+                                                    <p className="truncate text-sm font-semibold text-slate-800">
+                                                        {attempt.full_name}
+                                                    </p>
 
-                            <p className="text-xs text-slate-400">
-                                {attempt.submitted_at
-                                    ? new Date(
-                                          attempt.submitted_at
-                                      ).toLocaleDateString()
-                                    : ""}
-                            </p>
-                        </div>
-                    </div>
-                ))
-            ) : (
-                <p className="text-sm text-slate-500">
-                    No recent attempts.
-                </p>
-            )}
+                                                    <p className="truncate text-xs text-slate-500">
+                                                        {attempt.quiz_title}
+                                                    </p>
 
-        </div>
-    </div>
+                                                </div>
 
+                                                <div className="shrink-0 text-right">
 
-    {/* ATTEMPTS CHART */}
+                                                    <p className="text-sm font-bold text-slate-900">
+                                                        {Number(
+                                                            attempt.percentage
+                                                        )}
+                                                        %
+                                                    </p>
 
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+                                                    <p className="text-xs text-slate-400">
+                                                        {attempt.submitted_at
+                                                            ? new Date(
+                                                                  attempt.submitted_at
+                                                              ).toLocaleDateString()
+                                                            : ""}
+                                                    </p>
 
-        <h2 className="text-lg font-bold text-slate-900">
-            Attempts Over Time
-        </h2>
+                                                </div>
 
-        <div className="mt-6 flex h-56 items-end gap-3">
-
-            {(data?.attempts_over_time || [])
-                .slice()
-                .reverse()
-                .map((item) => {
-
-                    const attempts =
-                        Number(item.attempts);
-
-                    const height =
-                        Math.max(
-                            (attempts /
-                                maxDailyAttempts) *
-                                100,
-                            5
-                        );
-
-                    return (
-                        <div
-                            key={item.date}
-                            className="flex h-full flex-1 flex-col items-center justify-end"
-                        >
-                            <span className="mb-2 text-xs font-semibold text-slate-700">
-                                {attempts}
-                            </span>
-
-                            <div
-                                className="w-full max-w-10 rounded-t-lg bg-blue-600"
-                                style={{
-                                    height: `${height}%`,
-                                }}
-                            />
-
-                            <span className="mt-2 text-[10px] text-slate-400">
-                                {new Date(
-                                    item.date
-                                ).toLocaleDateString(
-                                    undefined,
-                                    {
-                                        month: "short",
-                                        day: "numeric",
-                                    }
+                                            </div>
+                                        )
+                                    )
+                                ) : (
+                                    <p className="text-sm text-slate-500">
+                                        No recent attempts.
+                                    </p>
                                 )}
-                            </span>
+
+                            </div>
+
                         </div>
-                    );
-                })}
 
-        </div>
+                        {/* ATTEMPTS CHART */}
 
-    </div>
+                        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
 
-</div>
+                            <h2 className="text-lg font-bold text-slate-900">
+                                Attempts Over Time
+                            </h2>
+
+                            <div className="mt-6 flex h-56 items-end gap-3">
+
+                                {(data?.attempts_over_time || [])
+                                    .slice()
+                                    .reverse()
+                                    .map((item) => {
+
+                                        const attempts =
+                                            Number(
+                                                item.attempts
+                                            );
+
+                                        const height =
+                                            Math.max(
+                                                (attempts /
+                                                    maxDailyAttempts) *
+                                                    100,
+                                                5
+                                            );
+
+                                        return (
+                                            <div
+                                                key={item.date}
+                                                className="flex h-full flex-1 flex-col items-center justify-end"
+                                            >
+
+                                                <span className="mb-2 text-xs font-semibold text-slate-700">
+                                                    {attempts}
+                                                </span>
+
+                                                <div
+                                                    className="w-full max-w-10 rounded-t-lg bg-blue-600"
+                                                    style={{
+                                                        height: `${height}%`,
+                                                    }}
+                                                />
+
+                                                <span className="mt-2 text-[10px] text-slate-400">
+                                                    {new Date(
+                                                        item.date
+                                                    ).toLocaleDateString(
+                                                        undefined,
+                                                        {
+                                                            month: "short",
+                                                            day: "numeric",
+                                                        }
+                                                    )}
+                                                </span>
+
+                                            </div>
+                                        );
+                                    })}
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                     {/* QUICK ACTIONS */}
 
@@ -496,7 +496,9 @@ function AdminDashboard() {
                             Quick Actions
                         </h2>
 
-                        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
+                            {/* MANAGE QUIZZES */}
 
                             <Link
                                 to="/admin/quizzes"
@@ -515,6 +517,8 @@ function AdminDashboard() {
                                 </p>
                             </Link>
 
+                            {/* MANAGE QUESTIONS */}
+
                             <Link
                                 to="/admin/questions"
                                 className="rounded-xl border border-slate-200 p-4 transition hover:bg-green-50"
@@ -531,6 +535,8 @@ function AdminDashboard() {
                                     Manage quiz questions.
                                 </p>
                             </Link>
+
+                            {/* CATEGORIES */}
 
                             <Link
                                 to="/admin/categories"
@@ -549,6 +555,8 @@ function AdminDashboard() {
                                 </p>
                             </Link>
 
+                            {/* MANAGE STUDENTS */}
+
                             <Link
                                 to="/admin/users"
                                 className="rounded-xl border border-slate-200 p-4 transition hover:bg-orange-50"
@@ -566,12 +574,33 @@ function AdminDashboard() {
                                 </p>
                             </Link>
 
+                            {/* QUIZ ATTEMPTS */}
+
+                            <Link
+                                to="/admin/attempts"
+                                className="rounded-xl border border-slate-200 p-4 transition hover:bg-yellow-50"
+                            >
+                                <span className="text-xl">
+                                    📊
+                                </span>
+
+                                <h3 className="mt-3 font-semibold text-slate-900">
+                                    Quiz Attempts
+                                </h3>
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    View student quiz results and attempts.
+                                </p>
+                            </Link>
+
                         </div>
 
                     </div>
 
                 </div>
+
             </main>
+
         </div>
     );
 }
