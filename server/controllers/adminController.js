@@ -132,3 +132,274 @@ const attemptsOverTime = await pool.query(`
         });
     }
 };
+
+// ==========================================
+// GET ALL STUDENTS
+// ADMIN USER MANAGEMENT
+// ==========================================
+
+export const getAdminUsers = async (req, res) => {
+    try {
+        const search = req.query.search || "";
+
+        const result = await pool.query(
+    `
+    SELECT
+        id,
+        full_name,
+        email,
+        role,
+        active,
+        created_at
+    FROM users
+    WHERE role = 'student'
+    AND (
+        full_name ILIKE $1
+        OR email ILIKE $1
+    )
+    ORDER BY id DESC
+    `,
+    [`%${search}%`]
+);
+
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(
+            "Get admin users error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Failed to fetch students",
+        });
+    }
+};
+
+
+// ==========================================
+// GET SINGLE STUDENT
+// + ATTEMPT HISTORY
+// ==========================================
+
+export const getAdminUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const userResult = await pool.query(
+            `
+            SELECT
+                id,
+                full_name,
+                email,
+                role,
+                created_at
+            FROM users
+            WHERE id = $1
+            AND role = 'student'
+            `,
+            [id]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                message: "Student not found",
+            });
+        }
+
+        const attemptsResult = await pool.query(
+            `
+            SELECT
+    attempts.id,
+    attempts.quiz_id,
+    quizzes.title AS quiz_title,
+    attempts.score,
+    attempts.percentage,
+    attempts.total_questions,
+    attempts.correct_answers,
+    attempts.incorrect_answers,
+    attempts.unanswered,
+    attempts.time_taken
+FROM attempts
+JOIN quizzes
+    ON attempts.quiz_id = quizzes.id
+WHERE attempts.user_id = $1
+ORDER BY attempts.id DESC
+`,
+[id]);
+
+        res.status(200).json({
+            user: userResult.rows[0],
+            attempts: attemptsResult.rows,
+        });
+    } catch (error) {
+        console.error(
+            "Get admin user error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Failed to fetch student",
+        });
+    }
+};
+
+
+// ==========================================
+// ACTIVATE / DEACTIVATE STUDENT
+// ==========================================
+
+export const updateAdminUserStatus = async (
+    req,
+    res
+) => {
+    try {
+        const { id } = req.params;
+        const { active } = req.body;
+
+        if (typeof active !== "boolean") {
+            return res.status(400).json({
+                message:
+                    "Active status must be true or false",
+            });
+        }
+
+        // Your current users table has no active column.
+        // Add it once using:
+        //
+        // ALTER TABLE users
+        // ADD COLUMN active BOOLEAN DEFAULT TRUE;
+
+        const result = await pool.query(
+            `
+            UPDATE users
+            SET active = $1
+            WHERE id = $2
+            AND role = 'student'
+            RETURNING
+                id,
+                full_name,
+                email,
+                role,
+                active,
+                created_at
+            `,
+            [active, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "Student not found",
+            });
+        }
+
+        res.status(200).json({
+            message: active
+                ? "Student activated successfully"
+                : "Student deactivated successfully",
+            user: result.rows[0],
+        });
+    } catch (error) {
+        console.error(
+            "Update user status error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Failed to update student status",
+        });
+    }
+};
+
+
+// ==========================================
+// DELETE STUDENT
+// ==========================================
+
+export const deleteAdminUser = async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+        const { id } = req.params;
+
+        await client.query("BEGIN");
+
+        const userResult = await client.query(
+            `
+            SELECT id, role
+            FROM users
+            WHERE id = $1
+            `,
+            [id]
+        );
+
+        if (userResult.rows.length === 0) {
+            await client.query("ROLLBACK");
+
+            return res.status(404).json({
+                message: "Student not found",
+            });
+        }
+
+        if (userResult.rows[0].role !== "student") {
+            await client.query("ROLLBACK");
+
+            return res.status(403).json({
+                message:
+                    "Only student accounts can be deleted",
+            });
+        }
+
+        // Delete saved answers first
+        await client.query(
+            `
+            DELETE FROM answers
+            WHERE attempt_id IN (
+                SELECT id
+                FROM attempts
+                WHERE user_id = $1
+            )
+            `,
+            [id]
+        );
+
+        // Delete attempts
+        await client.query(
+            `
+            DELETE FROM attempts
+            WHERE user_id = $1
+            `,
+            [id]
+        );
+
+        // Delete student
+        const result = await client.query(
+            `
+            DELETE FROM users
+            WHERE id = $1
+            AND role = 'student'
+            RETURNING id, full_name, email
+            `,
+            [id]
+        );
+
+        await client.query("COMMIT");
+
+        res.status(200).json({
+            message: "Student deleted successfully",
+            user: result.rows[0],
+        });
+    } catch (error) {
+        await client.query("ROLLBACK");
+
+        console.error(
+            "Delete student error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Failed to delete student",
+        });
+    } finally {
+        client.release();
+    }
+};

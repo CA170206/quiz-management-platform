@@ -9,7 +9,6 @@ import {
 import AuthPage from "../pages/auth/AuthPage";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
-import DeveloperLogin from "../pages/developer/DeveloperLogin";
 
 // Common
 import Navbar from "../components/common/Navbar";
@@ -22,6 +21,7 @@ import Categories from "../pages/admin/Categories";
 import Quizzes from "../pages/admin/Quizzes";
 import AdminProfile from "../pages/admin/Profile";
 import AdminAnalytics from "../pages/admin/Analytics";
+import Users from "../pages/admin/Users";
 
 // Student
 import Dashboard from "../pages/student/Dashboard";
@@ -39,12 +39,11 @@ import DeveloperUsers from "../pages/developer/Users";
 import DeveloperAdmins from "../pages/developer/Admins";
 import DeveloperDatabase from "../pages/developer/Database";
 import DeveloperAnalytics from "../pages/developer/Analytics";
-
+import DeveloperLogin from "../pages/developer/DeveloperLogin";
 
 function AppContent() {
     const location = useLocation();
 
-    // Pages where Navbar should NOT appear
     const publicPages = [
         "/",
         "/login",
@@ -56,22 +55,20 @@ function AppContent() {
         location.pathname
     );
 
-    // Developer pages use their own navigation
     const isDeveloperPage =
         location.pathname.startsWith("/developer");
 
     return (
         <>
-            {!isPublicPage &&
-                !isDeveloperPage &&
-                <Navbar />}
+            {!isPublicPage && !isDeveloperPage && (
+                <Navbar />
+            )}
 
             <main className="min-h-screen bg-slate-50">
-
                 <Routes>
 
                     {/* ================================= */}
-                    {/* PUBLIC / AUTHENTICATION */}
+                    {/* PUBLIC */}
                     {/* ================================= */}
 
                     <Route
@@ -89,8 +86,6 @@ function AppContent() {
                         element={<Register />}
                     />
 
-                    {/* Developer Login */}
-
                     <Route
                         path="/developer/login"
                         element={<DeveloperLogin />}
@@ -98,7 +93,7 @@ function AppContent() {
 
 
                     {/* ================================= */}
-                    {/* DEVELOPER PROTECTED ROUTES */}
+                    {/* DEVELOPER */}
                     {/* ================================= */}
 
                     <Route
@@ -108,7 +103,6 @@ function AppContent() {
                             />
                         }
                     >
-
                         <Route
                             path="/developer"
                             element={<DeveloperDashboard />}
@@ -133,12 +127,11 @@ function AppContent() {
                             path="/developer/analytics"
                             element={<DeveloperAnalytics />}
                         />
-
                     </Route>
 
 
                     {/* ================================= */}
-                    {/* ADMIN PROTECTED ROUTES */}
+                    {/* ADMIN */}
                     {/* ================================= */}
 
                     <Route
@@ -148,7 +141,6 @@ function AppContent() {
                             />
                         }
                     >
-
                         <Route
                             path="/admin/dashboard"
                             element={<AdminDashboard />}
@@ -170,6 +162,11 @@ function AppContent() {
                         />
 
                         <Route
+                            path="/admin/users"
+                            element={<Users />}
+                        />
+
+                        <Route
                             path="/admin/profile"
                             element={<AdminProfile />}
                         />
@@ -178,12 +175,11 @@ function AppContent() {
                             path="/admin/analytics"
                             element={<AdminAnalytics />}
                         />
-
                     </Route>
 
 
                     {/* ================================= */}
-                    {/* STUDENT PROTECTED ROUTES */}
+                    {/* STUDENT */}
                     {/* ================================= */}
 
                     <Route
@@ -193,7 +189,6 @@ function AppContent() {
                             />
                         }
                     >
-
                         <Route
                             path="/student/dashboard"
                             element={<Dashboard />}
@@ -233,11 +228,9 @@ function AppContent() {
                             path="/student/analytics"
                             element={<Analytics />}
                         />
-
                     </Route>
 
                 </Routes>
-
             </main>
         </>
     );
@@ -251,6 +244,5 @@ function AppRoutes() {
         </BrowserRouter>
     );
 }
-
 
 export default AppRoutes;
