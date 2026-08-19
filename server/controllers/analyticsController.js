@@ -15,12 +15,12 @@ export const getStudentAnalytics = async (req, res) => {
                 COUNT(*)::integer AS quizzes_attempted,
 
                 COALESCE(
-                    ROUND(AVG(percentage), 2),
+                    ROUND(AVG(a.percentage), 2),
                     0
                 ) AS average_score,
 
                 COALESCE(
-                    MAX(percentage),
+                    MAX(a.percentage),
                     0
                 ) AS best_score,
 
@@ -28,7 +28,7 @@ export const getStudentAnalytics = async (req, res) => {
                     ROUND(
                         (
                             COUNT(*) FILTER (
-                                WHERE percentage >= 40
+                                WHERE a.percentage >= q.passing_percentage
                             )::numeric
                             / NULLIF(COUNT(*), 0)
                         ) * 100,
@@ -38,25 +38,30 @@ export const getStudentAnalytics = async (req, res) => {
                 ) AS pass_rate,
 
                 COALESCE(
-                    SUM(correct_answers),
+                    SUM(a.correct_answers),
                     0
                 )::integer AS correct_answers,
 
                 COALESCE(
-                    SUM(incorrect_answers),
+                    SUM(a.incorrect_answers),
                     0
                 )::integer AS incorrect_answers,
 
                 COALESCE(
-                    SUM(unanswered),
+                    SUM(a.unanswered),
                     0
                 )::integer AS unanswered
 
-            FROM attempts
-            WHERE user_id = $1
+            FROM attempts a
+
+            INNER JOIN quizzes q
+                ON q.id = a.quiz_id
+
+            WHERE a.user_id = $1
             `,
             [userId]
         );
+
 
         const attemptsResult = await pool.query(
             `
@@ -87,12 +92,14 @@ export const getStudentAnalytics = async (req, res) => {
             [userId]
         );
 
+
         res.status(200).json({
             stats: statsResult.rows[0],
             attempts: attemptsResult.rows,
         });
 
     } catch (error) {
+
         console.error(
             "Student analytics error:",
             error
@@ -453,14 +460,16 @@ export const getDeveloperAnalytics = async (
                         SELECT ROUND(
                             (
                                 COUNT(*) FILTER (
-                                    WHERE percentage >= 40
+                                    WHERE a.percentage >= q.passing_percentage
                                 )::numeric
                                 /
                                 NULLIF(COUNT(*), 0)
                             ) * 100,
                             2
                         )
-                        FROM attempts
+                        FROM attempts a
+                        INNER JOIN quizzes q
+                            ON q.id = a.quiz_id
                     ),
                     0
                 ) AS pass_rate
@@ -515,6 +524,7 @@ export const getDeveloperAnalytics = async (
                     q.id,
                     q.title,
                     COUNT(a.id)::integer AS attempts,
+
                     COALESCE(
                         ROUND(
                             AVG(a.percentage),
@@ -522,15 +532,20 @@ export const getDeveloperAnalytics = async (
                         ),
                         0
                     ) AS average_score
+
                 FROM quizzes q
+
                 LEFT JOIN attempts a
                     ON a.quiz_id = q.id
+
                 GROUP BY
                     q.id,
                     q.title
+
                 ORDER BY
                     attempts DESC,
                     average_score DESC
+
                 LIMIT 10
                 `
             );
@@ -551,13 +566,18 @@ export const getDeveloperAnalytics = async (
                     a.score,
                     a.percentage,
                     a.submitted_at
+
                 FROM attempts a
+
                 INNER JOIN users u
                     ON u.id = a.user_id
+
                 INNER JOIN quizzes q
                     ON q.id = a.quiz_id
+
                 ORDER BY
                     a.submitted_at DESC
+
                 LIMIT 10
                 `
             );

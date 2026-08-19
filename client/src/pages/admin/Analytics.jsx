@@ -250,7 +250,7 @@ function Analytics() {
                         </p>
 
                         <p className="mt-2 text-xs text-slate-400">
-                            Attempts scoring 40% or higher
+                            Based on each quiz's passing percentage
                         </p>
 
                     </div>
