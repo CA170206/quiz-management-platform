@@ -3,6 +3,7 @@ import {
     Routes,
     Route,
     useLocation,
+    Navigate,
 } from "react-router-dom";
 
 // Authentication
@@ -42,6 +43,85 @@ import DeveloperDatabase from "../pages/developer/Database";
 import DeveloperAnalytics from "../pages/developer/Analytics";
 import DeveloperLogin from "../pages/developer/DeveloperLogin";
 
+
+// ==========================================
+// HOME REDIRECT
+// ==========================================
+
+function HomeRedirect() {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
+    // No saved login session
+    if (!token || !userData) {
+        return <AuthPage />;
+    }
+
+    try {
+        const user = JSON.parse(userData);
+
+        // Student
+        if (user.role === "student") {
+            return (
+                <Navigate
+                    to="/student/dashboard"
+                    replace
+                />
+            );
+        }
+
+        // Admin
+        if (user.role === "admin") {
+            return (
+                <Navigate
+                    to="/admin/dashboard"
+                    replace
+                />
+            );
+        }
+
+        // Developer
+        if (user.role === "developer") {
+            return (
+                <Navigate
+                    to="/developer"
+                    replace
+                />
+            );
+        }
+
+        // Invalid role
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
+
+        return <AuthPage />;
+
+    } catch (error) {
+
+        console.error(
+            "Stored user data error:",
+            error
+        );
+
+        // Corrupted stored data
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
+
+        return <AuthPage />;
+    }
+}
+
+
+// ==========================================
+// APP CONTENT
+// ==========================================
+
 function AppContent() {
     const location = useLocation();
 
@@ -66,6 +146,7 @@ function AppContent() {
             )}
 
             <main className="min-h-screen bg-slate-50">
+
                 <Routes>
 
                     {/* ================================= */}
@@ -74,7 +155,7 @@ function AppContent() {
 
                     <Route
                         path="/"
-                        element={<AuthPage />}
+                        element={<HomeRedirect />}
                     />
 
                     <Route
@@ -104,6 +185,7 @@ function AppContent() {
                             />
                         }
                     >
+
                         <Route
                             path="/developer"
                             element={<DeveloperDashboard />}
@@ -128,6 +210,7 @@ function AppContent() {
                             path="/developer/analytics"
                             element={<DeveloperAnalytics />}
                         />
+
                     </Route>
 
 
@@ -142,6 +225,7 @@ function AppContent() {
                             />
                         }
                     >
+
                         <Route
                             path="/admin/dashboard"
                             element={<AdminDashboard />}
@@ -181,6 +265,7 @@ function AppContent() {
                             path="/admin/attempts"
                             element={<AdminAttempts />}
                         />
+
                     </Route>
 
 
@@ -195,6 +280,7 @@ function AppContent() {
                             />
                         }
                     >
+
                         <Route
                             path="/student/dashboard"
                             element={<Dashboard />}
@@ -234,14 +320,20 @@ function AppContent() {
                             path="/student/analytics"
                             element={<Analytics />}
                         />
+
                     </Route>
 
                 </Routes>
+
             </main>
         </>
     );
 }
 
+
+// ==========================================
+// APP ROUTES
+// ==========================================
 
 function AppRoutes() {
     return (
